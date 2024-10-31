@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Logo.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Matrox.MatroxImagingLibrary">
+      <HintPath>..\..\..\..\..\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Matrox.MatroxImagingLibrary.WPF">
+      <HintPath>..\..\..\..\..\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
