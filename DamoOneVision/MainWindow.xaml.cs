@@ -27,14 +27,17 @@ namespace DamoOneVision
 		private MIL_ID MilImage = MIL.M_NULL;
 
 		private DispatcherTimer timer;
+
+		// 이미지 표시용 WriteableBitmap
+		private WriteableBitmap bitmap;
 		public MainWindow( )
 		{
 			InitializeComponent();
 
-			this.Loaded += MainWindow_Loaded;
-			this.Closing += MainWindow_Closing;
+			// 윈도우 종료 이벤트 핸들러 추가
+			this.Closing += Window_Closing;
 		}
-		private void MainWindow_Loaded( object sender, RoutedEventArgs e )
+		private void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
 			try
 			{
@@ -54,10 +57,70 @@ namespace DamoOneVision
 				timer.Interval = TimeSpan.FromMilliseconds( 33 ); // 약 30fps
 				timer.Tick += Timer_Tick;
 				timer.Start();
+
+				// 버튼 상태 변경
+				ConnectButton.IsEnabled = false;
+				DisconnectButton.IsEnabled = true;
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show( $"MIL 초기화 오류: {ex.Message}" );
+				MessageBox.Show( $"카메라 연결 오류: {ex.Message}" );
+			}
+		}
+
+		private void DisconnectButton_Click( object sender, RoutedEventArgs e )
+		{
+			DisconnectCamera();
+		}
+
+		private void DisconnectCamera( )
+		{
+			try
+			{
+				// 타이머 중지
+				if (timer != null)
+				{
+					timer.Stop();
+					timer.Tick -= Timer_Tick;
+					timer = null;
+				}
+
+				// MIL 자원 해제
+				if (MilImage != MIL.M_NULL)
+				{
+					MIL.MbufFree( MilImage );
+					MilImage = MIL.M_NULL;
+				}
+				if (MilDigitizer != MIL.M_NULL)
+				{
+					MIL.MdigFree( MilDigitizer );
+					MilDigitizer = MIL.M_NULL;
+				}
+				if (MilSystem != MIL.M_NULL)
+				{
+					MIL.MsysFree( MilSystem );
+					MilSystem = MIL.M_NULL;
+				}
+				if (MilApplication != MIL.M_NULL)
+				{
+					MIL.MappFree( MilApplication );
+					MilApplication = MIL.M_NULL;
+				}
+
+				// 이미지 초기화
+				VisionImage.Source = null;
+				bitmap = null;
+
+				// 버튼 상태 변경 (UI 스레드에서 실행)
+				Dispatcher.Invoke( ( ) =>
+				{
+					ConnectButton.IsEnabled = true;
+					DisconnectButton.IsEnabled = false;
+				} );
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show( $"카메라 연결 종료 오류: {ex.Message}" );
 			}
 		}
 
@@ -73,7 +136,7 @@ namespace DamoOneVision
 			}
 			catch (Exception ex)
 			{
-				// 예외 처리
+				// 예외 처리 (필요 시 로그 또는 메시지 표시)
 			}
 		}
 
@@ -83,6 +146,13 @@ namespace DamoOneVision
 			int width = (int)MIL.MbufInquire(MilImage, MIL.M_SIZE_X, MIL.M_NULL);
 			int height = (int)MIL.MbufInquire(MilImage, MIL.M_SIZE_Y, MIL.M_NULL);
 
+			// 첫 실행 시 WriteableBitmap 생성
+			if (bitmap == null)
+			{
+				bitmap = new WriteableBitmap( width, height, 96, 96, System.Windows.Media.PixelFormats.Gray8, null );
+				VisionImage.Source = bitmap;
+			}
+
 			// 픽셀 데이터 버퍼 생성
 			int bufferSize = width * height;
 			byte[] pixelData = new byte[bufferSize];
@@ -90,28 +160,14 @@ namespace DamoOneVision
 			// MIL 이미지 버퍼에서 픽셀 데이터 가져오기
 			MIL.MbufGet( MilImage, pixelData );
 
-			// WriteableBitmap 생성
-			WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Gray8, null);
+			// WritePixels를 사용하여 픽셀 데이터 업데이트
 			bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, width, 0 );
-
-			// 이미지 컨트롤에 표시
-			visionImage.Source = bitmap;
 		}
 
-		private void MainWindow_Closing( object sender, System.ComponentModel.CancelEventArgs e )
+		private void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			// 타이머 중지
-			timer.Stop();
-
-			// MIL 자원 해제
-			if (MilImage != MIL.M_NULL)
-				MIL.MbufFree( MilImage );
-			if (MilDigitizer != MIL.M_NULL)
-				MIL.MdigFree( MilDigitizer );
-			if (MilSystem != MIL.M_NULL)
-				MIL.MsysFree( MilSystem );
-			if (MilApplication != MIL.M_NULL)
-				MIL.MappFree( MilApplication );
+			// 애플리케이션 종료 시 카메라 연결 종료
+			DisconnectCamera();
 		}
 	}
 }
