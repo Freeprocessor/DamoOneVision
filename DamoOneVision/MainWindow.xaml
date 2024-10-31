@@ -6,11 +6,11 @@
         xmlns:local="clr-namespace:DamoOneVision"
         xmlns:milwpf="clr-namespace:Matrox.MatroxImagingLibrary.WPF;assembly=Matrox.MatroxImagingLibrary.WPF"
         mc:Ignorable="d"
-        Title="DamoOne Vision" Height="450" Width="800">
+        Title="DamoOne Vision" Height="490" Width="800">
     <Grid>
-        <Image x:Name="VisionImage" HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="345"/>
-        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="410,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click"/>
-        <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="490,64,0,0" VerticalAlignment="Top" Click="DisconnectButton_Click"/>
+        <Image x:Name="VisionImage" HorizontalAlignment="Left" Height="388" Margin="10,10,0,0" VerticalAlignment="Top" Width="655"/>
+        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="140,404,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click"/>
+        <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="210,404,0,0" VerticalAlignment="Top" Click="DisconnectButton_Click"/>
 
     </Grid>
 </Window>

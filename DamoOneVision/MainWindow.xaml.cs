@@ -43,6 +43,10 @@ namespace DamoOneVision
 			{
 				// MIL 초기화 및 자원 할당
 				MIL.MappAlloc( MIL.M_DEFAULT, ref MilApplication );
+
+				MIL.MappControl( MIL.M_ERROR, MIL.M_PRINT_DISABLE );
+				MIL.MappControl( MIL.M_ERROR, MIL.M_THROW_EXCEPTION );
+
 				MIL.MsysAlloc( MIL.M_SYSTEM_GIGE_VISION, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MilSystem );
 				MIL.MdigAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
 				MIL.MbufAlloc2d( MilSystem,
@@ -64,7 +68,13 @@ namespace DamoOneVision
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show( $"카메라 연결 오류: {ex.Message}" );
+				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
+				// 리소스 해제
+				DisconnectCamera();
+			}
+			finally
+			{
+
 			}
 		}
 
