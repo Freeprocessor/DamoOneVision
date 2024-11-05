@@ -28,6 +28,7 @@ namespace DamoOneVision.Camera
 					camera = camList[ 0 ];
 					camera.Init();
 
+					camera.AcquisitionFrameRate.Value = 30.0;
 					// 이미지 크기 가져오기
 					width = (int) camera.Width.Value;
 					height = (int) camera.Height.Value;

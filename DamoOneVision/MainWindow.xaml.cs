@@ -82,11 +82,11 @@ namespace DamoOneVision
 
 				if (camera.Connect())
 				{
-					// 타이머 설정
-					timer = new DispatcherTimer();
-					timer.Interval = TimeSpan.FromMilliseconds( 33 ); // 약 30fps
-					timer.Tick += Timer_Tick;
-					timer.Start();
+					// CancellationTokenSource 초기화
+					cts = new CancellationTokenSource();
+
+					// 이미지 캡처 Task 시작
+					captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
 
 					// 버튼 상태 변경
 					ConnectButton.IsEnabled = false;
@@ -105,6 +105,53 @@ namespace DamoOneVision
 			}
 		}
 
+		private async Task CaptureImages( CancellationToken token )
+		{
+			frameCount = 0;
+			fpsStartTime = DateTime.Now;
+			currentFps = 0;
+
+			while (!token.IsCancellationRequested)
+			{
+				try
+				{
+					// 이미지 획득
+					byte[] pixelData = camera.CaptureImage();
+
+					if (pixelData != null)
+					{
+						// UI 스레드에서 이미지 표시
+						await Dispatcher.InvokeAsync( ( ) => DisplayImage( pixelData ) );
+
+						// FPS 계산
+						frameCount++;
+						TimeSpan elapsed = DateTime.Now - fpsStartTime;
+
+						if (elapsed.TotalSeconds >= 1.0)
+						{
+							currentFps = frameCount / elapsed.TotalSeconds;
+							frameCount = 0;
+							fpsStartTime = DateTime.Now;
+
+							// FPS를 화면에 표시
+							await Dispatcher.InvokeAsync( ( ) =>
+							{
+								FpsLabel.Content = $"FPS: {currentFps:F2}";
+							} );
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					// 예외 처리
+					await Dispatcher.InvokeAsync( ( ) =>
+					{
+						MessageBox.Show( $"이미지 획득 오류: {ex.Message}" );
+					} );
+				}
+			}
+		}
+
 		private void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
 			DisconnectCamera();
@@ -114,12 +161,18 @@ namespace DamoOneVision
 		{
 			try
 			{
-				// 타이머 중지
-				if (timer != null)
+				// CancellationTokenSource 취소
+				if (cts != null)
 				{
-					timer.Stop();
-					timer.Tick -= Timer_Tick;
-					timer = null;
+					cts.Cancel();
+					cts = null;
+				}
+
+				// 캡처 Task 완료 대기
+				if (captureTask != null)
+				{
+					captureTask.Wait();
+					captureTask = null;
 				}
 
 				// 카메라 해제
@@ -132,6 +185,12 @@ namespace DamoOneVision
 				// 이미지 초기화
 				VisionImage.Source = null;
 				bitmap = null;
+
+				// FPS 레이블 초기화
+				Dispatcher.Invoke( ( ) =>
+				{
+					FpsLabel.Content = "FPS: 0";
+				} );
 
 				// 버튼 상태 변경 (UI 스레드에서 실행)
 				Dispatcher.Invoke( ( ) =>
@@ -194,8 +253,16 @@ namespace DamoOneVision
 				VisionImage.Source = bitmap;
 			}
 
-			// WritePixels를 사용하여 픽셀 데이터 업데이트
-			bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, width, 0 );
+			// WriteableBitmap의 버퍼에 직접 쓰기
+			bitmap.Lock();
+			try
+			{
+				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, width, 0 );
+			}
+			finally
+			{
+				bitmap.Unlock();
+			}
 		}
 
 		private void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
