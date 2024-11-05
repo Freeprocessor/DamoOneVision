@@ -20,12 +20,15 @@
   <ItemGroup>
     <Reference Include="Matrox.MatroxImagingLibrary">
       <HintPath>..\..\..\..\..\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Matrox.MatroxImagingLibrary.WPF">
       <HintPath>..\..\..\..\..\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.wpf.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SpinnakerNET_v140">
       <HintPath>..\..\..\..\..\Program Files\Teledyne\Spinnaker\bin64\vs2015\SpinnakerNET_v140.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
