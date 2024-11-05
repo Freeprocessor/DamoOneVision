@@ -56,8 +56,8 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			//return "Matrox"; // 또는 "Spinnaker"
-			return "Spinnaker";
+			return "Matrox"; // 또는 "Spinnaker"
+			//return "Spinnaker";
 		}
 		private void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
@@ -101,7 +101,7 @@ namespace DamoOneVision
 			{
 				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
 				// 리소스 해제
-				DisconnectCamera();
+				DisconnectCameraAsync();
 			}
 		}
 
@@ -137,9 +137,18 @@ namespace DamoOneVision
 							await Dispatcher.InvokeAsync( ( ) =>
 							{
 								FpsLabel.Content = $"FPS: {currentFps:F2}";
+								Console.WriteLine( $"FPS 업데이트: {currentFps:F2}" );
 							} );
 						}
 					}
+
+					// 작업이 취소되었는지 확인
+					token.ThrowIfCancellationRequested();
+				}
+				catch (OperationCanceledException)
+				{
+					// 작업이 취소되었음을 무시하고 루프 종료
+					break;
 				}
 				catch (Exception ex)
 				{
@@ -154,10 +163,10 @@ namespace DamoOneVision
 
 		private void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
-			DisconnectCamera();
+			DisconnectCameraAsync();
 		}
 
-		private void DisconnectCamera( )
+		private async Task DisconnectCameraAsync( )
 		{
 			try
 			{
@@ -171,7 +180,18 @@ namespace DamoOneVision
 				// 캡처 Task 완료 대기
 				if (captureTask != null)
 				{
-					captureTask.Wait();
+					try
+					{
+						await captureTask;
+					}
+					catch (OperationCanceledException)
+					{
+						// 작업이 취소되었음을 무시
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show( $"캡처 Task 오류: {ex.Message}" );
+					}
 					captureTask = null;
 				}
 
@@ -183,17 +203,15 @@ namespace DamoOneVision
 				}
 
 				// 이미지 초기화
-				VisionImage.Source = null;
-				bitmap = null;
-
-				// FPS 레이블 초기화
-				Dispatcher.Invoke( ( ) =>
+				await Dispatcher.InvokeAsync( ( ) =>
 				{
+					VisionImage.Source = null;
+					bitmap = null;
 					FpsLabel.Content = "FPS: 0";
 				} );
 
-				// 버튼 상태 변경 (UI 스레드에서 실행)
-				Dispatcher.Invoke( ( ) =>
+				// 버튼 상태 변경
+				await Dispatcher.InvokeAsync( ( ) =>
 				{
 					ConnectButton.IsEnabled = true;
 					DisconnectButton.IsEnabled = false;
@@ -268,7 +286,7 @@ namespace DamoOneVision
 		private void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
 		{
 			// 애플리케이션 종료 시 카메라 연결 종료
-			DisconnectCamera();
+			DisconnectCameraAsync();
 		}
 		private void Click( object sender, RoutedEventArgs e )
 		{
@@ -277,7 +295,7 @@ namespace DamoOneVision
 
 		private void ExitProgram( object sender, EventArgs e )
 		{
-			DisconnectCamera();
+			DisconnectCameraAsync();
 			Close();
 		}
 	}

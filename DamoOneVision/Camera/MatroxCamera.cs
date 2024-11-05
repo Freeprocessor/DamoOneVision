@@ -36,7 +36,7 @@ namespace DamoOneVision.Camera
 								ref MilImage );
 
 				// 프레임 레이트 설정 (예: 30 FPS)
-				MIL.MdigControl( MilDigitizer, MIL.M_FRAME_RATE, 30.0 );
+				//MIL.MdigControl( MilDigitizer, MIL.M_FRAME_RATE, 30.0 );
 
 				return true;
 			}

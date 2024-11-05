@@ -18,8 +18,8 @@
             <ColumnDefinition/>
 
         </Grid.ColumnDefinitions>
-        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="36,65,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click" Grid.Row="2" Grid.Column="1" Height="20" Width="48"/>
-        <Button x:Name="DisconnectButton" Content="Disconnect" Margin="120,65,0,0" VerticalAlignment="Top" Click="DisconnectButton_Click" Grid.Row="2" Grid.Column="1" Height="20" HorizontalAlignment="Left" Width="70"/>
+        <Button x:Name="ConnectButton" Content="Connect" Margin="0,0,112,10" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="48" Height="20" VerticalAlignment="Bottom"/>
+        <Button x:Name="DisconnectButton" Content="Disconnect" Margin="0,0,20,10" VerticalAlignment="Bottom" Click="DisconnectButton_Click" Grid.Row="1" Grid.Column="1" Height="20" HorizontalAlignment="Right" Width="70"/>
         <Menu Grid.Column="0" Grid.ColumnSpan="3">
             <MenuItem Height="24" Width="45">
                 <MenuItem.Header>
@@ -67,8 +67,8 @@
                 <MenuItem Header="파일생성" IsCheckable="False" Click="Click"/>
             </MenuItem>
         </Menu>
-        <Image x:Name="VisionImage" Grid.Column="1" Margin="20,40,20,20" Grid.Row="1" Grid.ColumnSpan="2"/>
-        <Label x:Name="FpsLabel" Content="FPS: 0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="577,10,0,0" Height="25" Grid.Row="1" Grid.Column="1"/>
+        <Image x:Name="VisionImage" Grid.Column="1" Margin="20,40,20,40" Grid.Row="1"/>
+        <Label x:Name="FpsLabel" Content="FPS: 0" Margin="0,10,20,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="60" Height="25" VerticalAlignment="Top"/>
 
 
     </Grid>
