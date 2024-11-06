@@ -58,7 +58,7 @@ namespace DamoOneVision
 			return "Matrox"; // 또는 "Spinnaker"
 			//return "Spinnaker";
 		}
-		private void ConnectButton_Click( object sender, RoutedEventArgs e )
+		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
 			try
 			{
@@ -72,7 +72,7 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
-				cameraManager.DisconnectAsync();
+				await cameraManager.DisconnectAsync();
 			}
 		}
 
