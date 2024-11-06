@@ -90,7 +90,7 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					int bufferSize = (int)(rawImage.Width * rawImage.Height);
+					int bufferSize = (int)(rawImage.Width * rawImage.Height * 3);
 					byte[] pixelData = new byte[bufferSize];
 
 					// 이미지 데이터 복사
