@@ -71,7 +71,6 @@
         </Menu>
         <Image x:Name="VisionImage" Grid.Column="1" Margin="20,40,20,40" Grid.Row="1"/>
         <Label x:Name="FpsLabel" Content="FPS: 0" Margin="0,10,20,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="60" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="FileLoadingButton" Content="File Loading" Click="FileLoadingButton_Click" Margin="210,0,320,10" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1" />
 
 
     </Grid>

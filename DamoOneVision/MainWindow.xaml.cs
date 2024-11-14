@@ -62,8 +62,9 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			return "Matrox"; // 또는 "Spinnaker"
-			//return "Spinnaker";
+			//return "Matrox"; // 또는 "Spinnaker"
+							 //return "Spinnaker";
+			return "USB";
 		}
 		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
@@ -149,7 +150,7 @@ namespace DamoOneVision
 
 			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
 			//TODO: 픽셀 데이터를 컬러로 변환하는 로직을 구현
-			PixelFormat pixelFormat = PixelFormats.Gray8;
+			PixelFormat pixelFormat = PixelFormats.Bgr24;
 			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
 
 			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height || bitmap.Format != pixelFormat)
@@ -254,15 +255,15 @@ namespace DamoOneVision
 			//}
 		}
 
-		private void FileLoadingButton_Click( object sender, RoutedEventArgs e )
-		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			if (openFileDialog.ShowDialog() == true)
-			{
-				// 파일 선택 후 처리 로직을 여기에 구현
-				MessageBox.Show( $"선택된 파일: {openFileDialog.FileName}" );
-			}
-		}
+		//private void FileLoadingButton_Click( object sender, RoutedEventArgs e )
+		//{
+		//	OpenFileDialog openFileDialog = new OpenFileDialog();
+		//	if (openFileDialog.ShowDialog() == true)
+		//	{
+		//		// 파일 선택 후 처리 로직을 여기에 구현
+		//		MessageBox.Show( $"선택된 파일: {openFileDialog.FileName}" );
+		//	}
+		//}
 		protected async override void OnClosed( EventArgs e )
 		{
 			base.OnClosed( e );

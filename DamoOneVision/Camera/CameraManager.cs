@@ -30,6 +30,10 @@ namespace DamoOneVision.Camera
 			{
 				camera = new SpinnakerCamera();
 			}
+			else if (cameraModel == "USB")
+			{
+				camera = new USBCamera();
+			}
 			else
 			{
 				throw new Exception( "지원되지 않는 카메라 모델입니다." );
