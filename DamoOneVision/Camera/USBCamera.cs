@@ -8,6 +8,7 @@ using System.Windows;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System.Runtime.InteropServices;
+using System.Drawing.Drawing2D;
 
 namespace DamoOneVision.Camera
 {
@@ -78,7 +79,7 @@ namespace DamoOneVision.Camera
 
 				// OpenCV Mat를 MIL 버퍼로 변환
 				byte[] imageData = ConvertMatToMilBuffer(frame);
-
+				//byte[] imageData = frame;
 				return imageData;
 			}
 
@@ -98,37 +99,57 @@ namespace DamoOneVision.Camera
 				int height = mat.Height;
 				int channels = mat.Channels();
 
+
+				//Data Type
+				int milType = 8+MIL.M_UNSIGNED;
+
+				// 픽셀 포맷 및 속성 설정
+				MIL_INT attribute = MIL.M_IMAGE + MIL.M_PROC + MIL.M_PACKED;
+
 				// MIL 버퍼 할당
-				MilImageLocal = MIL.MbufAllocColor( MilSystem, channels, width, height, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
+				//TODO 필요한 구문이 아닌 것 같으니 최적화 대상
+				if(channels == 1)
+				{
+					//gray
+					MilImageLocal = MIL.MbufAllocColor( MilSystem, channels, width, height, milType, attribute, MIL.M_NULL );
+				}
+				else if(channels ==3)
+				{
+					//color
+					attribute += MIL.M_BGR24;
+					MilImageLocal = MIL.MbufAllocColor( MilSystem, channels, width, height, milType, attribute, MIL.M_NULL );
+				}
+				else
+				{
+					Console.WriteLine( "지원하지 않는 채널 수입니다." );
+					return null;
+				}
+
+				// OpenCV Mat 데이터가 연속적인지 확인
+				if (!mat.IsContinuous())
+				{
+					mat = mat.Clone();
+				}
+
+				//MIL.MbufPut( MilImageLocal, matData );
+
 
 				// OpenCV Mat 데이터를 바이트 배열로 가져오기
 				int bufferSize = width * height * channels;
 				byte[] matData = new byte[bufferSize];
 				Marshal.Copy( mat.Data, matData, 0, bufferSize );
-
-				MIL.MbufPut( MilImageLocal, matData );
-
-				// 필요한 이미지 처리를 여기서 수행할 수 있습니다.
-				// 예를 들어, 그레이스케일 변환
-				if (MilImage != MIL.M_NULL)
-				{
-					MIL.MbufFree( MilImage );
-				}
-				//TODO: 픽셀 사이즈 계산 확인 요
 				MilImage = MIL.MbufAlloc2d( MilSystem, width, height, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
-				MIL.MimConvert( MilImageLocal, MilImage, MIL.M_RGB_TO_L );
 
-				// 처리된 이미지를 바이트 배열로 가져오기
-				int sizeByte = (int)(width * height);
-				imageData = new byte[ sizeByte ];
-				MIL.MbufGet( MilImage, imageData );
+				MIL.MbufPut( this.MilImage, matData );
+
+				imageData = matData;
 			}
 			finally
 			{
-				//if (MilImageLocal != MIL.M_NULL)
-				//{
-				//	MIL.MbufFree( MilImageLocal );
-				//}
+				if (MilImageLocal != MIL.M_NULL)
+				{
+					MIL.MbufFree( MilImageLocal );
+				}
 			}
 
 			return imageData;

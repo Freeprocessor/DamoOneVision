@@ -83,8 +83,8 @@ namespace DamoOneVision.Camera
 			if (MilPatContext != MIL.M_NULL)
 				MIL.MpatFree( MilPatContext );
 
-			if (MilTemplateImage != MIL.M_NULL)
-				MIL.MbufFree( MilTemplateImage );
+			if (MilTemplateImage != MIL.M_NULL) ;
+				//MIL.MbufFree( MilTemplateImage );
 
 			//if (MilSystem != MIL.M_NULL)
 			//	MIL.MsysFree( MilSystem );
