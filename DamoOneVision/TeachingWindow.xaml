@@ -1,0 +1,195 @@
+﻿<Window x:Class="DamoOneVision.TeachingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DamoOneVision"
+        xmlns:viewModels="clr-namespace:DamoOneVision.ViewModels"
+        xmlns:converters="clr-namespace:DamoOneVision.Converters"
+        
+        mc:Ignorable="d"
+        Title="TeachingWindow" Height="720" Width="1280">
+
+
+    <Window.DataContext>
+        <viewModels:MainViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- BoolToVisibilityConverter 리소스 등록 -->
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    </Window.Resources>
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="183*"/>
+            <ColumnDefinition Width="97*"/>
+            <ColumnDefinition Width="360*"/>
+
+        </Grid.ColumnDefinitions>
+        <!-- 이미지 표시 영역 -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2" Margin="0,0,194,0">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <!-- ItemsControl for dynamic ComboBoxes -->
+                <!-- 동적으로 추가되는 ComboBox와 관련 UI -->
+                <ItemsControl ItemsSource="{Binding ComboBoxItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5" Padding="15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Number 표시 -->
+                                    <TextBlock Text="{Binding Number}" 
+                                           FontWeight="Bold" 
+                                           FontSize="14" 
+                                           Foreground="Black"
+                                           Grid.Row="0" 
+                                           Grid.Column="0" 
+                                           VerticalAlignment="Top" 
+                                           HorizontalAlignment="Left" />
+
+                                    <!-- Delete Button -->
+                                    <Button Content="X" 
+                                            Width="20" 
+                                            Height="20" 
+                                            Grid.Row="0" 
+                                            Grid.Column="1" 
+                                            HorizontalAlignment="Right" 
+                                            VerticalAlignment="Top"
+                                            Command="{Binding DataContext.DeleteComboBoxCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" 
+                                            ToolTip="삭제" />
+                                    
+                                    <StackPanel>
+                                        <!-- ComboBox -->
+                                        <ComboBox 
+                                        Width="200" 
+                                        Margin="0,0,0,10"
+                                        ItemsSource="{Binding Options}"
+                                        SelectedItem="{Binding SelectedOption, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <!-- HSV 슬라이더 -->
+                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=HSV}">
+                                            <!-- H 슬라이더 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="HMin: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding HMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding HMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="HMax: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding HMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding HMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+
+                                            <!-- S 슬라이더 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="SMin: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding SMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding SMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="SMax: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding SMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding SMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+                                            
+                                            <!-- V 슬라이더 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="VMin: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding VMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding VMinValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="VMax: " Width="35" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding VMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                     Width="40" 
+                                                     Margin="0,0,10,0" 
+                                                     VerticalAlignment="Center"
+                                                     PreviewTextInput="NumberValidationTextBox" />
+                                                <Slider Minimum="0" Maximum="255" 
+                                                    Value="{Binding VMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                    Width="200" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Template Matching 버튼 -->
+                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=Template Matching}">
+                                            <TextBlock Text="Template Matching" FontWeight="Bold" />
+                                            <Button Content="파일 불러오기" Command="{Binding LoadFileCommand}" Margin="0,5,0,0" />
+                                        </StackPanel>
+
+                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=File Loading}">
+                                            <TextBlock Text="File Loading" FontWeight="Bold" />
+                                            <Button Content="파일 불러오기" Command="{Binding LoadFileCommand}" Margin="0,5,0,0" />
+                                        </StackPanel>
+
+                                        <!--<Separator Margin="0,10,0,10" />-->
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!-- "추가" 버튼 -->
+                <Button Content="추가" 
+                Command="{Binding AddComboBoxCommand}" 
+                Width="100" 
+                Height="30" 
+                Margin="0,10,0,0" 
+                HorizontalAlignment="Center" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 버튼들 -->
+
+        <Image x:Name="TemplateImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" Grid.ColumnSpan="2" />
+        <StackPanel Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,0,194,0">
+            <Grid>
+
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -20,6 +20,7 @@ using SpinnakerNET.GenApi;
 using DamoOneVision.Camera;
 using DamoOneVision.Data;
 using System.IO;
+using Microsoft.Win32;
 
 
 namespace DamoOneVision
@@ -31,12 +32,16 @@ namespace DamoOneVision
 	public partial class MainWindow : Window
 	{
 		//private ICamera camera;
+		//private TemplateMatcher templateMatcher;
 		private CameraManager cameraManager;
 
 		private WriteableBitmap bitmap;
 		private int frameCount = 0;
 		private DateTime fpsStartTime = DateTime.Now;
 		private double currentFps = 0;
+
+		private bool isContinuous = false; // Continuous 모드 상태
+		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
 
 		public MainWindow( )
 		{
@@ -47,6 +52,8 @@ namespace DamoOneVision
 
 			cameraManager = new CameraManager();
 			cameraManager.ImageCaptured += OnImageCaptured;
+
+			//templateMatcher = new TemplateMatcher();
 		}
 		private string DetectCameraModel( )
 		{
@@ -68,6 +75,7 @@ namespace DamoOneVision
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
+
 			}
 			catch (Exception ex)
 			{
@@ -88,6 +96,7 @@ namespace DamoOneVision
 			DisconnectButton.IsEnabled = false;
 		}
 
+		
 		private void OnImageCaptured( byte[ ] pixelData )
 		{
 			Dispatcher.Invoke( ( ) =>
@@ -109,6 +118,29 @@ namespace DamoOneVision
 				}
 			} );
 		}
+		/*
+		private void OnImageCaptured( byte[ ] pixelData )
+		{
+			Dispatcher.Invoke( ( ) =>
+			{
+				DisplayImage( pixelData );
+
+				// 템플릿 매칭 수행
+				if (templateMatcher != null)
+				{
+					double posX, posY, score;
+					templateMatcher.FindTemplate( pixelData, cameraManager.GetWidth(), cameraManager.GetHeight(), out posX, out posY, out score );
+
+					if (score > 0.8) // 임계값은 필요에 따라 조정
+					{
+						// 템플릿이 발견된 위치에 표시하거나 처리
+						Console.WriteLine( $"템플릿 발견: X={posX}, Y={posY}, Score={score}" );
+					}
+				}
+
+				// FPS 계산 코드
+			} );
+		}*/
 
 		private void DisplayImage( byte[ ] pixelData )
 		{
@@ -116,6 +148,7 @@ namespace DamoOneVision
 			int height = cameraManager.GetHeight();
 
 			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
+			//TODO: 픽셀 데이터를 컬러로 변환하는 로직을 구현
 			PixelFormat pixelFormat = PixelFormats.Gray8;
 			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
 
@@ -153,6 +186,93 @@ namespace DamoOneVision
 		private void ExitProgram( object sender, EventArgs e )
 		{
 			Application.Current.Shutdown();
+		}
+		private void ContinuousMenuItem_Checked( object sender, RoutedEventArgs e )
+		{
+			isContinuous = true;
+
+			if (cameraManager.IsConnected)
+			{
+				cameraManager.StartContinuousCapture();
+			}
+		}
+
+		private void ContinuousMenuItem_Unchecked( object sender, RoutedEventArgs e )
+		{
+			isContinuous = false;
+
+			if (cameraManager.IsConnected)
+			{
+				cameraManager.StopContinuousCapture();
+			}
+		}
+
+		private async void TriggerButton_Click( object sender, RoutedEventArgs e )
+		{
+			if (!cameraManager.IsConnected)
+			{
+				MessageBox.Show( "카메라가 연결되어 있지 않습니다." );
+				return;
+			}
+
+			if (!isContinuous && !isCapturing)
+			{
+				isCapturing = true;
+
+				try
+				{
+					// 단일 이미지 캡처
+					byte[] pixelData = await cameraManager.CaptureSingleImageAsync();
+
+					if (pixelData != null)
+					{
+						DisplayImage( pixelData );
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show( $"이미지 캡처 중 오류 발생: {ex.Message}" );
+				}
+				finally
+				{
+					isCapturing = false;
+				}
+			}
+		}
+		
+		private void TeachingButton_Click( object sender, RoutedEventArgs e )
+		{
+			// 템플릿 학습 윈도우 열기
+			TeachingWindow teachingWindow = new TeachingWindow();
+			teachingWindow.ShowDialog();
+
+			//if (teachingWindow.TemplateImageData != null)
+			//{
+				// 템플릿 학습
+				//templateMatcher.TeachTemplate( teachingWindow.TemplateImageData, teachingWindow.TemplateWidth, teachingWindow.TemplateHeight );
+			//	MessageBox.Show( "템플릿이 학습되었습니다." );
+			//}
+		}
+
+		private void FileLoadingButton_Click( object sender, RoutedEventArgs e )
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			if (openFileDialog.ShowDialog() == true)
+			{
+				// 파일 선택 후 처리 로직을 여기에 구현
+				MessageBox.Show( $"선택된 파일: {openFileDialog.FileName}" );
+			}
+		}
+		protected async override void OnClosed( EventArgs e )
+		{
+			base.OnClosed( e );
+
+			// 리소스 해제
+			//templateMatcher?.Dispose();
+			await cameraManager?.DisconnectAsync();
+
+			// MILContext 해제
+			MILContext.Instance.Dispose();
 		}
 	}
 }

@@ -18,8 +18,10 @@
             <ColumnDefinition/>
 
         </Grid.ColumnDefinitions>
-        <Button x:Name="ConnectButton" Content="Connect" Margin="0,0,112,10" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="48" Height="20" VerticalAlignment="Bottom"/>
-        <Button x:Name="DisconnectButton" Content="Disconnect" Margin="0,0,20,10" VerticalAlignment="Bottom" Click="DisconnectButton_Click" Grid.Row="1" Grid.Column="1" Height="20" HorizontalAlignment="Right" Width="70"/>
+        <Button x:Name="ConnectButton" Content="Connect" Margin="0,0,220,10" RenderTransformOrigin="1.116,0.754" Click="ConnectButton_Click" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="48" Height="20" VerticalAlignment="Bottom"/>
+        <Button x:Name="DisconnectButton" Content="Disconnect" Margin="0,0,120,10" VerticalAlignment="Bottom" Click="DisconnectButton_Click" Grid.Row="1" Grid.Column="1" Height="20" HorizontalAlignment="Right" Width="70"/>
+        <Button x:Name="TriggerButton" Content="Trigger" Margin="0,0,20,10" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Height="20" HorizontalAlignment="Right" Width="60" RenderTransformOrigin="0.929,-3.5" Click="TriggerButton_Click"/>
+        <Button x:Name="TeachingButton" Content="Teaching" Click="TeachingButton_Click" Margin="10,0,520,10" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1" />
         <Menu Grid.Column="0" Grid.ColumnSpan="3">
             <MenuItem Height="24" Width="45">
                 <MenuItem.Header>
@@ -37,7 +39,7 @@
                         VerticalAlignment="Center" HorizontalAlignment="Center" Width="31" 
                                />
                 </MenuItem.Header>
-                <MenuItem Header="파일생성" IsCheckable="False" Click="Click" />
+                <MenuItem x:Name="ContinuousMenuItem" Header="Continuous" IsCheckable="True" Checked="ContinuousMenuItem_Checked" Unchecked="ContinuousMenuItem_Unchecked" />
             </MenuItem>
             <MenuItem Height="24" Width="60">
                 <MenuItem.Header>
@@ -69,6 +71,7 @@
         </Menu>
         <Image x:Name="VisionImage" Grid.Column="1" Margin="20,40,20,40" Grid.Row="1"/>
         <Label x:Name="FpsLabel" Content="FPS: 0" Margin="0,10,20,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="60" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="FileLoadingButton" Content="File Loading" Click="FileLoadingButton_Click" Margin="210,0,320,10" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1" />
 
 
     </Grid>

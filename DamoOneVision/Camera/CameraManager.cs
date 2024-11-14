@@ -18,6 +18,8 @@ namespace DamoOneVision.Camera
 
 		public bool IsConnected { get; private set; } = false;
 
+		private bool isContinuous = false;
+
 		public void Connect( string cameraModel )
 		{
 			if (cameraModel == "Matrox")
@@ -35,8 +37,8 @@ namespace DamoOneVision.Camera
 
 			if (camera.Connect())
 			{
-				cts = new CancellationTokenSource();
-				captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
+				//cts = new CancellationTokenSource();
+				//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
 				IsConnected = true;
 			}
 			else
@@ -45,65 +47,109 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		private async Task CaptureImages( CancellationToken token )
+		public async Task DisconnectAsync( )
 		{
-			while (!token.IsCancellationRequested)
+			try
 			{
-				try
-				{
-					byte[] pixelData = camera.CaptureImage();
+				StopContinuousCapture();
 
-					if (pixelData != null)
+				if (captureTask != null)
+				{
+					try
 					{
-						// 이벤트를 통해 이미지 전달
-						ImageCaptured?.Invoke( pixelData );
+						await captureTask;
 					}
-
-					token.ThrowIfCancellationRequested();
-				}
-				catch (OperationCanceledException)
-				{
-					break;
-				}
-				catch (Exception ex)
-				{
-					// 예외 처리
-					Console.WriteLine( $"이미지 획득 오류: {ex.Message}" );
+					catch (OperationCanceledException)
+					{
+						// 작업이 취소되었음을 무시
+					}
+					captureTask = null;
 				}
 
-				// 적절한 프레임 속도를 위해 지연 시간 추가 (필요한 경우)
-				await Task.Delay( 1 );
+				if (camera != null)
+				{
+					camera.Disconnect();
+					camera = null;
+				}
+
+				IsConnected = false;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
+				throw;
 			}
 		}
 
-		public async Task DisconnectAsync( )
+
+		public async Task<byte[ ]> CaptureSingleImageAsync( )
+		{
+			if (camera == null)
+				throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
+
+			return await Task.Run( ( ) =>
+			{
+				return camera.CaptureImage();
+			} );
+		}
+
+		public void StartContinuousCapture( )
+		{
+			if (camera == null)
+				throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
+
+			if (captureTask == null || captureTask.IsCompleted)
+			{
+				isContinuous = true;
+				cts = new CancellationTokenSource();
+				captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
+			}
+		}
+
+		public void StopContinuousCapture( )
 		{
 			if (cts != null)
 			{
+				isContinuous = false;
 				cts.Cancel();
 				cts = null;
 			}
+		}
 
-			if (captureTask != null)
+		private async Task CaptureImages( CancellationToken token )
+		{
+			try
 			{
-				try
+				while (!token.IsCancellationRequested && isContinuous)
 				{
-					await captureTask;
-				}
-				catch (OperationCanceledException)
-				{
-					// 작업이 취소되었음을 무시
-				}
-				captureTask = null;
-			}
+					try
+					{
+						byte[] pixelData = camera.CaptureImage();
 
-			if (camera != null)
+						if (pixelData != null)
+						{
+							ImageCaptured?.Invoke( pixelData );
+						}
+
+						token.ThrowIfCancellationRequested();
+					}
+					catch (OperationCanceledException)
+					{
+						break;
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine( $"이미지 캡처 중 예외 발생: {ex.Message}" );
+					}
+
+					// 필요에 따라 지연 시간 추가
+					await Task.Delay( 1 );
+				}
+			}
+			catch (Exception ex)
 			{
-				camera.Disconnect();
-				camera = null;
+				Console.WriteLine( $"CaptureImages에서 예외 발생: {ex.Message}" );
 			}
-
-			IsConnected = false;
 		}
 
 		public int GetWidth( )
