@@ -95,9 +95,9 @@ namespace DamoOneVision.Camera
 
 			try
 			{
-				int width = mat.Width;
-				int height = mat.Height;
-				int channels = mat.Channels();
+				MILContext.Width = mat.Width;
+				MILContext.Height = mat.Height;
+				MILContext.NbBands = mat.Channels();
 
 
 				//Data Type
@@ -108,22 +108,24 @@ namespace DamoOneVision.Camera
 
 				// MIL 버퍼 할당
 				//TODO 필요한 구문이 아닌 것 같으니 최적화 대상
-				if(channels == 1)
+				if(MILContext.NbBands == 1)
 				{
 					//gray
-					MilImageLocal = MIL.MbufAllocColor( MilSystem, channels, width, height, milType, attribute, MIL.M_NULL );
+					MilImageLocal = MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, milType, attribute, MIL.M_NULL );
 				}
-				else if(channels ==3)
+				else if(MILContext.NbBands == 3)
 				{
 					//color
 					attribute += MIL.M_BGR24;
-					MilImageLocal = MIL.MbufAllocColor( MilSystem, channels, width, height, milType, attribute, MIL.M_NULL );
+					MilImageLocal = MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, milType, attribute, MIL.M_NULL );
 				}
 				else
 				{
 					Console.WriteLine( "지원하지 않는 채널 수입니다." );
 					return null;
 				}
+				
+
 
 				// OpenCV Mat 데이터가 연속적인지 확인
 				if (!mat.IsContinuous())
@@ -135,10 +137,11 @@ namespace DamoOneVision.Camera
 
 
 				// OpenCV Mat 데이터를 바이트 배열로 가져오기
-				int bufferSize = width * height * channels;
+				int bufferSize = mat.Width * mat.Height * mat.Channels();
 				byte[] matData = new byte[bufferSize];
 				Marshal.Copy( mat.Data, matData, 0, bufferSize );
-				MilImage = MIL.MbufAlloc2d( MilSystem, width, height, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
+				MilImage = MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
+				MILContext.DataType = 8 + MIL.M_UNSIGNED;
 
 				MIL.MbufPut( this.MilImage, matData );
 

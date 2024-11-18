@@ -15,6 +15,8 @@ namespace DamoOneVision.Camera
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
 
+
+
 		public bool Connect( )
 		{
 			// MILContext에서 MilSystem 가져오기
@@ -48,12 +50,10 @@ namespace DamoOneVision.Camera
 			if (MilImage == MIL.M_NULL)
 			{
 				// 이미지 크기 및 속성 가져오기
-				MIL_INT SizeX = 0, SizeY = 0;
-				MIL_INT NbBands = 0, DataType = 0;
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref SizeX );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref SizeY );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref NbBands );
-				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref DataType );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref MILContext.Width );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref MILContext.Height );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref MILContext.NbBands );
+				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref MILContext.DataType );
 
 				// 원하는 프레임 레이트 설정 (예: 30fps)
 				//double desiredFrameRate = 30.0;
@@ -62,7 +62,7 @@ namespace DamoOneVision.Camera
 				//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_FRAME_RATE, desiredFrameRate );
 
 				// 이미지 버퍼 할당
-				MIL.MbufAlloc2d( MilSystem, SizeX, SizeY, DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
+				MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
 			}
 
 
@@ -86,6 +86,14 @@ namespace DamoOneVision.Camera
 		public int GetHeight( )
 		{
 			return (int) MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, MIL.M_NULL );
+		}
+		public int GetNbBands( )
+		{
+			return (int) MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, MIL.M_NULL );
+		}
+		public int GetDataType( )
+		{
+			return (int) MIL.MbufInquire( MilImage, MIL.M_TYPE, MIL.M_NULL );
 		}
 	}
 }

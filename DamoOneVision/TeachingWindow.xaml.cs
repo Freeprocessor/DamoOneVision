@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using static DamoOneVision.Camera.Conversion;
+
 
 namespace DamoOneVision
 {
@@ -32,6 +34,7 @@ namespace DamoOneVision
 		private PixelFormat pixelFormat;
 		private MainViewModel _viewModel;
 
+		private Camera.Conversion _conversion;
 
 		public TeachingWindow( byte[ ] LocalPixelData, int width, int height, PixelFormat pixelFormat )
 		{
@@ -39,8 +42,21 @@ namespace DamoOneVision
 			_viewModel = DataContext as MainViewModel;
 
 			_viewModel.PixelData = LoadPixelData();
+
+			_conversion = new Camera.Conversion();
+			_conversion.ImageProcessed += Conversion_ImageProcessed;
+
 			ConversionImageDisplay( LocalPixelData, width, height, pixelFormat );
 
+		}
+
+		private void Conversion_ImageProcessed( object sender, ImageProcessedEventArgs e )
+		{
+			// UI 스레드에서 실행되도록 Dispatcher 사용
+			Dispatcher.Invoke( ( ) =>
+			{
+				ConversionImageDisplay( e.ProcessedPixelData, e.Width, e.Height, e.PixelFormat );
+			} );
 		}
 
 		private byte[ ] LoadPixelData( )
