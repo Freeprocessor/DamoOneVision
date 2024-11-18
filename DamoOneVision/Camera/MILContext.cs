@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 namespace DamoOneVision.Camera
 {
 	public class MILContext : IDisposable
+	//자원 해제를 위한 IDisposable 인터페이스 구현
+	//Dispose 메서드를 구현하여 자원을 해제
+	//비관리 자원을 명시적으로 해제할 수 있음
 	{
 		private static MILContext instance;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
-
+//ICommand 인터페이스를 간편하게 구현할 수 있도록 도와주는 도움 클래스
 namespace DamoOneVision.ViewModels
 {
 	public class RelayCommand : ICommand

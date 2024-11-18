@@ -55,9 +55,16 @@ namespace DamoOneVision.Camera
 				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref NbBands );
 				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref DataType );
 
+				// 원하는 프레임 레이트 설정 (예: 30fps)
+				//double desiredFrameRate = 30.0;
+
+				// 디지타이저의 프레임 레이트를 설정
+				//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_FRAME_RATE, desiredFrameRate );
+
 				// 이미지 버퍼 할당
 				MIL.MbufAlloc2d( MilSystem, SizeX, SizeY, DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
 			}
+
 
 			// 이미지 캡처
 			MIL.MdigGrab( MilDigitizer, MilImage );

@@ -23,13 +23,12 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="183*"/>
-            <ColumnDefinition Width="97*"/>
-            <ColumnDefinition Width="360*"/>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="457*"/>
 
         </Grid.ColumnDefinitions>
         <!-- 이미지 표시 영역 -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2" Margin="0,0,194,0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Margin="10">
                 <!-- ItemsControl for dynamic ComboBoxes -->
                 <!-- 동적으로 추가되는 ComboBox와 관련 UI -->
@@ -68,7 +67,19 @@
                                             Command="{Binding DataContext.DeleteComboBoxCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}" 
                                             ToolTip="삭제" />
-                                    
+
+                                    <Button Content="실행" 
+                                        Width="40" 
+                                        Height="20" 
+                                        Grid.Row="0" 
+                                        Grid.Column="2" 
+                                        HorizontalAlignment="Right" 
+                                        VerticalAlignment="Top"
+                                        Margin="5,0,0,0"
+                                        Command="{Binding DataContext.ConversionProcessCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding Number}" 
+                                        ToolTip="해당 번호까지 실행" />
+
                                     <StackPanel>
                                         <!-- ComboBox -->
                                         <ComboBox 
@@ -128,7 +139,7 @@
                                                     Value="{Binding SMaxValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                                     Width="200" />
                                             </StackPanel>
-                                            
+
                                             <!-- V 슬라이더 -->
                                             <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
                                                 <TextBlock Text="VMin: " Width="35" VerticalAlignment="Center" />
@@ -185,8 +196,8 @@
 
         <!-- 버튼들 -->
 
-        <Image x:Name="TemplateImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" Grid.ColumnSpan="2" />
-        <StackPanel Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,0,194,0">
+        <Image x:Name="ConversionImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" />
+        <StackPanel Orientation="Vertical">
             <Grid>
 
             </Grid>

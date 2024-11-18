@@ -24,7 +24,7 @@ namespace DamoOneVision.Camera
 		}
 
 
-		private void RunHSVThreshold( double hMin, double hMax, double sMin, double sMax, double vMin, double vMax)
+		public void RunHSVThreshold( double hMin, double hMax, double sMin, double sMax, double vMin, double vMax, byte[ ] pixelData )
 		{
 			// HSV 임계값 설정 (원하는 값으로 수정 가능)
 			//double hMin = 0.0;    // Hue 최소값
@@ -38,12 +38,13 @@ namespace DamoOneVision.Camera
 			{
 				// RGB 이미지 로드
 				// TODo: 이미지 파일 경로를 수정하세요.
-				MilImageRGB = MIL.MbufRestore( "IMG_1160.jpg", MilSystem, MIL.M_NULL );
+				//MilImageRGB = MilImage;
+				MilSystem
 
 				// 이미지 크기 및 채널 수 가져오기
-				int sizeX = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_X, MIL.M_NULL);
-				int sizeY = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_Y, MIL.M_NULL);
-				int bands = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_BAND, MIL.M_NULL);
+				//int sizeX = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_X, MIL.M_NULL);
+				//int sizeY = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_Y, MIL.M_NULL);
+				//int bands = (int)MIL.MbufInquire(MilImageRGB, MIL.M_SIZE_BAND, MIL.M_NULL);
 
 				// HSV 이미지 버퍼 할당
 				MilImageHSV = MIL.MbufAllocColor( MilSystem, bands, sizeX, sizeY, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
@@ -94,6 +95,7 @@ namespace DamoOneVision.Camera
 				if (MilImageRGB != MIL.M_NULL) MIL.MbufFree( MilImageRGB );
 				if (MilImageHSV != MIL.M_NULL) MIL.MbufFree( MilImageHSV );
 				if (MilImageBin != MIL.M_NULL) MIL.MbufFree( MilImageBin );
+				//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
 			}
 		}
 

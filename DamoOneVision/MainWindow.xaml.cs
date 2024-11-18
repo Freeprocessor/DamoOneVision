@@ -36,12 +36,17 @@ namespace DamoOneVision
 		private CameraManager cameraManager;
 
 		private WriteableBitmap bitmap;
+		private byte[ ] pixelData;
 		private int frameCount = 0;
 		private DateTime fpsStartTime = DateTime.Now;
 		private double currentFps = 0;
 
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
+
+		private int width;
+		private int height;
+		PixelFormat pixelFormat;
 
 		public MainWindow( )
 		{
@@ -62,9 +67,9 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			//return "Matrox"; // 또는 "Spinnaker"
+			return "USB"; // 또는 "Matrox"
 							 //return "Spinnaker";
-			return "USB";
+							 //return "USB";
 		}
 		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
@@ -150,6 +155,7 @@ namespace DamoOneVision
 
 			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
 			//TODO: 컬러인지 그레이인지 판별하여 PixelFormats.Gray8 또는 PixelFormats.Bgr24 선택
+			//PixelFormat pixelFormat = PixelFormats.Bgr24;
 			PixelFormat pixelFormat = PixelFormats.Bgr24;
 			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
 
@@ -163,10 +169,16 @@ namespace DamoOneVision
 			try
 			{
 				// 스트라이드 계산
+				//int stride = width * bytesPerPixel;
 				int stride = width * bytesPerPixel;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
 				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
+				this.pixelData = pixelData;
+				this.width = width;
+				this.height = height;
+				this.pixelFormat = pixelFormat;
+
 			}
 			finally
 			{
@@ -244,7 +256,12 @@ namespace DamoOneVision
 		private void TeachingButton_Click( object sender, RoutedEventArgs e )
 		{
 			// 템플릿 학습 윈도우 열기
-			TeachingWindow teachingWindow = new TeachingWindow();
+			if (this.pixelData == null)
+			{
+				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
+				return;
+			}
+			TeachingWindow teachingWindow = new TeachingWindow(this.pixelData, this.width, this.height, this.pixelFormat);
 			teachingWindow.ShowDialog();
 
 			//if (teachingWindow.TemplateImageData != null)
