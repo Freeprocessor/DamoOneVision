@@ -12,7 +12,7 @@
 
 
     <Window.DataContext>
-        <viewModels:MainViewModel />
+        <viewModels:TeachingViewModel />
     </Window.DataContext>
 
     <Window.Resources>

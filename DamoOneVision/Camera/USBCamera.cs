@@ -9,6 +9,7 @@ using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
+using System.Diagnostics;
 
 namespace DamoOneVision.Camera
 {
@@ -31,7 +32,7 @@ namespace DamoOneVision.Camera
 			capture = new VideoCapture( 0 );
 			if (!capture.IsOpened())
 			{
-				Console.WriteLine( "카메라를 열 수 없습니다." );
+				Debug.WriteLine( "카메라를 열 수 없습니다." );
 				return false;
 			}
 
@@ -73,7 +74,7 @@ namespace DamoOneVision.Camera
 				capture.Read( frame );
 				if (frame.Empty())
 				{
-					Console.WriteLine( "프레임을 읽을 수 없습니다." );
+					Debug.WriteLine( "프레임을 읽을 수 없습니다." );
 					return null;
 				}
 
@@ -89,7 +90,7 @@ namespace DamoOneVision.Camera
 		private byte[ ] ConvertMatToMilBuffer( Mat mat )
 		{
 			//Cv2.CvtColor( mat, mat, ColorConversionCodes.BGR2GRAY );
-			//Console.WriteLine( "" );
+			//Debug.WriteLine( "" );
 			MIL_ID MilImageLocal = MIL.M_NULL;
 			byte[] imageData = null;
 
@@ -121,7 +122,7 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					Console.WriteLine( "지원하지 않는 채널 수입니다." );
+					Debug.WriteLine( "지원하지 않는 채널 수입니다." );
 					return null;
 				}
 				

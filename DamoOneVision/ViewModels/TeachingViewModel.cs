@@ -11,7 +11,7 @@ using System.Windows.Input;
 namespace DamoOneVision.ViewModels
 {
 
-	public class MainViewModel
+	public class TeachingViewModel
 	{
 		//Bscking Field
 		private byte[ ] _pixelData;
@@ -40,7 +40,7 @@ namespace DamoOneVision.ViewModels
 		public ICommand DeleteComboBoxCommand { get; set; }
 		public ICommand ConversionProcessCommand { get; set; }
 
-		public MainViewModel( )
+		public TeachingViewModel( )
 		{
 			// MILContext에서 MilSystem 가져오기
 			//MilSystem = MILContext.Instance.MilSystem;
@@ -101,8 +101,7 @@ namespace DamoOneVision.ViewModels
 						switch (item.SelectedOption)
 						{
 							case "HSV":
-								Conversion conversion = new Conversion();
-								await Task.Run( ( ) => conversion.RunHSVThreshold( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ));
+								await Task.Run( ( ) => Conversion.RunHSVThreshold( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ));
 
 								break;
 							case "Template Matching":

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,7 +81,7 @@ namespace DamoOneVision.Camera
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
+				Debug.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
 				throw;
 			}
 		}
@@ -143,7 +144,7 @@ namespace DamoOneVision.Camera
 					}
 					catch (Exception ex)
 					{
-						Console.WriteLine( $"이미지 캡처 중 예외 발생: {ex.Message}" );
+						Debug.WriteLine( $"이미지 캡처 중 예외 발생: {ex.Message}" );
 					}
 
 					// 필요에 따라 지연 시간 추가
@@ -152,7 +153,7 @@ namespace DamoOneVision.Camera
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine( $"CaptureImages에서 예외 발생: {ex.Message}" );
+				Debug.WriteLine( $"CaptureImages에서 예외 발생: {ex.Message}" );
 			}
 		}
 

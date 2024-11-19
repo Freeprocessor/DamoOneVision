@@ -21,6 +21,7 @@ using DamoOneVision.Camera;
 using DamoOneVision.Data;
 using System.IO;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 
 namespace DamoOneVision
@@ -120,7 +121,7 @@ namespace DamoOneVision
 					fpsStartTime = DateTime.Now;
 
 					FpsLabel.Content = $"FPS: {currentFps:F2}";
-					Console.WriteLine( $"FPS 업데이트: {currentFps:F2}" );
+					Debug.WriteLine( $"FPS 업데이트: {currentFps:F2}" );
 				}
 			} );
 		}
@@ -140,7 +141,7 @@ namespace DamoOneVision
 					if (score > 0.8) // 임계값은 필요에 따라 조정
 					{
 						// 템플릿이 발견된 위치에 표시하거나 처리
-						Console.WriteLine( $"템플릿 발견: X={posX}, Y={posY}, Score={score}" );
+						Debug.WriteLine( $"템플릿 발견: X={posX}, Y={posY}, Score={score}" );
 					}
 				}
 
