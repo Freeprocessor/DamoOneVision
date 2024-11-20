@@ -157,7 +157,7 @@ namespace DamoOneVision
 			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
 			//TODO: 컬러인지 그레이인지 판별하여 PixelFormats.Gray8 또는 PixelFormats.Bgr24 선택
 			//PixelFormat pixelFormat = PixelFormats.Bgr24;
-			PixelFormat pixelFormat = PixelFormats.Bgr24;
+			PixelFormat pixelFormat = PixelFormats.Rgb24;
 			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
 
 			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height || bitmap.Format != pixelFormat)

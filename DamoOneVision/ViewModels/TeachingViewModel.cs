@@ -101,7 +101,7 @@ namespace DamoOneVision.ViewModels
 						switch (item.SelectedOption)
 						{
 							case "HSV":
-								await Task.Run( ( ) => Conversion.RunHSVThreshold( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ));
+								await Task.Run( ( ) => Conversion.RunHSLThreshold( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ));
 
 								break;
 							case "Template Matching":

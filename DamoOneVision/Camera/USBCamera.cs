@@ -101,6 +101,8 @@ namespace DamoOneVision.Camera
 				MILContext.NbBands = mat.Channels();
 
 
+				Cv2.CvtColor( mat, mat, ColorConversionCodes.BGR2RGB );
+
 				//Data Type
 				int milType = 8+MIL.M_UNSIGNED;
 
@@ -117,7 +119,7 @@ namespace DamoOneVision.Camera
 				else if(MILContext.NbBands == 3)
 				{
 					//color
-					attribute += MIL.M_BGR24;
+					attribute += MIL.M_RGB24;
 					MilImageLocal = MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, milType, attribute, MIL.M_NULL );
 				}
 				else
