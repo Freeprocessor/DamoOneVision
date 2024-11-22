@@ -68,7 +68,7 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			return "USB"; // 또는 "Matrox"
+			return "Matrox"; // 또는 "Matrox"
 							 //return "Spinnaker";
 							 //return "USB";
 		}
@@ -157,7 +157,7 @@ namespace DamoOneVision
 			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
 			//TODO: 컬러인지 그레이인지 판별하여 PixelFormats.Gray8 또는 PixelFormats.Bgr24 선택
 			//PixelFormat pixelFormat = PixelFormats.Bgr24;
-			PixelFormat pixelFormat = PixelFormats.Rgb24;
+			PixelFormat pixelFormat = PixelFormats.Gray16;
 			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
 
 			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height || bitmap.Format != pixelFormat)
@@ -292,6 +292,11 @@ namespace DamoOneVision
 
 			// MILContext 해제
 			MILContext.Instance.Dispose();
+		}
+
+		private void dataGrid_SelectionChanged( object sender, SelectionChangedEventArgs e )
+		{
+
 		}
 	}
 }

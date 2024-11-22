@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Logo.ico" />
   </ItemGroup>
 
@@ -35,6 +39,10 @@
     <Reference Include="SpinnakerNET_v140">
       <HintPath>..\..\..\..\..\..\..\Program Files\Teledyne\Spinnaker\bin64\vs2015\SpinnakerNET_v140.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Logo.png" />
   </ItemGroup>
 
 </Project>
