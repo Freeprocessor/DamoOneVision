@@ -38,6 +38,7 @@ namespace DamoOneVision
 
 		private WriteableBitmap bitmap;
 		private byte[ ] pixelData;
+
 		private int frameCount = 0;
 		private DateTime fpsStartTime = DateTime.Now;
 		private double currentFps = 0;
@@ -125,6 +126,7 @@ namespace DamoOneVision
 				}
 			} );
 		}
+
 		/*
 		private void OnImageCaptured( byte[ ] pixelData )
 		{

@@ -73,88 +73,80 @@ namespace DamoOneVision.Camera
 			// 이미지 캡처
 			MIL.MdigGrab( MilDigitizer, MilImage );
 
-
-			ushort[] imageData = new ushort[ MILContext.Width * MILContext.Height ];
-			MIL.MbufGet2d( MilImage, 0, 0, MILContext.Width, MILContext.Height, imageData );
-
-			ushort MinPixelValue = imageData.Min();
-			ushort MaxPixelValue = imageData.Max();
-
-			// 온도 범위 정의
-			double MinTemp = -20.0;
-			double MaxTemp = 175.0;
-			MIL_ID lutId = MIL.MbufAlloc1d(MIL.M_DEFAULT_HOST, 65536, 16 + MIL.M_UNSIGNED, MIL.M_LUT, MIL.M_NULL);
-
-
-
-			//// 픽셀 값을 온도 값으로 매핑하기 위한 스케일링 인자 계산
-			//double ScaleFactor = (MaxTemp - MinTemp) / (MaxPixelValue - MinPixelValue);
-			//double Offset = MinTemp - (MinPixelValue * ScaleFactor);
-
-			//// 픽셀 값을 온도 값으로 변환하여 8비트로 매핑
-			//byte[] imageData8Bit = new byte[MILContext.Width * MILContext.Height];
-			//for (int i = 0; i < imageData.Length; i++)
-			//{
-			//	double tempValue = imageData[i] * ScaleFactor + Offset;
-			//	// 온도 값을 0~255 범위로 스케일링
-			//	double scaledValue = ((tempValue - MinTemp) / (MaxTemp - MinTemp)) * 255.0;
-			//	// 범위를 벗어나는 값 클리핑
-			//	if (scaledValue < 0) scaledValue = 0;
-			//	if (scaledValue > 255) scaledValue = 255;
-			//	imageData8Bit[ i ] = (byte) scaledValue;
-			//}
-
-
-
-
-
-
-
-			//MIL.MimClip( MilImage, MilImage, MIL.M_INSIDE, MinTemp, MaxTemp, 0.0, 0.0 );
-			//MIL.MimArith( MilImage, MinTemp, MilImage, MIL.M_SUB_CONST );
-			//double scale = 255.0 / (MaxTemp - MinTemp);
-			//MIL.MimArith( MilImage, scale, MilImage, MIL.M_MULT_CONST );
-
-
-			//// 컬러맵 생성 및 적용 (Jet 컬러맵 사용)
-			//MIL_ID MilLut = MIL.M_NULL;
-			//MIL.MbufAllocColor( MilSystem, 3, 256, 1, 8 + MIL.M_UNSIGNED, MIL.M_LUT, ref MilLut );
-
-			//// Jet 컬러 맵 생성
-			//byte[] jetR = new byte[256];
-			//byte[] jetG = new byte[256];
-			//byte[] jetB = new byte[256];
-			//for (int i = 0; i < 256; i++)
-			//{
-			//	double value = i / 255.0;
-			//	jetR[ i ] = (byte) (255 * Math.Clamp( 1.5 - Math.Abs( 4 * (value - 0.75) ), 0, 1 ));
-			//	jetG[ i ] = (byte) (255 * Math.Clamp( 1.5 - Math.Abs( 4 * (value - 0.5) ), 0, 1 ));
-			//	jetB[ i ] = (byte) (255 * Math.Clamp( 1.5 - Math.Abs( 4 * (value - 0.25) ), 0, 1 ));
-			//}
-
-			//// LUT에 컬러 맵 데이터 설정
-			//MIL.MbufPutColor( MilLut, MIL.M_PLANAR, MIL.M_RED, jetR );
-			//MIL.MbufPutColor( MilLut, MIL.M_PLANAR, MIL.M_GREEN, jetG );
-			//MIL.MbufPutColor( MilLut, MIL.M_PLANAR, MIL.M_BLUE, jetB );
-
-			//// LUT 매핑 적용
-			//MIL.MimLutMap( MilGrayImage, MilColorImage, MilLut, MIL.M_DEFAULT );
-
-
-			// 컬러 이미지 데이터를 바이트 배열로 가져오기 (BGR24 포맷)
-			byte[] colorImageData = new byte[MILContext.Width * MILContext.Height * 3];
-			MIL.MbufGetColor( MilImageColor, MIL.M_PACKED + MIL.M_BGR24, MIL.M_ALL_BANDS, colorImageData );
+			ushort[] ushortimageData = new ushort[ MILContext.Width * MILContext.Height ];
 
 			// 이미지 데이터 가져오기
-			//MIL_INT SizeByte = 0;
+			MIL.MbufGet( MilImage, ushortimageData );
 
-			//MIL.MbufInquire( MilImage8Bit, MIL.M_SIZE_BYTE, ref SizeByte );
 
-			//byte[] imageData = new byte[SizeByte];
+			//ushort 데이터에서 최대, 최소값을 추출 
+			ushort MinPixelValue = ushortimageData.Min();
+			ushort MaxPixelValue = ushortimageData.Max();
+			//double ScaleFactor =  65535.0 * (MaxPixelValue - MinPixelValue);
 
-			//MIL.MbufGet( MilImage8Bit, imageData );
+			//최대, 최소값 기준으로 데이터값을 0~65535로 스케일링
+			for (int i=0; i < ushortimageData.Length; i++)
+			{
+				ushortimageData[ i ] = (ushort) (((double) (ushortimageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
+			}
 
-			return colorImageData;
+			
+
+			
+
+			MIL_ID MilImageScale = MIL.M_NULL;
+			// ushort 데이터를 할당할 버퍼	생성
+			MilImageScale = MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height,
+					16 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
+
+			// ushort 데이터를 버퍼에 쓰기
+			MIL.MbufPut( MilImageScale, ushortimageData );
+
+			MIL_INT SizeByte = 0;
+			//버퍼에 쓴 ushort 데이터를 byte로 변환
+			MIL.MbufInquire( MilImageScale, MIL.M_SIZE_BYTE, ref SizeByte );
+			byte[] imageData = new byte[SizeByte];
+			
+			MIL.MbufGet( MilImageScale, imageData );
+
+
+			MIL_INT offsetX = 100;
+			MIL_INT offsetY = 50;
+			MIL_INT width = 200;
+			MIL_INT height = 150;
+
+			MIL_ID MilChildImage = MIL.M_NULL;
+			MIL.MbufChild2d( MilImageScale, offsetX, offsetY, width, height, ref MilChildImage );
+
+			//템플릿 저장 테스트 코드(템플릿을 크롭했으므로 주석처리함)
+			//string filePath = @".\cropped_image.tif";
+			//MIL.MbufExport( filePath, MIL.M_TIFF, MilChildImage );
+
+			MIL.MbufFree( MilChildImage );
+
+			//Template Matching 테스트 코드
+			//위에 주석문에서 저장한 이미지를 다시 불러옴
+			MIL_ID MilTemplateImage = MIL.M_NULL;
+			string templateImagePath = @".\cropped_image.tif";
+			MIL.MbufRestore( templateImagePath, MilSystem, ref MilTemplateImage );
+
+
+			MIL_ID MilMatchContext = MIL.M_NULL;
+			MIL_ID MilMatchResult = MIL.M_NULL;
+			MIL.MpatAlloc( MilSystem, MIL.M_NORMALIZED, MIL.M_DEFAULT, ref MilMatchContext );
+			MIL.MpatAllocResult( MilSystem, MIL.M_DEFAULT, ref MilMatchResult );
+
+			// 템플릿 학습
+			MIL.MpatDefine( MilMatchContext, MIL.M_REGULAR_MODEL, MilTemplateImage, 0, 0, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_NULL );
+			MIL.MpatPreprocModel( MilMatchContext, MIL.M_DEFAULT );
+
+
+
+			MIL.MbufFree( MilImageScale );
+
+
+
+			return imageData;
 		}
 
 		public int GetWidth( )
