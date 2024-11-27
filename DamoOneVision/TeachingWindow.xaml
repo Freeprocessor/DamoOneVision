@@ -22,6 +22,11 @@
 
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="599*"/>
+
+            <RowDefinition Height="55"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="350"/>
             <ColumnDefinition Width="457*"/>
@@ -217,8 +222,8 @@
                                             </StackPanel>
 
                                         </StackPanel>
-                                        
-                                        
+
+
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -235,13 +240,17 @@
             </StackPanel>
         </ScrollViewer>
 
+        <StackPanel Margin="0,0,0,0" Grid.Row="1">
+            <Button Content="Model Load" 
+            Command="{Binding LoadModelCommand}" 
+            Width="100" Margin="5"/>
+            <Button Content="Model Save" 
+            Command="{Binding SaveModelCommand}" 
+            Width="100"/>
+        </StackPanel>
         <!-- 버튼들 -->
 
-        <Image x:Name="ConversionImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" />
-        <StackPanel Orientation="Vertical">
-            <Grid>
+        <Image x:Name="ConversionImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" Grid.RowSpan="3" />
 
-            </Grid>
-        </StackPanel>
     </Grid>
 </Window>

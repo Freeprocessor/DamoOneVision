@@ -51,16 +51,16 @@ namespace DamoOneVision.ViewModels
 		}
 
 		// HSV 슬라이더 값
-		private int _hMinValue;
-		private int _hMaxValue;
-		private int _sMinValue;
-		private int _sMaxValue;
-		private int _vMinValue;
-		private int _vMaxValue;
+		private int? _hMinValue;
+		private int? _hMaxValue;
+		private int? _sMinValue;
+		private int? _sMaxValue;
+		private int? _vMinValue;
+		private int? _vMaxValue;
 
 
 		// HValue 속성
-		public int HMinValue
+		public int? HMinValue
 		{
 			get => _hMinValue;
 			set
@@ -72,7 +72,7 @@ namespace DamoOneVision.ViewModels
 				}
 			}
 		}
-		public int HMaxValue
+		public int? HMaxValue
 		{
 			get => _hMaxValue;
 			set
@@ -85,7 +85,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		public int SMinValue
+		public int? SMinValue
 		{
 			get => _sMinValue;
 			set
@@ -97,7 +97,7 @@ namespace DamoOneVision.ViewModels
 				}
 			}
 		}
-		public int SMaxValue
+		public int? SMaxValue
 		{
 			get => _sMaxValue;
 			set
@@ -110,7 +110,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		public int VMinValue
+		public int? VMinValue
 		{
 			get => _vMinValue;
 			set
@@ -123,7 +123,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		public int VMaxValue
+		public int? VMaxValue
 		{
 			get => _vMaxValue;
 			set
@@ -159,8 +159,8 @@ namespace DamoOneVision.ViewModels
 		}
 
 		// Clip을 위한 숫자 입력 필드
-		private ushort _lowerLimit;
-		public ushort LowerLimit
+		private ushort? _lowerLimit;
+		public ushort? LowerLimit
 		{
 			get => _lowerLimit;
 			set
@@ -173,8 +173,8 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private ushort _upperLimit;
-		public ushort UpperLimit
+		private ushort? _upperLimit;
+		public ushort? UpperLimit
 		{
 			get => _upperLimit;
 			set
@@ -187,8 +187,8 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private ushort _writeLow;
-		public ushort WriteLow
+		private ushort? _writeLow;
+		public ushort? WriteLow
 		{
 			get => _writeLow;
 			set
@@ -201,8 +201,8 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private ushort _writeHigh;
-		public ushort WriteHigh
+		private ushort? _writeHigh;
+		public ushort? WriteHigh
 		{
 			get => _writeHigh;
 			set
@@ -215,14 +215,11 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		// 선택 상태를 나타내는 속성 추가
+
 		/// <summary>
 		/// Command
 		/// </summary>
-
-
-		public ICommand LoadTempleteFileCommand { get; set; }
-
-		public ICommand LoadFileCommand { get; set; }
 
 		public ComboBoxItemViewModel( )
 		{
@@ -234,6 +231,8 @@ namespace DamoOneVision.ViewModels
 				"File Loading",
 				"Clip"
 			};
+
+			SelectedProcessingOption = "선택해주세요"; // 기본 선택값 설정
 
 			ClipOptions = new ObservableCollection<string>
 			{
@@ -251,7 +250,7 @@ namespace DamoOneVision.ViewModels
 
 			SelectedClipOption = ClipOptions.FirstOrDefault(); // 기본값 설정
 
-			SelectedProcessingOption = "선택해주세요"; // 기본 선택값 설정
+
 
 			// 슬라이더 초기값 설정
 			HMinValue = 0;
@@ -260,12 +259,17 @@ namespace DamoOneVision.ViewModels
 			SMaxValue = 0;
 			VMinValue = 0;
 			VMaxValue = 0;
+			LowerLimit = 0;
+			UpperLimit = 0;
+			WriteLow = 0;
+			WriteHigh = 0;
 
 			LoadTempleteFileCommand = new RelayCommand( LoadTempleteFile, CanLoadTempleteFile );
 			LoadFileCommand = new RelayCommand( LoadFile, CanLoadFile );
 		}
 
-
+		public ICommand LoadTempleteFileCommand { get; set; }
+		public ICommand LoadFileCommand { get; set; }
 
 		private bool CanLoadTempleteFile( object parameter )
 		{

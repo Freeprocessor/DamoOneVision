@@ -1,4 +1,5 @@
 ﻿using DamoOneVision.Camera;
+using DamoOneVision.Data;
 using DamoOneVision.ViewModels;
 using Matrox.MatroxImagingLibrary;
 using Spinnaker;
@@ -8,6 +9,10 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+
+using Newtonsoft.Json;
+using System.IO;
+using DamoOneVision.Models;
 
 namespace DamoOneVision.ViewModels
 {
@@ -43,6 +48,14 @@ namespace DamoOneVision.ViewModels
 		public ICommand DeleteComboBoxCommand { get; set; }
 		public ICommand ConversionProcessCommand { get; set; }
 
+
+		//Model 저장을 위한 ICommand 추가
+
+		public ICommand SaveModelCommand { get; set; }
+		public ICommand LoadModelCommand { get; set; }
+
+		private SQLiteHelper _dbHelper;
+
 		public TeachingViewModel( )
 		{
 			// MILContext에서 MilSystem 가져오기
@@ -53,8 +66,20 @@ namespace DamoOneVision.ViewModels
 			DeleteComboBoxCommand = new RelayCommand( DeleteComboBox );
 			ConversionProcessCommand = new AsyncRelayCommand( ConversionProcessAsync, CanExecuteConversionProcess );
 
+			//Model 저장을 위한 ICommand 추가
+			SaveModelCommand = new RelayCommand( SaveModel );
+			LoadModelCommand = new RelayCommand( LoadModel );
+
 			// CollectionChanged 이벤트 핸들러 등록
 			ComboBoxItems.CollectionChanged += ComboBoxItems_CollectionChanged;
+
+			string databasePath = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+				"DamoOneVision",
+				"models.db"
+			);
+			Directory.CreateDirectory( Path.GetDirectoryName( databasePath ) );
+			_dbHelper = new SQLiteHelper( databasePath );
 		}
 
 		//CanExcute 메서드가 지정되지 않았으므로 기본적으로 이 명령은 항상 실행이 가능함
@@ -104,9 +129,9 @@ namespace DamoOneVision.ViewModels
 						switch (item.SelectedProcessingOption)
 						{
 							case "HSV":
-								Conversion.RunHSLThreshold( item.HMinValue, item.HMaxValue, 
-									item.SMinValue, item.SMaxValue, item.VMinValue, 
-									item.VMaxValue, ProcessingPixelData ) ;
+								Conversion.RunHSLThreshold( item.HMinValue ?? 0, item.HMaxValue ?? 0, 
+									item.SMinValue ?? 0, item.SMaxValue ?? 0, item.VMinValue ?? 0, 
+									item.VMaxValue ?? 0, ProcessingPixelData ) ;
 
 								break;
 							case "Template Matching":
@@ -120,8 +145,8 @@ namespace DamoOneVision.ViewModels
 								{
 									 Conversion.RunClip(
 										clipOption,
-										item.LowerLimit, item.UpperLimit,
-										item.WriteLow, item.WriteHigh,
+										item.LowerLimit ?? 0, item.UpperLimit ?? 0,
+										item.WriteLow ?? 0, item.WriteHigh ?? 0,
 										ProcessingPixelData ) ;
 								}
 								else
@@ -148,9 +173,130 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private void SaveModelData( )
+		private void SaveModel( object parameter )
 		{
+			// 모델 이름을 입력받기 위한 다이얼로그 표시
+			string modelName = ShowInputDialog("모델 이름을 입력하세요:");
+			if (string.IsNullOrEmpty( modelName ))
+			{
+				MessageBox.Show( "모델 이름이 유효하지 않습니다." );
+				return;
+			}
 
+			// 모든 ComboBoxItems를 직렬화하여 저장
+			string serializedData = JsonConvert.SerializeObject(ComboBoxItems.ToList());
+
+			// SQLiteHelper를 사용하여 데이터베이스에 저장
+			try
+			{
+				_dbHelper.SaveModel( modelName, serializedData );
+				MessageBox.Show( "모델이 성공적으로 저장되었습니다." );
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show( $"모델 저장 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+			}
+		}
+		private void LoadModel( object parameter )
+		{
+			// 데이터베이스에서 모델 목록 가져오기
+			List<ModelItem> modelList;
+			try
+			{
+				modelList = _dbHelper.GetModelList();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show( $"모델 목록을 가져오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+				return;
+			}
+
+			if (modelList.Count == 0)
+			{
+				MessageBox.Show( "저장된 모델이 없습니다." );
+				return;
+			}
+
+			// 모델 선택을 위한 다이얼로그 표시
+			int selectedModelId = ShowModelSelectionDialog(modelList);
+			if (selectedModelId == -1)
+			{
+				// 선택 취소 또는 오류
+				return;
+			}
+
+			// 선택된 모델의 데이터를 불러오기
+			string serializedData;
+			try
+			{
+				serializedData = _dbHelper.LoadModelData( selectedModelId );
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show( $"모델 데이터를 불러오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+				return;
+			}
+
+			if (string.IsNullOrEmpty( serializedData ))
+			{
+				MessageBox.Show( "모델 데이터를 불러오지 못했습니다." );
+				return;
+			}
+
+			// 직렬화된 데이터를 역직렬화하여 ComboBoxItems에 반영
+			try
+			{
+				DeserializeModelData( serializedData );
+				MessageBox.Show( "모델이 성공적으로 불러와졌습니다." );
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show( $"모델 데이터를 역직렬화하는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+			}
+		}
+
+		// 직렬화된 데이터를 역직렬화하여 ComboBoxItems에 반영
+		private void DeserializeModelData( string serializedData )
+		{
+			var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
+			if (items != null)
+			{
+				// 기존 항목을 지우고 불러온 항목으로 대체
+				ComboBoxItems.Clear();
+				foreach (var item in items)
+				{
+					// 로드된 항목의 선택 상태를 유지하거나 초기화
+					// item.IsSelected = false; // 선택 상태 초기화 원할 경우
+					ComboBoxItems.Add( item );
+				}
+				// 번호 재할당
+				for (int i = 0; i < ComboBoxItems.Count; i++)
+				{
+					ComboBoxItems[ i ].Number = i + 1;
+				}
+			}
+		}
+
+		// 사용자 입력 다이얼로그 표시 메서드
+		private string ShowInputDialog( string message )
+		{
+			InputDialog inputDialog = new InputDialog(message);
+			if (inputDialog.ShowDialog() == true)
+			{
+				return inputDialog.ResponseText;
+			}
+			return null;
+		}
+
+		// 모델 선택 다이얼로그 표시 메서드
+		private int ShowModelSelectionDialog( List<ModelItem> modelList )
+		{
+			ModelSelectionDialog selectionDialog = new ModelSelectionDialog(modelList);
+			if (selectionDialog.ShowDialog() == true)
+			{
+				return selectionDialog.SelectedModelId;
+			}
+			return -1;
 		}
 
 
