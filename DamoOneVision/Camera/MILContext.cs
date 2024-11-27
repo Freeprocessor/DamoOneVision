@@ -28,56 +28,12 @@ namespace DamoOneVision.Camera
 
 		public static MIL_INT Width;
 
-		//public static MIL_INT Width
-		//{
-		//	get
-		//	{
-		//		if (width == MIL.M_NULL)
-		//		{
-		//			return 0;
-		//		}
-		//		return width;
-		//	}
-		//}
 		public static MIL_INT Height;
 
-		//public static MIL_INT Height
-		//{
-		//	get
-		//	{
-		//		if (height == MIL.M_NULL)
-		//		{
-		//			return 0;
-		//		}
-		//		return height;
-		//	}
-		//}
 		public static MIL_INT NbBands;
 
-		//public static MIL_INT NbBands
-		//{
-		//	get
-		//	{
-		//		if (nbBands == MIL.M_NULL)
-		//		{
-		//			return 0;
-		//		}
-		//		return nbBands;
-		//	}
-		//}
 		public static MIL_INT DataType;
 
-		//public static MIL_INT DataType
-		//{
-		//	get
-		//	{
-		//		if (dataType == MIL.M_NULL)
-		//		{
-		//			return 0;
-		//		}
-		//		return dataType;
-		//	}
-		//}
 
 		// 속성 대신 필드로 선언
 		public MIL_ID MilApplication = MIL.M_NULL;

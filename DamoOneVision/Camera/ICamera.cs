@@ -11,7 +11,5 @@ namespace DamoOneVision.Camera
 		bool Connect( );
 		void Disconnect( );
 		byte[ ] CaptureImage( );
-		int GetWidth( );
-		int GetHeight( );
 	}
 }

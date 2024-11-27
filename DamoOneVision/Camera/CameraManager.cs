@@ -156,16 +156,5 @@ namespace DamoOneVision.Camera
 				Debug.WriteLine( $"CaptureImages에서 예외 발생: {ex.Message}" );
 			}
 		}
-
-		public int GetWidth( )
-		{
-			return camera?.GetWidth() ?? 0;
-		}
-
-		public int GetHeight( )
-		{
-			return camera?.GetHeight() ?? 0;
-		}
-
 	}
 }

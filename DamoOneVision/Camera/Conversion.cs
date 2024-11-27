@@ -15,11 +15,7 @@ namespace DamoOneVision.Camera
 	{
 
 		private static MIL_ID MilSystem = MIL.M_NULL;
-		//private static MIL_ID MilImageRGB = MIL.M_NULL;
-		//private static MIL_ID MilImageHSV = MIL.M_NULL;
-		//private static MIL_ID MilImageBin = MIL.M_NULL;
-		//private static MIL_ID MilMaskRGB = MIL.M_NULL;
-		//private static MIL_ID MilImageMasked = MIL.M_NULL;
+
 
 		// 이미지 처리 완료 시 발생하는 이벤트
 		//
@@ -33,9 +29,9 @@ namespace DamoOneVision.Camera
 		}
 
 
-		public static void OnImageProcessed( byte[ ] processedPixelData, int width, int height, PixelFormat pixelFormat )
+		public static void OnImageProcessed( byte[ ] processedPixelData )
 		{
-			ImageProcessed?.Invoke( null, new ImageProcessedEventArgs( processedPixelData, width, height, pixelFormat ) );
+			ImageProcessed?.Invoke( null, new ImageProcessedEventArgs( processedPixelData ) );
 		}
 
 		/*

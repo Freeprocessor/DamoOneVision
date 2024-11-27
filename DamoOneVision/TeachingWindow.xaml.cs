@@ -31,9 +31,6 @@ namespace DamoOneVision
 
 		private byte[ ] pixelData;
 		private WriteableBitmap bitmap;
-		private int width;
-		private int height;
-		private PixelFormat pixelFormat;
 		private TeachingViewModel _viewModel;
 
 
@@ -45,13 +42,10 @@ namespace DamoOneVision
 			_viewModel.RawPixelData = (byte[ ]) LocalPixelData.Clone();
 
 			this.pixelData = (byte[ ])LocalPixelData.Clone();
-			this.width = width;
-			this.height = height;
-			this.pixelFormat = pixelFormat;
 
 			Conversion.ImageProcessed += Conversion_ImageProcessed;
 			//_conversion.RunHSVThreshold( 0.0, 180.0, 0.0, 255.0, 0.0, 255.0, this.pixelData );
-			ConversionImageDisplay( LocalPixelData, width, height, pixelFormat );
+			ConversionImageDisplay( LocalPixelData );
 
 		}
 
@@ -62,7 +56,7 @@ namespace DamoOneVision
 				// UI 스레드에서 실행되도록 Dispatcher 사용
 				Dispatcher.Invoke( ( ) =>
 				{
-					ConversionImageDisplay( e.ProcessedPixelData, e.Width, e.Height, e.PixelFormat );
+					ConversionImageDisplay( e.ProcessedPixelData );
 				} );
 			}
 			catch (Exception ex)
@@ -72,14 +66,14 @@ namespace DamoOneVision
 			}
 		}
 
-		private void ConversionImageDisplay( byte[ ] LocalPixelData, int width, int height, PixelFormat pixelFormat )
+		private void ConversionImageDisplay( byte[ ] LocalPixelData )
 		{
 			this.pixelData = LocalPixelData;
-			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
+			int bytesPerPixel = (int)MILContext.DataType * (int)MILContext.NbBands / 8;
 
-			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height || bitmap.Format != pixelFormat)
+			if (bitmap == null || bitmap.PixelWidth != MILContext.Width || bitmap.PixelHeight != MILContext.Height )
 			{
-				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
+				bitmap = new WriteableBitmap( (int)MILContext.Width, (int)MILContext.Height, 96, 96, getPixelFormat(), null );
 				ConversionImage.Source = bitmap;
 			}
 
@@ -88,10 +82,10 @@ namespace DamoOneVision
 			{
 				// 스트라이드 계산
 				//int stride = width * bytesPerPixel;
-				int stride = width * bytesPerPixel;
+				int stride = (int)MILContext.Width * bytesPerPixel ;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), this.pixelData, stride, 0 );
+				bitmap.WritePixels( new Int32Rect( 0, 0, (int) MILContext.Width, (int) MILContext.Height ), this.pixelData, stride, 0 );
 			}
 			catch (Exception ex)
 			{
@@ -102,6 +96,30 @@ namespace DamoOneVision
 			{
 				bitmap.Unlock();
 			}
+		}
+
+		private static PixelFormat getPixelFormat( )
+		{
+			PixelFormat pixelFormat;
+			if (MILContext.DataType == 8 && MILContext.NbBands == 3)
+			{
+				pixelFormat = PixelFormats.Rgb24;
+			}
+			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+			{
+				pixelFormat = PixelFormats.Gray8;
+			}
+			else if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			{
+				pixelFormat = PixelFormats.Gray16;
+			}
+			else
+			{
+				pixelFormat = PixelFormats.Default;
+			}
+
+
+			return pixelFormat;
 		}
 
 		//private byte[ ] LoadPixelData( )

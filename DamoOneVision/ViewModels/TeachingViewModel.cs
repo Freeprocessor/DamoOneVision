@@ -161,7 +161,7 @@ namespace DamoOneVision.ViewModels
 						// 비동기 이미지 변환 함수 호출
 					}
 					// TODO : 처리 완료된 PixelData를 출력
-					Conversion.OnImageProcessed( ProcessingPixelData, (int) MILContext.Width, (int) MILContext.Height, PixelFormats.Gray16 );
+					Conversion.OnImageProcessed( ProcessingPixelData );
 					// 처리 완료 후 사용자에게 알림
 					//MessageBox.Show( $"1~{targetNumber}번까지의 이미지 변환이 완료되었습니다.", "변환 완료", MessageBoxButton.OK, MessageBoxImage.Information );
 				}

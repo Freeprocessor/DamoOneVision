@@ -10,16 +10,10 @@ namespace DamoOneVision.Camera
 	public class ImageProcessedEventArgs : EventArgs
 	{
 		public byte[ ] ProcessedPixelData { get; }
-		public int Width { get; }
-		public int Height { get; }
-		public PixelFormat PixelFormat { get; }
 
-		public ImageProcessedEventArgs( byte[ ] data, int width, int height, PixelFormat format )
+		public ImageProcessedEventArgs( byte[ ] data )
 		{
 			ProcessedPixelData = data;
-			Width = (int) width;
-			Height = (int) height;
-			PixelFormat = format;
 		}
 	}
 }

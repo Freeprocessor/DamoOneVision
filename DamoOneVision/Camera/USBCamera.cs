@@ -17,7 +17,7 @@ namespace DamoOneVision.Camera
 	{
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;
-		private MIL_ID MilImage = MIL.M_NULL;
+		//private MIL_ID MilImage = MIL.M_NULL;
 
 		//OpenCV 관련 필드
 		private VideoCapture capture;
@@ -58,11 +58,11 @@ namespace DamoOneVision.Camera
 			}
 
 			// MIL 리소스 해제
-			if (MilImage != MIL.M_NULL)
-			{
-				MIL.MbufFree( MilImage );
-				MilImage = MIL.M_NULL;
-			}
+			//if (MilImage != MIL.M_NULL)
+			//{
+			//	MIL.MbufFree( MilImage );
+			//	MilImage = MIL.M_NULL;
+			//}
 
 		}
 
@@ -99,12 +99,9 @@ namespace DamoOneVision.Camera
 				MILContext.Width = mat.Width;
 				MILContext.Height = mat.Height;
 				MILContext.NbBands = mat.Channels();
-
+				MILContext.DataType = 8;
 
 				Cv2.CvtColor( mat, mat, ColorConversionCodes.BGR2RGB );
-
-				//Data Type
-				int milType = 8+MIL.M_UNSIGNED;
 
 				// 픽셀 포맷 및 속성 설정
 				MIL_INT attribute = MIL.M_IMAGE + MIL.M_PROC + MIL.M_PACKED;
@@ -114,21 +111,19 @@ namespace DamoOneVision.Camera
 				if(MILContext.NbBands == 1)
 				{
 					//gray
-					MilImageLocal = MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, milType, attribute, MIL.M_NULL );
+
 				}
 				else if(MILContext.NbBands == 3)
 				{
 					//color
 					attribute += MIL.M_RGB24;
-					MilImageLocal = MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, milType, attribute, MIL.M_NULL );
 				}
 				else
 				{
 					Debug.WriteLine( "지원하지 않는 채널 수입니다." );
 					return null;
 				}
-				
-
+				MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImageLocal );
 
 				// OpenCV Mat 데이터가 연속적인지 확인
 				if (!mat.IsContinuous())
@@ -143,10 +138,6 @@ namespace DamoOneVision.Camera
 				int bufferSize = mat.Width * mat.Height * mat.Channels();
 				byte[] matData = new byte[bufferSize];
 				Marshal.Copy( mat.Data, matData, 0, bufferSize );
-				MilImage = MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
-				MILContext.DataType = 8 + MIL.M_UNSIGNED;
-
-				MIL.MbufPut( this.MilImage, matData );
 
 				imageData = matData;
 			}
@@ -159,16 +150,6 @@ namespace DamoOneVision.Camera
 			}
 
 			return imageData;
-		}
-
-		public int GetWidth( )
-		{
-			return (int) MIL.MbufInquire( MilImage, MIL.M_SIZE_X, MIL.M_NULL );
-		}
-
-		public int GetHeight( )
-		{
-			return (int) MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, MIL.M_NULL );
 		}
 	}
 }

@@ -109,15 +109,5 @@ namespace DamoOneVision.Camera
 				return null;
 			}
 		}
-
-		public int GetWidth( )
-		{
-			return width;
-		}
-
-		public int GetHeight( )
-		{
-			return height;
-		}
 	}
 }

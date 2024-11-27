@@ -32,9 +32,11 @@ namespace DamoOneVision
 			if (SelectedModelId == -1)
 			{
 				MessageBox.Show( "모델을 선택하세요." );
+				DialogResult = true;
 				return;
 			}
-			DialogResult = true;
+
 		}
+
 	}
 }

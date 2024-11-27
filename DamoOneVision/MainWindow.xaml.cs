@@ -46,9 +46,6 @@ namespace DamoOneVision
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
 
-		private int width;
-		private int height;
-		PixelFormat pixelFormat;
 
 		public MainWindow( )
 		{
@@ -69,7 +66,7 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			return "Matrox"; // 또는 "Matrox"
+			return "USB"; // 또는 "Matrox"
 							 //return "Spinnaker";
 							 //return "USB";
 		}
@@ -153,18 +150,13 @@ namespace DamoOneVision
 
 		private void DisplayImage( byte[ ] pixelData )
 		{
-			int width = cameraManager.GetWidth();
-			int height = cameraManager.GetHeight();
+			int width = (int)MILContext.Width;
+			int height = (int)MILContext.Height;
+			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
 
-			// 픽셀 포맷을 컬러로 변경 (예: Bgr24)
-			//TODO: 컬러인지 그레이인지 판별하여 PixelFormats.Gray8 또는 PixelFormats.Bgr24 선택
-			//PixelFormat pixelFormat = PixelFormats.Bgr24;
-			PixelFormat pixelFormat = PixelFormats.Gray16;
-			int bytesPerPixel = (pixelFormat.BitsPerPixel + 7) / 8;
-
-			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height || bitmap.Format != pixelFormat)
+			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height )
 			{
-				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
+				bitmap = new WriteableBitmap( width, height, 96, 96, getPixelFormat(), null );
 				VisionImage.Source = bitmap;
 			}
 
@@ -172,21 +164,40 @@ namespace DamoOneVision
 			try
 			{
 				// 스트라이드 계산
-				//int stride = width * bytesPerPixel;
 				int stride = width * bytesPerPixel;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
 				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
 				this.RawPixelData = pixelData;
-				this.width = width;
-				this.height = height;
-				this.pixelFormat = pixelFormat;
-
 			}
 			finally
 			{
 				bitmap.Unlock();
 			}
+		}
+
+		private static PixelFormat getPixelFormat()
+		{
+			PixelFormat pixelFormat;
+			if (MILContext.DataType == 8 && MILContext.NbBands == 3)
+			{
+				pixelFormat = PixelFormats.Rgb24;
+			}
+			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+			{
+				pixelFormat = PixelFormats.Gray8;
+			}
+			else if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			{
+				pixelFormat = PixelFormats.Gray16;
+			}
+			else
+			{
+				pixelFormat = PixelFormats.Default;
+			}
+
+
+			return pixelFormat;
 		}
 
 		private async void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
@@ -264,7 +275,7 @@ namespace DamoOneVision
 				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
 				return;
 			}
-			TeachingWindow teachingWindow = new TeachingWindow((byte[])this.RawPixelData.Clone(), this.width, this.height, this.pixelFormat);
+			TeachingWindow teachingWindow = new TeachingWindow((byte[])this.RawPixelData.Clone(), (int)MILContext.Width, (int)MILContext.Height, getPixelFormat());
 			teachingWindow.ShowDialog();
 
 			//if (teachingWindow.TemplateImageData != null)
@@ -296,7 +307,7 @@ namespace DamoOneVision
 			MILContext.Instance.Dispose();
 		}
 
-		private void dataGrid_SelectionChanged( object sender, SelectionChangedEventArgs e )
+		private void LoadModelButton_Click( object sender, RoutedEventArgs e )
 		{
 
 		}

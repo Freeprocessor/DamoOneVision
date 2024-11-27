@@ -28,7 +28,7 @@
                        VerticalAlignment="Center" HorizontalAlignment="Center" Width="31" 
                        />
                 </MenuItem.Header>
-                <MenuItem Header="Model" IsCheckable="False" Click="ExitProgram"/>
+                <MenuItem Header="Model Load" IsCheckable="False" Click="LoadModelButton_Click"/>
                 <MenuItem Header="Exit" IsCheckable="False" Click="ExitProgram"/>
             </MenuItem>
             <MenuItem Height="24" Width="45">

@@ -240,14 +240,17 @@
             </StackPanel>
         </ScrollViewer>
 
-        <StackPanel Margin="0,0,0,0" Grid.Row="1">
+        <Grid Margin="5" Grid.Row="1">
             <Button Content="Model Load" 
             Command="{Binding LoadModelCommand}" 
-            Width="100" Margin="5"/>
+            Width="100" Margin="205,5,35,5"/>
+            
             <Button Content="Model Save" 
             Command="{Binding SaveModelCommand}" 
-            Width="100"/>
-        </StackPanel>
+            Width="100" Margin="35,5,200,5"/>
+        </Grid>
+
+
         <!-- 버튼들 -->
 
         <Image x:Name="ConversionImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" Grid.RowSpan="3" />
