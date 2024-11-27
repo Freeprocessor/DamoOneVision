@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DamoOneVision.ViewModels
 {
@@ -14,23 +15,25 @@ namespace DamoOneVision.ViewModels
 	public class TeachingViewModel
 	{
 		//Bscking Field
-		private byte[ ] _pixelData;
-		public byte[ ] PixelData
+		private byte[ ] _processingPixelData;
+		public byte[ ] ProcessingPixelData
 		{
 			// Get 할 시에 _pixelData를 반환
-			get => _pixelData;
+			get => _processingPixelData;
 			// Set 할 시에 _pixelData에 value를 할당하고 PropertyChanged 이벤트를 호출하여 속성값이 변경되었음을 알림
 			set
 			{
-				if (_pixelData != value)
+				if (_processingPixelData != value)
 				{
 					//프라이빗 필드에 새값을 할당하여 실제 데이터를 업데이트, Value는 자동으로 생성되는 값, Gettersetter를 통해 전달된 값
-					_pixelData = value;
+					_processingPixelData = value;
 					//인터페이스의 PropertyChanged 이벤트를 호출하여 속성값이 변경되었음을 알림
-					OnPropertyChanged( nameof( PixelData ) );
+					OnPropertyChanged( nameof( ProcessingPixelData ) );
 				}
 			}
 		}
+
+		public byte[ ] RawPixelData;
 		//private MIL_ID MilSystem = MIL.M_NULL;
 		//컬랙션의 변경사항을 알리는 기능을 제공하는 네임스페이스
 		public ObservableCollection<ComboBoxItemViewModel> ComboBoxItems { get; set; }
@@ -92,16 +95,18 @@ namespace DamoOneVision.ViewModels
 			{
 				try
 				{
-					
+					ProcessingPixelData = (byte[])RawPixelData.Clone();
 					foreach (var item in ComboBoxItems)
 					{
 						if (item.Number > targetNumber)
 							break;
 
-						switch (item.SelectedOption)
+						switch (item.SelectedProcessingOption)
 						{
 							case "HSV":
-								await Task.Run( ( ) => Conversion.RunHSLThreshold( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ));
+								Conversion.RunHSLThreshold( item.HMinValue, item.HMaxValue, 
+									item.SMinValue, item.SMaxValue, item.VMinValue, 
+									item.VMaxValue, ProcessingPixelData ) ;
 
 								break;
 							case "Template Matching":
@@ -109,12 +114,29 @@ namespace DamoOneVision.ViewModels
 								//await Task.Run( ( ) => templateMatcher.FindTemplate( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ) );
 								break;
 
+							case "Clip":
+								// 문자열을 상수로 매핑
+								if (ClipOptionMapping.TryGetValue( item.SelectedClipOption, out MIL_ID clipOption ))
+								{
+									 Conversion.RunClip(
+										clipOption,
+										item.LowerLimit, item.UpperLimit,
+										item.WriteLow, item.WriteHigh,
+										ProcessingPixelData ) ;
+								}
+								else
+								{
+									// 매핑 실패 시 예외 처리 또는 기본값 설정
+									throw new Exception( "유효하지 않은 Clip 옵션입니다." );
+								}
+								break;
+
 						}
 
 						// 비동기 이미지 변환 함수 호출
-						
 					}
-
+					// TODO : 처리 완료된 PixelData를 출력
+					Conversion.OnImageProcessed( ProcessingPixelData, (int) MILContext.Width, (int) MILContext.Height, PixelFormats.Gray16 );
 					// 처리 완료 후 사용자에게 알림
 					//MessageBox.Show( $"1~{targetNumber}번까지의 이미지 변환이 완료되었습니다.", "변환 완료", MessageBoxButton.OK, MessageBoxImage.Information );
 				}
@@ -125,6 +147,18 @@ namespace DamoOneVision.ViewModels
 				}
 			}
 		}
+
+		private void SaveModelData( )
+		{
+
+		}
+
+
+		private static readonly Dictionary<string, MIL_ID> ClipOptionMapping = new Dictionary<string, MIL_ID>
+		{
+			{ "MIL.M_IN_RANGE", MIL.M_IN_RANGE },
+			{ "MIL.M_OUT_RANGE", MIL.M_OUT_RANGE },
+		};
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

@@ -85,11 +85,11 @@
                                         <ComboBox 
                                         Width="200" 
                                         Margin="0,0,0,10"
-                                        ItemsSource="{Binding Options}"
-                                        SelectedItem="{Binding SelectedOption, UpdateSourceTrigger=PropertyChanged}" />
+                                        ItemsSource="{Binding ProcessingOptions}"
+                                        SelectedItem="{Binding SelectedProcessingOption, UpdateSourceTrigger=PropertyChanged}" />
 
                                         <!-- HSV 슬라이더 -->
-                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=HSV}">
+                                        <StackPanel Visibility="{Binding SelectedProcessingOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=HSV}">
                                             <!-- H 슬라이더 -->
                                             <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
                                                 <TextBlock Text="HMin: " Width="35" VerticalAlignment="Center" />
@@ -167,17 +167,58 @@
                                         </StackPanel>
 
                                         <!-- Template Matching 버튼 -->
-                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=Template Matching}">
+                                        <StackPanel Visibility="{Binding SelectedProcessingOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=Template Matching}">
                                             <TextBlock Text="Template Matching" FontWeight="Bold" />
                                             <Button Content="파일 불러오기" Command="{Binding LoadFileCommand}" Margin="0,5,0,0" />
                                         </StackPanel>
 
-                                        <StackPanel Visibility="{Binding SelectedOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=File Loading}">
+                                        <StackPanel Visibility="{Binding SelectedProcessingOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=File Loading}">
                                             <TextBlock Text="File Loading" FontWeight="Bold" />
                                             <Button Content="파일 불러오기" Command="{Binding LoadFileCommand}" Margin="0,5,0,0" />
                                         </StackPanel>
 
                                         <!--<Separator Margin="0,10,0,10" />-->
+                                        <StackPanel Visibility="{Binding SelectedProcessingOption, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=Clip}">
+                                            <TextBlock Text="Clip" FontWeight="Bold" />
+                                            <ComboBox Width="200" Margin="0,0,0,10"
+                                                      ItemsSource="{Binding ClipOptions}"
+                                                      SelectedItem="{Binding SelectedClipOption, UpdateSourceTrigger=PropertyChanged}" />
+
+                                            <!-- XValue 입력 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="LowerLimit: " Width="80" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding LowerLimit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                         Width="40" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                         PreviewTextInput="NumberValidationTextBox" />
+                                            </StackPanel>
+
+                                            <!-- YValue 입력 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="UpperLimit: " Width="80" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding UpperLimit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                         Width="40" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                         PreviewTextInput="NumberValidationTextBox" />
+                                            </StackPanel>
+
+                                            <!-- WidthValue 입력 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="WriteLow: " Width="80" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding WriteLow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                         Width="40" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                         PreviewTextInput="NumberValidationTextBox" />
+                                            </StackPanel>
+
+                                            <!-- HeightValue 입력 -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,5" VerticalAlignment="Center">
+                                                <TextBlock Text="WriteHigh: " Width="80" VerticalAlignment="Center" />
+                                                <TextBox Text="{Binding WriteHigh, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                         Width="40" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                         PreviewTextInput="NumberValidationTextBox" />
+                                            </StackPanel>
+
+                                        </StackPanel>
+                                        
+                                        
                                     </StackPanel>
                                 </Grid>
                             </Border>

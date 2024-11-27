@@ -33,12 +33,12 @@ namespace DamoOneVision.Camera
 		}
 
 
-		private static void OnImageProcessed( byte[ ] processedPixelData, int width, int height, PixelFormat pixelFormat )
+		public static void OnImageProcessed( byte[ ] processedPixelData, int width, int height, PixelFormat pixelFormat )
 		{
 			ImageProcessed?.Invoke( null, new ImageProcessedEventArgs( processedPixelData, width, height, pixelFormat ) );
 		}
 
-
+		/*
 		//public static void RunHSVThreshold( double hMin, double hMax, double sMin, double sMax, double vMin, double vMax, byte[ ] pixelData )
 		//{
 		//	MIL_ID MilImageRGB = MIL.M_NULL;
@@ -501,6 +501,7 @@ namespace DamoOneVision.Camera
 		//		if (MilImageRGB != MIL.M_NULL) MIL.MbufFree( MilImageRGB );
 		//	}
 		//}
+		*/
 		public static void RunHSLThreshold( double hMin, double hMax, double sMin, double sMax, double lMin, double lMax, byte[ ] pixelData )
 		{
 			MIL_ID MilImageRGB = MIL.M_NULL;
@@ -636,7 +637,7 @@ namespace DamoOneVision.Camera
 				//SwapBlueAndRedChannels( maskedPixelData );
 
 				// 이벤트 발생
-				OnImageProcessed( maskedPixelData, (int) MILContext.Width, (int) MILContext.Height, PixelFormats.Rgb24 );
+				//OnImageProcessed( maskedPixelData, (int) MILContext.Width, (int) MILContext.Height, PixelFormats.Rgb24 );
 				Debug.WriteLine( "마스킹된 이미지 처리 이벤트 발생" );
 
 				// 마스킹된 이미지 버퍼 해제
@@ -653,6 +654,36 @@ namespace DamoOneVision.Camera
 				Debug.WriteLine( $"RunHSLThreshold에서 예외 발생: {ex.Message}" );
 			}
 		}
+
+
+		public static void RunClip(MIL_ID ClipType, ushort LowerLimit, ushort UpperLimit, ushort WriteLow, ushort WriteHigh, byte[ ]PixelData)
+		{
+
+			MIL_ID MilImage = MIL.M_NULL;
+
+
+			MilImage = MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height,
+					16 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC, MIL.M_NULL );
+			MIL.MbufPut( MilImage, PixelData );
+
+			try
+			{
+				MIL.MimClip( MilImage, MilImage, ClipType, LowerLimit, UpperLimit, WriteLow, WriteHigh );
+			}
+			catch(Exception ex)
+			{
+				Debug.WriteLine( $"Clip에서 예외 발생: {ex.Message}" );
+			}
+
+			MIL.MbufGet( MilImage, PixelData );
+
+			//OnImageProcessed( PixelData, (int) MILContext.Width, (int) MILContext.Height, PixelFormats.Gray16 );
+
+			MIL.MbufFree( MilImage );
+
+			Debug.WriteLine( $"RunClip 동작 완료" );
+		}
+
 
 
 		private static void CleanUp( params MIL_ID[ ] milIds )

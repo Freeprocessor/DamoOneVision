@@ -42,9 +42,9 @@ namespace DamoOneVision
 			InitializeComponent();
 			_viewModel = DataContext as TeachingViewModel;
 
-			_viewModel.PixelData = LocalPixelData;
+			_viewModel.RawPixelData = (byte[ ]) LocalPixelData.Clone();
 
-			this.pixelData = LocalPixelData;
+			this.pixelData = (byte[ ])LocalPixelData.Clone();
 			this.width = width;
 			this.height = height;
 			this.pixelFormat = pixelFormat;
@@ -104,10 +104,10 @@ namespace DamoOneVision
 			}
 		}
 
-		private byte[ ] LoadPixelData( )
-		{
-			return this.pixelData;
-		}
+		//private byte[ ] LoadPixelData( )
+		//{
+		//	return this.RawPixelData;
+		//}
 		// 숫자만 입력할 수 있도록 하는 이벤트 핸들러
 		private void NumberValidationTextBox( object sender, TextCompositionEventArgs e )
 		{

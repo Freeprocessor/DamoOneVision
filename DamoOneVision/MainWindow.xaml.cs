@@ -37,7 +37,7 @@ namespace DamoOneVision
 		private CameraManager cameraManager;
 
 		private WriteableBitmap bitmap;
-		private byte[ ] pixelData;
+		private byte[ ] RawPixelData;
 
 		private int frameCount = 0;
 		private DateTime fpsStartTime = DateTime.Now;
@@ -177,7 +177,7 @@ namespace DamoOneVision
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
 				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
-				this.pixelData = pixelData;
+				this.RawPixelData = pixelData;
 				this.width = width;
 				this.height = height;
 				this.pixelFormat = pixelFormat;
@@ -259,12 +259,12 @@ namespace DamoOneVision
 		private void TeachingButton_Click( object sender, RoutedEventArgs e )
 		{
 			// 템플릿 학습 윈도우 열기
-			if (this.pixelData == null)
+			if (this.RawPixelData == null)
 			{
 				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
 				return;
 			}
-			TeachingWindow teachingWindow = new TeachingWindow(this.pixelData, this.width, this.height, this.pixelFormat);
+			TeachingWindow teachingWindow = new TeachingWindow((byte[])this.RawPixelData.Clone(), this.width, this.height, this.pixelFormat);
 			teachingWindow.ShowDialog();
 
 			//if (teachingWindow.TemplateImageData != null)
