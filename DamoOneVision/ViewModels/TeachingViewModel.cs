@@ -168,7 +168,7 @@ namespace DamoOneVision.ViewModels
 				catch (Exception ex)
 				{
 					// 예외 발생 시 사용자에게 알림
-					//MessageBox.Show( $"이미지 변환 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+					MessageBox.Show( $"이미지 변환 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
 				}
 			}
 		}

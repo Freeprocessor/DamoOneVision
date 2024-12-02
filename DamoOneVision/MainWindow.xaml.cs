@@ -22,6 +22,9 @@ using DamoOneVision.Data;
 using System.IO;
 using Microsoft.Win32;
 using System.Diagnostics;
+using DamoOneVision.Models;
+using DamoOneVision.ViewModels;
+using Newtonsoft.Json;
 
 
 namespace DamoOneVision
@@ -46,6 +49,9 @@ namespace DamoOneVision
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
 
+		// SQLiteHelper를 위한 필드 추가
+		private SQLiteHelper dbHelper;
+
 
 		public MainWindow( )
 		{
@@ -56,6 +62,14 @@ namespace DamoOneVision
 
 			cameraManager = new CameraManager();
 			cameraManager.ImageCaptured += OnImageCaptured;
+
+			string databasePath = System.IO.Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+				"DamoOneVision",
+				"models.db"
+			);
+			Directory.CreateDirectory( System.IO.Path.GetDirectoryName( databasePath ) );
+			dbHelper = new SQLiteHelper( databasePath );
 
 			//templateMatcher = new TemplateMatcher();
 		}
@@ -295,6 +309,49 @@ namespace DamoOneVision
 		//		MessageBox.Show( $"선택된 파일: {openFileDialog.FileName}" );
 		//	}
 		//}
+
+
+		private void LoadModelButton_Click( object sender, RoutedEventArgs e )
+		{
+			// 데이터베이스에서 모델 리스트 가져오기
+			List<ModelItem> modelList = dbHelper.GetModelList();
+
+			// ModelSelectionDialog 생성 및 표시
+			ModelSelectionDialog dialog = new ModelSelectionDialog(modelList);
+			bool? result = dialog.ShowDialog();
+
+			if (result == true)
+			{
+				int selectedModelId = dialog.SelectedModelId;
+				if (selectedModelId != -1)
+				{
+					// 모델 데이터 로드
+					string modelData = dbHelper.LoadModelData(selectedModelId);
+
+					// 모델 데이터 처리
+					LoadModel( modelData );
+				}
+				else
+				{
+					MessageBox.Show( "모델이 선택되지 않았습니다." );
+				}
+			}
+		}
+
+		private void LoadModel( string modelData )
+		{
+			// 여기에 모델 로딩 로직을 구현하세요
+			DeserializeModelData( modelData );
+			MessageBox.Show( "모델이 로드되었습니다: " + modelData );
+
+			// 예를 들어, modelData를 역직렬화하여 애플리케이션의 상태나 설정에 적용할 수 있습니다.
+		}
+
+		private void DeserializeModelData( string serializedData )
+		{
+			var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
+		}
+
 		protected async override void OnClosed( EventArgs e )
 		{
 			base.OnClosed( e );
@@ -305,11 +362,6 @@ namespace DamoOneVision
 
 			// MILContext 해제
 			MILContext.Instance.Dispose();
-		}
-
-		private void LoadModelButton_Click( object sender, RoutedEventArgs e )
-		{
-
 		}
 	}
 }

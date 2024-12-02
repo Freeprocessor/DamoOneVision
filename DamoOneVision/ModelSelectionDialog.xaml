@@ -9,10 +9,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox ItemsSource="{Binding ModelList}" 
+        <ListBox x:Name="ModelListBox"
+                 ItemsSource="{Binding ModelList}" 
                  DisplayMemberPath="Name" 
                  SelectedValuePath="Id"
-                 SelectedValue="{Binding SelectedModelId, Mode=TwoWay}" />
+                 SelectedValue="{Binding SelectedModelId, Mode=TwoWay}"
+                 SelectionChanged="ModelListBox_SelectionChanged"/>
 
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Right" 
