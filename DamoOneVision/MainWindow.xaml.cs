@@ -80,7 +80,7 @@ namespace DamoOneVision
 			// 또는 연결된 카메라를 검색하여 모델명 확인
 
 			// 예시로 수동 설정
-			return "USB"; // 또는 "Matrox"
+			return "Matrox"; // 또는 "Matrox"
 							 //return "Spinnaker";
 							 //return "USB";
 		}
@@ -170,7 +170,8 @@ namespace DamoOneVision
 
 			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height )
 			{
-				bitmap = new WriteableBitmap( width, height, 96, 96, getPixelFormat(), null );
+				PixelFormat pixelFormat = getPixelFormat();
+				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
 				VisionImage.Source = bitmap;
 			}
 

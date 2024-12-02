@@ -63,14 +63,17 @@ namespace DamoOneVision.Camera
 			MIL.MdigGrab( MilDigitizer, MilImage );
 
 			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
-			ushort [] ushortScaleImageData = MilImageShortScale(MilImage);
-			// Scale된 이미지 데이터 Buffer에 전송
-			MIL.MbufPut( MilImage, ushortScaleImageData );
+			if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			{
+				ushort [] ushortScaleImageData = MilImageShortScale(MilImage);
+				// Scale된 이미지 데이터 Buffer에 전송
+				MIL.MbufPut( MilImage, ushortScaleImageData );
+			}
 
 
 			// Scale된 이미지 데이터를 byte로 변환
 			// TODO : 어떻게 사용할건지 확인해야함
-			byte [] byteImageData = ShortToByte(ushortScaleImageData);
+			//byte [] byteImageData = ShortToByte(ushortScaleImageData);
 
 
 			MIL_INT SizeByte = 0;

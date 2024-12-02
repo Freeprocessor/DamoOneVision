@@ -127,7 +127,7 @@ namespace DamoOneVision.ViewModels
 							break;
 
 						switch (item.SelectedProcessingOption)
-						{
+						{ 
 							case "HSV":
 								Conversion.RunHSLThreshold( item.HMinValue ?? 0, item.HMaxValue ?? 0, 
 									item.SMinValue ?? 0, item.SMaxValue ?? 0, item.VMinValue ?? 0, 
