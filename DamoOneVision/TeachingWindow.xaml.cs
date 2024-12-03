@@ -33,7 +33,8 @@ namespace DamoOneVision
 		private WriteableBitmap bitmap;
 		private TeachingViewModel _viewModel;
 
-
+		private AdornerLayer adornerLayer;
+		private SelectionAdorner selectionAdorner;
 		private System.Windows.Point startPoint;
 		private bool isDragging = false;
 
@@ -48,7 +49,6 @@ namespace DamoOneVision
 			this.pixelData = (byte[ ])LocalPixelData.Clone();
 
 			Conversion.ImageProcessed += Conversion_ImageProcessed;
-			//_conversion.RunHSVThreshold( 0.0, 180.0, 0.0, 255.0, 0.0, 255.0, this.pixelData );
 			ConversionImageDisplay( LocalPixelData );
 
 		}
@@ -126,10 +126,6 @@ namespace DamoOneVision
 			return pixelFormat;
 		}
 
-		//private byte[ ] LoadPixelData( )
-		//{
-		//	return this.RawPixelData;
-		//}
 		// 숫자만 입력할 수 있도록 하는 이벤트 핸들러
 		private void NumberValidationTextBox( object sender, TextCompositionEventArgs e )
 		{
@@ -141,33 +137,44 @@ namespace DamoOneVision
 		{
 			if (ConversionImage.Source != null)
 			{
+				// 마우스 캡처
+				ConversionImage.CaptureMouse();
+
+				// 시작 점 저장
 				startPoint = e.GetPosition( ConversionImage );
 
-				// 선택 영역 초기화
-				SelectionRectangle.Visibility = Visibility.Visible;
-				SelectionRectangle.Width = 0;
-				SelectionRectangle.Height = 0;
+				// AdornerLayer 가져오기
+				if (adornerLayer == null)
+				{
+					adornerLayer = AdornerLayer.GetAdornerLayer( ConversionImage );
+				}
+
+				// SelectionAdorner 생성 및 추가
+				selectionAdorner = new SelectionAdorner( ConversionImage );
+				adornerLayer.Add( selectionAdorner );
 
 				isDragging = true;
-				ConversionImage.CaptureMouse();
 			}
 		}
 
 		private void ConversionImage_MouseMove( object sender, MouseEventArgs e )
 		{
-			if (isDragging)
+			if (isDragging && selectionAdorner != null)
 			{
+				// 현재 위치 가져오기
 				var pos = e.GetPosition(ConversionImage);
 
+				// 선택 영역 계산
 				double x = Math.Min(pos.X, startPoint.X);
 				double y = Math.Min(pos.Y, startPoint.Y);
 				double width = Math.Abs(pos.X - startPoint.X);
 				double height = Math.Abs(pos.Y - startPoint.Y);
 
-				// 선택 영역 업데이트
-				SelectionRectangle.Margin = new Thickness( x, y, 0, 0 );
-				SelectionRectangle.Width = width;
-				SelectionRectangle.Height = height;
+				// 선택 영역 설정
+				selectionAdorner.SelectionRectangle = new Rect( x, y, width, height );
+
+				// Adorner 업데이트
+				selectionAdorner.InvalidateVisual();
 			}
 		}
 
@@ -183,34 +190,15 @@ namespace DamoOneVision
 				var imageSource = ConversionImage.Source as BitmapSource;
 				if (imageSource != null)
 				{
-					// 이미지의 실제 렌더링된 크기 얻기
-					var bitmapWidth = imageSource.PixelWidth;
-					var bitmapHeight = imageSource.PixelHeight;
+					// 이미지의 실제 크기와 컨트롤의 크기 비율 계산
+					var scaleX = imageSource.PixelWidth / ConversionImage.ActualWidth;
+					var scaleY = imageSource.PixelHeight / ConversionImage.ActualHeight;
 
-					// 이미지 컨트롤의 크기 얻기
-					var controlWidth = ConversionImage.ActualWidth;
-					var controlHeight = ConversionImage.ActualHeight;
-
-					// 이미지의 렌더링된 크기 계산
-					var scale = Math.Min(controlWidth / bitmapWidth, controlHeight / bitmapHeight);
-					var renderWidth = bitmapWidth * scale;
-					var renderHeight = bitmapHeight * scale;
-
-					// 이미지가 컨트롤 내에서 렌더링되는 위치 계산
-					var offsetX = (controlWidth - renderWidth) / 2;
-					var offsetY = (controlHeight - renderHeight) / 2;
-
-					// 마우스 좌표를 이미지 좌표로 변환
-					var x1 = startPoint.X - offsetX;
-					var y1 = startPoint.Y - offsetY;
-					var x2 = endPoint.X - offsetX;
-					var y2 = endPoint.Y - offsetY;
-
-					// 스케일을 고려하여 이미지 픽셀 좌표로 변환
-					int pixelX1 = (int)(x1 / scale);
-					int pixelY1 = (int)(y1 / scale);
-					int pixelX2 = (int)(x2 / scale);
-					int pixelY2 = (int)(y2 / scale);
+					// 마우스 좌표를 이미지의 픽셀 좌표로 변환
+					int pixelX1 = (int)(startPoint.X * scaleX);
+					int pixelY1 = (int)(startPoint.Y * scaleY);
+					int pixelX2 = (int)(endPoint.X * scaleX);
+					int pixelY2 = (int)(endPoint.Y * scaleY);
 
 					// 좌표 정렬
 					int pixelX = Math.Min(pixelX1, pixelX2);
@@ -244,11 +232,14 @@ namespace DamoOneVision
 					}
 				}
 
-				// 선택 영역 숨기기
-				SelectionRectangle.Visibility = Visibility.Collapsed;
+				// AdornerLayer에서 제거
+				if (selectionAdorner != null)
+				{
+					adornerLayer.Remove( selectionAdorner );
+					selectionAdorner = null;
+				}
 			}
 		}
-
 
 		private void SaveCroppedImage( BitmapSource croppedBitmap )
 		{
