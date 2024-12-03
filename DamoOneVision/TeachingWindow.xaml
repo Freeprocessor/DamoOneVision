@@ -6,9 +6,11 @@
         xmlns:local="clr-namespace:DamoOneVision"
         xmlns:viewModels="clr-namespace:DamoOneVision.ViewModels"
         xmlns:converters="clr-namespace:DamoOneVision.Converters"
-        
         mc:Ignorable="d"
-        Title="TeachingWindow" Height="720" Width="1280">
+        Title="TeachingWindow" Height="720" Width="1280"
+        KeyDown="Window_KeyDown"
+        Focusable="True"
+        FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}">
 
 
     <Window.DataContext>

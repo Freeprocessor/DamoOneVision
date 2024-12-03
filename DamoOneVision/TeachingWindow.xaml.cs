@@ -133,6 +133,12 @@ namespace DamoOneVision
 			e.Handled = regex.IsMatch( e.Text );
 		}
 
+		protected override void OnClosed( EventArgs e )
+		{
+			base.OnClosed( e );
+			Conversion.ImageProcessed -= Conversion_ImageProcessed;
+		}
+
 		private void ConversionImage_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			if (ConversionImage.Source != null)
@@ -149,8 +155,16 @@ namespace DamoOneVision
 					adornerLayer = AdornerLayer.GetAdornerLayer( ConversionImage );
 				}
 
+				// 기존의 선택 영역 제거
+				if (selectionAdorner != null)
+				{
+					adornerLayer.Remove( selectionAdorner );
+					selectionAdorner = null;
+				}
+
 				// SelectionAdorner 생성 및 추가
 				selectionAdorner = new SelectionAdorner( ConversionImage );
+				selectionAdorner.SelectionRectangle = new Rect( startPoint, new System.Windows.Size( 0, 0 ) );
 				adornerLayer.Add( selectionAdorner );
 
 				isDragging = true;
@@ -185,58 +199,151 @@ namespace DamoOneVision
 				isDragging = false;
 				ConversionImage.ReleaseMouseCapture();
 
-				var endPoint = e.GetPosition(ConversionImage);
+				// 드래그 종료 후 추가 동작 없음 (이미지 저장은 별도의 버튼에서 처리)
+			}
+		}
 
-				var imageSource = ConversionImage.Source as BitmapSource;
-				if (imageSource != null)
+		// 키보드 이벤트 핸들러
+		private void Window_KeyDown( object sender, KeyEventArgs e )
+		{
+			if (selectionAdorner != null)
+			{
+				double moveStep = 1; // 이동 또는 크기 조정 단위 픽셀 수
+
+				if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
 				{
-					// 이미지의 실제 크기와 컨트롤의 크기 비율 계산
-					var scaleX = imageSource.PixelWidth / ConversionImage.ActualWidth;
-					var scaleY = imageSource.PixelHeight / ConversionImage.ActualHeight;
-
-					// 마우스 좌표를 이미지의 픽셀 좌표로 변환
-					int pixelX1 = (int)(startPoint.X * scaleX);
-					int pixelY1 = (int)(startPoint.Y * scaleY);
-					int pixelX2 = (int)(endPoint.X * scaleX);
-					int pixelY2 = (int)(endPoint.Y * scaleY);
-
-					// 좌표 정렬
-					int pixelX = Math.Min(pixelX1, pixelX2);
-					int pixelY = Math.Min(pixelY1, pixelY2);
-					int pixelWidth = Math.Abs(pixelX1 - pixelX2);
-					int pixelHeight = Math.Abs(pixelY1 - pixelY2);
-
-					// 이미지 경계를 벗어나지 않도록 좌표 조정
-					pixelX = Math.Max( 0, Math.Min( imageSource.PixelWidth - 1, pixelX ) );
-					pixelY = Math.Max( 0, Math.Min( imageSource.PixelHeight - 1, pixelY ) );
-					if (pixelX + pixelWidth > imageSource.PixelWidth)
-						pixelWidth = imageSource.PixelWidth - pixelX;
-					if (pixelY + pixelHeight > imageSource.PixelHeight)
-						pixelHeight = imageSource.PixelHeight - pixelY;
-
-					// 크기가 유효한지 확인
-					if (pixelWidth > 0 && pixelHeight > 0)
+					// Shift 키가 눌린 상태 - 선택 영역 크기 조정
+					switch (e.Key)
 					{
-						// 크롭 영역 정의
-						Int32Rect cropRect = new Int32Rect(pixelX, pixelY, pixelWidth, pixelHeight);
-
-						// 크롭된 이미지 생성
-						CroppedBitmap croppedBitmap = new CroppedBitmap(imageSource, cropRect);
-
-						// 크롭된 이미지 저장
-						SaveCroppedImage( croppedBitmap );
+						case Key.Left:
+							// 오른쪽 가장자리 조정 (너비 감소)
+							selectionAdorner.Resize( -moveStep, 0 );
+							break;
+						case Key.Right:
+							// 오른쪽 가장자리 조정 (너비 증가)
+							selectionAdorner.Resize( moveStep, 0 );
+							break;
+						case Key.Up:
+							// 아래쪽 가장자리 조정 (높이 감소)
+							selectionAdorner.Resize( 0, -moveStep );
+							break;
+						case Key.Down:
+							// 아래쪽 가장자리 조정 (높이 증가)
+							selectionAdorner.Resize( 0, moveStep );
+							break;
 					}
-					else
+				}
+				else
+				{
+					// Shift 키가 눌리지 않은 상태 - 선택 영역 이동
+					switch (e.Key)
 					{
-						MessageBox.Show( "유효한 영역을 선택하세요." );
+						case Key.Left:
+							selectionAdorner.Move( -moveStep, 0 );
+							break;
+						case Key.Right:
+							selectionAdorner.Move( moveStep, 0 );
+							break;
+						case Key.Up:
+							selectionAdorner.Move( 0, -moveStep );
+							break;
+						case Key.Down:
+							selectionAdorner.Move( 0, moveStep );
+							break;
 					}
 				}
 
-				// AdornerLayer에서 제거
-				if (selectionAdorner != null)
+				// 선택 영역이 이미지 경계를 벗어나지 않도록 제한
+				EnsureSelectionWithinBounds();
+
+				// 선택 영역 업데이트
+				selectionAdorner.InvalidateArrange();
+				selectionAdorner.InvalidateVisual();
+			}
+		}
+
+
+
+		private void EnsureSelectionWithinBounds( )
+		{
+			if (selectionAdorner != null)
+			{
+				var rect = selectionAdorner.SelectionRectangle;
+
+				// 이미지의 실제 크기
+				double maxX = ConversionImage.ActualWidth;
+				double maxY = ConversionImage.ActualHeight;
+
+				// 너비와 높이가 이미지 경계를 넘지 않도록 조정
+				if (rect.X + rect.Width > maxX)
 				{
-					adornerLayer.Remove( selectionAdorner );
-					selectionAdorner = null;
+					rect.Width = maxX - rect.X;
+				}
+				if (rect.Y + rect.Height > maxY)
+				{
+					rect.Height = maxY - rect.Y;
+				}
+
+				// 너비와 높이가 최소 크기 이상인지 확인
+				if (rect.Width < 10)
+				{
+					rect.Width = 10;
+				}
+				if (rect.Height < 10)
+				{
+					rect.Height = 10;
+				}
+
+				selectionAdorner.SelectionRectangle = rect;
+
+				// 시각적 업데이트
+				selectionAdorner.InvalidateArrange();
+				selectionAdorner.InvalidateVisual();
+			}
+		}
+
+
+
+		private void CropAndSaveImage( )
+		{
+			var imageSource = ConversionImage.Source as BitmapSource;
+			if (imageSource != null)
+			{
+				// 이미지의 실제 크기와 컨트롤의 크기 비율 계산
+				var scaleX = imageSource.PixelWidth / ConversionImage.ActualWidth;
+				var scaleY = imageSource.PixelHeight / ConversionImage.ActualHeight;
+
+				// 선택 영역의 좌표를 이미지의 픽셀 좌표로 변환
+				var rect = selectionAdorner.SelectionRectangle;
+
+				int pixelX = (int)(rect.X * scaleX);
+				int pixelY = (int)(rect.Y * scaleY);
+				int pixelWidth = (int)(rect.Width * scaleX);
+				int pixelHeight = (int)(rect.Height * scaleY);
+
+				// 이미지 경계를 벗어나지 않도록 좌표 조정
+				pixelX = Math.Max( 0, Math.Min( imageSource.PixelWidth - 1, pixelX ) );
+				pixelY = Math.Max( 0, Math.Min( imageSource.PixelHeight - 1, pixelY ) );
+				if (pixelX + pixelWidth > imageSource.PixelWidth)
+					pixelWidth = imageSource.PixelWidth - pixelX;
+				if (pixelY + pixelHeight > imageSource.PixelHeight)
+					pixelHeight = imageSource.PixelHeight - pixelY;
+
+				// 크기가 유효한지 확인
+				if (pixelWidth > 0 && pixelHeight > 0)
+				{
+					// 크롭 영역 정의
+					Int32Rect cropRect = new Int32Rect(pixelX, pixelY, pixelWidth, pixelHeight);
+
+					// 크롭된 이미지 생성
+					CroppedBitmap croppedBitmap = new CroppedBitmap(imageSource, cropRect);
+
+					// 크롭된 이미지 저장
+					SaveCroppedImage( croppedBitmap );
+				}
+				else
+				{
+					MessageBox.Show( "유효한 영역을 선택하세요." );
 				}
 			}
 		}
@@ -279,11 +386,7 @@ namespace DamoOneVision
 		}
 
 
-		protected override void OnClosed( EventArgs e )
-		{
-			base.OnClosed( e );
-			Conversion.ImageProcessed -= Conversion_ImageProcessed;
-		}
+
 
 	}
 }

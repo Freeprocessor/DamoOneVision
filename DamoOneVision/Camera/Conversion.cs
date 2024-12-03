@@ -18,7 +18,6 @@ namespace DamoOneVision.Camera
 
 
 		// 이미지 처리 완료 시 발생하는 이벤트
-		//
 		public static event EventHandler<ImageProcessedEventArgs> ImageProcessed;
 
 		static Conversion( )
@@ -678,6 +677,27 @@ namespace DamoOneVision.Camera
 			MIL.MbufFree( MilImage );
 
 			Debug.WriteLine( $"RunClip 동작 완료" );
+		}
+
+		public static void PattenMatching(int patX, int patY, int width, int height)
+		{
+			MIL_ID PatContext = MIL.M_NULL;
+			MIL_ID PatResult = MIL.M_NULL;
+			MIL_ID PatModel = MIL.M_NULL;
+
+			MIL_ID MilImage = MIL.M_NULL;
+
+			MIL.MbufImport("", MIL.M_BMP, MIL.M_RESTORE, MilSystem, MilImage );
+
+			MIL.MpatAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref PatContext );
+			MIL.MpatAllocResult( MilSystem, MIL.M_DEFAULT, ref PatResult );
+
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, MilImage , patX, patY, width, height, MIL.M_DEFAULT);
+
+
+
+
+
 		}
 
 
