@@ -171,6 +171,7 @@ namespace DamoOneVision
 			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height )
 			{
 				PixelFormat pixelFormat = getPixelFormat();
+				//pixelFormat = PixelFormats.Rgb24;
 				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
 				VisionImage.Source = bitmap;
 			}

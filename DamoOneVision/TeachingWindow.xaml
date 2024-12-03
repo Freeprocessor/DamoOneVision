@@ -252,8 +252,16 @@
 
 
         <!-- 버튼들 -->
+        <Grid Grid.Column="1" Grid.RowSpan="3">
+            <Image x:Name="ConversionImage" Margin="0" Stretch="Uniform" 
+                        MouseLeftButtonDown="ConversionImage_MouseLeftButtonDown"
+                        MouseLeftButtonUp="ConversionImage_MouseLeftButtonUp"
+                        MouseMove="ConversionImage_MouseMove"/>
+            <Rectangle x:Name="SelectionRectangle"
+                Stroke="Red"
+                   StrokeThickness="2"
+                   Visibility="Collapsed"/>
+        </Grid>
 
-        <Image x:Name="ConversionImage" Margin="10,10,10,10" Stretch="Uniform" Grid.Column="1" Grid.RowSpan="3" />
-
-    </Grid>
+        </Grid>
 </Window>
