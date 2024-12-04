@@ -66,7 +66,7 @@ namespace DamoOneVision.Camera
 				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref MILContext.NbBands );
 				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref MILContext.DataType );
 
-				MILContext.NbBands = 1;
+				//MILContext.NbBands = 1;
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
@@ -84,13 +84,26 @@ namespace DamoOneVision.Camera
 			MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
 
 
+
+			///
 			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
 			if (MILContext.DataType == 16 && MILContext.NbBands == 1)
 			{
-				ushort [] ushortScaleImageData = MilImageShortScale(MilImage);
+				ushort [] ushortScaleImageData = ShortMilImageShortScale(MilImage);
+
+				//byte [] byteImageData = ShortToByte(ushortScaleImageData);
 				// Scale된 이미지 데이터 Buffer에 전송
 				MIL.MbufPut( MilImage, ushortScaleImageData );
+				//MIL.MbufPut( MilImage, ushortScaleImageData );
 			}
+			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+			{
+				byte [] byteScaleImageData = ByteMilImageShortScale(MilImage);
+				// Scale된 이미지 데이터 Buffer에 전송
+				MIL.MbufPut( MilImage, byteScaleImageData );
+				//MIL.MbufPut( MilImage, ushortScaleImageData );
+			}
+
 
 			//Bayer 이미지일 경우 RGB로 변환
 			///TODO : Bayer 이미지를 RGB로 변환하는 코드 추가
@@ -109,10 +122,10 @@ namespace DamoOneVision.Camera
 			// 전체 파일 경로
 			string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
-			MIL.MbufExport( filePath, MIL.M_BMP, MilImage);
+			//MIL.MbufExport( filePath, MIL.M_BMP, MilImage);
 
 			return imageData;
-
+			
 
 			// Scale된 이미지 데이터를 byte로 변환
 			// TODO : 어떻게 사용할건지 확인해야함
@@ -121,7 +134,7 @@ namespace DamoOneVision.Camera
 
 		}
 
-		private ushort[ ] MilImageShortScale( MIL_ID MilImage )
+		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
 		{
 			ushort [] ImageData = new ushort[ MILContext.Width * MILContext.Height ];
 
@@ -131,7 +144,10 @@ namespace DamoOneVision.Camera
 			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
 			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
 			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
-			ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			if (distinctNumbersDesc[ 1 ] != null)
+			{
+				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			}
 
 			ushort MinPixelValue = ImageData.Min();
 			ushort MaxPixelValue = ImageData.Max();
@@ -140,6 +156,34 @@ namespace DamoOneVision.Camera
 			for (int i = 0; i < ImageData.Length; i++)
 			{
 				ImageData[ i ] = (ushort) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
+			}
+
+			return ImageData;
+		}
+
+		private byte[ ] ByteMilImageShortScale( MIL_ID MilImage )
+		{
+			byte [] ImageData = new byte[ MILContext.Width * MILContext.Height ];
+
+			MIL.MbufGet( MilImage, ImageData );
+
+
+			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
+			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
+			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			if (distinctNumbersDesc[ 1 ] != null)
+			{
+				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			}
+				
+
+			byte MinPixelValue = ImageData.Min();
+			byte MaxPixelValue = ImageData.Max();
+
+
+			for (int i = 0; i < ImageData.Length; i++)
+			{
+				ImageData[ i ] = (byte) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 255);
 			}
 
 			return ImageData;

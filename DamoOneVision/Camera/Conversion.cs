@@ -679,7 +679,7 @@ namespace DamoOneVision.Camera
 			Debug.WriteLine( $"RunClip 동작 완료" );
 		}
 
-		public static void PattenMatching(int patX, int patY, int width, int height)
+		public static void PattenMatching(int patXpos, int patYpos, int patWidth, int patHeight)
 		{
 			MIL_ID PatContext = MIL.M_NULL;
 			MIL_ID PatResult = MIL.M_NULL;
@@ -687,12 +687,12 @@ namespace DamoOneVision.Camera
 
 			MIL_ID MilImage = MIL.M_NULL;
 
-			MIL.MbufImport("", MIL.M_BMP, MIL.M_RESTORE, MilSystem, MilImage );
+			MIL.MbufImport("저장한 템플릿 파일 위치", MIL.M_BMP, MIL.M_RESTORE, MilSystem, MilImage );
 
 			MIL.MpatAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref PatContext );
 			MIL.MpatAllocResult( MilSystem, MIL.M_DEFAULT, ref PatResult );
 
-			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, MilImage , patX, patY, width, height, MIL.M_DEFAULT);
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, MilImage , patXpos, patYpos, patWidth, patHeight, MIL.M_DEFAULT);
 
 
 
