@@ -17,6 +17,8 @@ namespace DamoOneVision.Camera
 		private MIL_ID MilSystem = MIL.M_NULL;
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
+		private bool isIRCamera = false;
+		private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
 
 
 		public bool Connect( )
@@ -72,6 +74,7 @@ namespace DamoOneVision.Camera
 				//Bayer 이미지일 경우 NbBand 확인
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
 				MIL.MbufAllocColor(MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
+				isIRCamera = true;
 			}
 
 			// 이미지 캡처
@@ -87,21 +90,36 @@ namespace DamoOneVision.Camera
 
 			///
 			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
-			if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			if (isIRCamera == true)
 			{
-				ushort [] ushortScaleImageData = ShortMilImageShortScale(MilImage);
+				if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+				{
+					ushort [] ushortScaleImageData = ShortMilImageShortScale(MilImage);
 
-				//byte [] byteImageData = ShortToByte(ushortScaleImageData);
-				// Scale된 이미지 데이터 Buffer에 전송
-				MIL.MbufPut( MilImage, ushortScaleImageData );
-				//MIL.MbufPut( MilImage, ushortScaleImageData );
-			}
-			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
-			{
-				byte [] byteScaleImageData = ByteMilImageShortScale(MilImage);
-				// Scale된 이미지 데이터 Buffer에 전송
-				MIL.MbufPut( MilImage, byteScaleImageData );
-				//MIL.MbufPut( MilImage, ushortScaleImageData );
+					//byte [] byteImageData = ShortToByte(ushortScaleImageData);
+					// Scale된 이미지 데이터 Buffer에 전송
+					MIL.MbufPut( MilImage, ushortScaleImageData );
+					//MIL.MbufPut( MilImage, ushortScaleImageData );
+				}
+				else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+				{
+					byte [] byteScaleImageData = ByteMilImageShortScale(MilImage);
+					// Scale된 이미지 데이터 Buffer에 전송
+					MIL.MbufPut( MilImage, byteScaleImageData );
+					//MIL.MbufPut( MilImage, ushortScaleImageData );
+				}
+				MIL_ID JETColorMap = MIL.M_NULL;
+				MIL_ID MimLut = MIL.M_NULL;
+				MIL_ID ChildImage = MIL.M_NULL;
+
+				MIL.MbufImport( LUT_FILE, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref JETColorMap );
+				MIL.MbufAllocColor(MilSystem, 3, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MimLut);
+
+				MIL.MbufClear( MimLut, MIL.M_COLOR_BLACK );
+
+				MIL.MbufChildColor(MimLut, MIL.M_PLANAR, 0, MIL.M_ALL_BANDS, MilImage, MIL.M_ALL_BANDS, 0, 0, MIL.M_NULL, ref ChildImage );
+
+				MIL.MimLutMap(MilImage, MimLut, JETColorMap );
 			}
 
 
