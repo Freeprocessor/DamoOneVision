@@ -71,7 +71,7 @@ namespace DamoOneVision.Camera
 				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref MILContext.NbBands );
 				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref MILContext.DataType );
 
-				//MILContext.NbBands = 1;
+				MILContext.NbBands = 1;
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
@@ -93,7 +93,7 @@ namespace DamoOneVision.Camera
 				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
 				//SaveImage( imageData, filePath );
-				MIL.MbufSave( filePath, MilImage );
+				//MIL.MbufSave( filePath, MilImage );
 			}
 
 			MIL_INT SizeByte = 0;

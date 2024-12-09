@@ -223,7 +223,7 @@ namespace DamoOneVision
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
 				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
-				this.RawPixelData = pixelData;
+				//this.RawPixelData = pixelData;
 			}
 			finally
 			{
@@ -316,6 +316,7 @@ namespace DamoOneVision
 					if (cameraManager.IsConnected)
 					{
 						pixelData = await cameraManager.CaptureSingleImageAsync();
+						DisplayImage( pixelData );
 					}
 					else
 					{
@@ -328,14 +329,15 @@ namespace DamoOneVision
 						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-						bool isGood = false;
-						Conversion.Model1( pixelData, ref isGood );
+						//bool isGood = false;
+						//byte[] ConversionpixelData = (byte[])pixelData.Clone();
+						//Conversion.Model1( ConversionpixelData, ref isGood );
 
 
 
 
 
-						DisplayConversionImage( pixelData );
+						//DisplayConversionImage( ConversionpixelData );
 					}
 				}
 				catch (Exception ex)
