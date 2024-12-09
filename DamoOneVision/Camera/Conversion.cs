@@ -242,7 +242,12 @@ namespace DamoOneVision.Camera
 			MIL_ID MilColorImage = MIL.M_NULL;
 			MIL_ID Mil8bitImage = MIL.M_NULL;
 			MIL_ID BinarizedImage = MIL.M_NULL;
-			MIL_ID CircleMeasMaker = MIL.M_NULL;
+			MIL_ID CircleMeasMarker = MIL.M_NULL;
+
+			double Radius = 0;
+			double XPos = 0;
+			double YPos = 0;
+			double Number = 0;
 
 			MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height,MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImage );
 			MIL.MbufAllocColor( MilSystem, 3, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref MilColorImage );
@@ -255,23 +260,33 @@ namespace DamoOneVision.Camera
 			//8bit Color 이미지를 8bit Gray 이미지로 변환
 			MIL.MimConvert( MilColorImage, Mil8bitImage, MIL.M_RGB_TO_L );
 
-			MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 47, MIL.M_NULL );
+			MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 50, MIL.M_NULL );
 
 
 
 
+			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref CircleMeasMarker );
 
-			MIL.MmeasFindMarker(MIL.M_DEFAULT, BinarizedImage, CircleMeasMaker, MIL.M_DEFAULT );
+			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
+			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_CENTER, 219.0, 184.0 );
+			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_RADII, 115.0, 183.5 );
 
+			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, CircleMeasMarker, MIL.M_DEFAULT );
+
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_RADIUS, ref Radius, IntPtr.Zero );
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_POSITION, ref XPos, ref YPos );	
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_NUMBER, ref Number, IntPtr.Zero );
 
 
 			//MIL.MbufPut( BinarizedImage, imageData );
 			MIL.MbufGet( BinarizedImage, imageData );
 
 
-
-
-
+			MIL.MbufFree( MilImage );
+			MIL.MbufFree( MilColorImage );
+			MIL.MbufFree( Mil8bitImage );
+			MIL.MbufFree( BinarizedImage );
+			//MIL.MbufFree( CircleMeasMarker );
 
 			return imageData;
 		}

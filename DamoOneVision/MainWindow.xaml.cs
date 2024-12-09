@@ -44,7 +44,8 @@ namespace DamoOneVision
 		public ObservableCollection<string> ImagePaths { get; set; }
 		private string imagesFolder;
 
-		private WriteableBitmap bitmap;
+		private WriteableBitmap bitmapVision;
+		private WriteableBitmap bitmapConversion;
 		private byte[ ] RawPixelData;
 
 		private int frameCount = 0;
@@ -117,7 +118,9 @@ namespace DamoOneVision
 			await cameraManager.DisconnectAsync();
 
 			VisionImage.Source = null;
-			bitmap = null;
+			ConversionImage.Source = null;
+			bitmapVision = null;
+			bitmapConversion = null;
 			FpsLabel.Content = "FPS: 0";
 
 			ConnectButton.IsEnabled = true;
@@ -129,7 +132,7 @@ namespace DamoOneVision
 		{
 			Dispatcher.Invoke( ( ) =>
 			{
-				DisplayImage( pixelData );
+				DisplayImage( (byte[ ])pixelData.Clone() );
 
 				// FPS 계산
 				frameCount++;
@@ -147,29 +150,6 @@ namespace DamoOneVision
 			} );
 		}
 
-		/*
-		private void OnImageCaptured( byte[ ] pixelData )
-		{
-			Dispatcher.Invoke( ( ) =>
-			{
-				DisplayImage( pixelData );
-
-				// 템플릿 매칭 수행
-				if (templateMatcher != null)
-				{
-					double posX, posY, score;
-					templateMatcher.FindTemplate( pixelData, cameraManager.GetWidth(), cameraManager.GetHeight(), out posX, out posY, out score );
-
-					if (score > 0.8) // 임계값은 필요에 따라 조정
-					{
-						// 템플릿이 발견된 위치에 표시하거나 처리
-						Debug.WriteLine( $"템플릿 발견: X={posX}, Y={posY}, Score={score}" );
-					}
-				}
-
-				// FPS 계산 코드
-			} );
-		}*/
 
 		private void DisplayImage( byte[ ] pixelData )
 		{
@@ -177,27 +157,27 @@ namespace DamoOneVision
 			int height = (int)MILContext.Height;
 			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
 
-			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height )
+			if (bitmapVision == null || bitmapVision.PixelWidth != width || bitmapVision.PixelHeight != height )
 			{
 				PixelFormat pixelFormat = getPixelFormat();
 				//pixelFormat = PixelFormats.Rgb24;
-				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
-				VisionImage.Source = bitmap;
+				bitmapVision = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
+				VisionImage.Source = bitmapVision;
 			}
 
-			bitmap.Lock();
+			bitmapVision.Lock();
 			try
 			{
 				// 스트라이드 계산
 				int stride = width * bytesPerPixel;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
+				bitmapVision.WritePixels( new Int32Rect( 0, 0, width, height ), (byte[ ]) pixelData.Clone(), stride, 0 );
 				this.RawPixelData = pixelData;
 			}
 			finally
 			{
-				bitmap.Unlock();
+				bitmapVision.Unlock();
 			}
 		}
 
@@ -205,32 +185,31 @@ namespace DamoOneVision
 		{
 			int width = (int)MILContext.Width;
 			int height = (int)MILContext.Height;
-			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
+			int bytesPerPixel = 8*(int)MILContext.NbBands / 8;
 
-			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height)
+			if (bitmapConversion == null || bitmapConversion.PixelWidth != width || bitmapConversion.PixelHeight != height)
 			{
-				PixelFormat pixelFormat = getPixelFormat();
+				PixelFormat pixelFormat = PixelFormats.Gray8;
 				//pixelFormat = PixelFormats.Rgb24;
-				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
-				ConversionImage.Source = bitmap;
+				bitmapConversion = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
+				ConversionImage.Source = bitmapConversion;
 			}
 
-			bitmap.Lock();
+			bitmapConversion.Lock();
 			try
 			{
 				// 스트라이드 계산
 				int stride = width * bytesPerPixel;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
+				bitmapConversion.WritePixels( new Int32Rect( 0, 0, width, height ), (byte[ ]) pixelData.Clone(), stride, 0 );
 				//this.RawPixelData = pixelData;
 			}
 			finally
 			{
-				bitmap.Unlock();
+				bitmapConversion.Unlock();
 			}
 		}
-
 
 
 		private static PixelFormat getPixelFormat()
@@ -329,15 +308,15 @@ namespace DamoOneVision
 						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-						//bool isGood = false;
-						//byte[] ConversionpixelData = (byte[])pixelData.Clone();
-						//Conversion.Model1( ConversionpixelData, ref isGood );
+						bool isGood = false;
+						byte[] ConversionpixelData = (byte[])pixelData.Clone();
+						Conversion.Model1( ConversionpixelData, ref isGood );
 
 
 
 
 
-						//DisplayConversionImage( ConversionpixelData );
+						DisplayConversionImage( ConversionpixelData );
 					}
 				}
 				catch (Exception ex)
@@ -362,23 +341,7 @@ namespace DamoOneVision
 			TeachingWindow teachingWindow = new TeachingWindow((byte[])this.RawPixelData.Clone(), (int)MILContext.Width, (int)MILContext.Height, getPixelFormat());
 			teachingWindow.ShowDialog();
 
-			//if (teachingWindow.TemplateImageData != null)
-			//{
-				// 템플릿 학습
-				//templateMatcher.TeachTemplate( teachingWindow.TemplateImageData, teachingWindow.TemplateWidth, teachingWindow.TemplateHeight );
-			//	MessageBox.Show( "템플릿이 학습되었습니다." );
-			//}
 		}
-
-		//private void FileLoadingButton_Click( object sender, RoutedEventArgs e )
-		//{
-		//	OpenFileDialog openFileDialog = new OpenFileDialog();
-		//	if (openFileDialog.ShowDialog() == true)
-		//	{
-		//		// 파일 선택 후 처리 로직을 여기에 구현
-		//		MessageBox.Show( $"선택된 파일: {openFileDialog.FileName}" );
-		//	}
-		//}
 
 
 		private void LoadModelButton_Click( object sender, RoutedEventArgs e )

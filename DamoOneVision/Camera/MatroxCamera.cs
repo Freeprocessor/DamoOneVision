@@ -93,7 +93,7 @@ namespace DamoOneVision.Camera
 				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
 				//SaveImage( imageData, filePath );
-				//MIL.MbufSave( filePath, MilImage );
+				MIL.MbufSave( filePath, MilImage );
 			}
 
 			MIL_INT SizeByte = 0;
@@ -167,15 +167,7 @@ namespace DamoOneVision.Camera
 				MIL.MbufSave( filePath, MilImage);
 			}
 
-
-
 			return imageData;
-			
-
-			// Scale된 이미지 데이터를 byte로 변환
-			// TODO : 어떻게 사용할건지 확인해야함
-			//byte [] byteImageData = ShortToByte(ushortScaleImageData);
-			//
 
 		}
 
