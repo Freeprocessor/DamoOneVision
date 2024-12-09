@@ -25,6 +25,8 @@ using System.Diagnostics;
 using DamoOneVision.Models;
 using DamoOneVision.ViewModels;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Drawing;
 
 
 namespace DamoOneVision
@@ -38,6 +40,9 @@ namespace DamoOneVision
 		//private ICamera camera;
 		//private TemplateMatcher templateMatcher;
 		private CameraManager cameraManager;
+		private MIL_ID MilSystem = MIL.M_NULL;
+		public ObservableCollection<string> ImagePaths { get; set; }
+		private string imagesFolder;
 
 		private WriteableBitmap bitmap;
 		private byte[ ] RawPixelData;
@@ -56,6 +61,10 @@ namespace DamoOneVision
 		public MainWindow( )
 		{
 			InitializeComponent();
+			this.DataContext = this;
+			ImagePaths = new ObservableCollection<string>();
+			imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+			MilSystem = MILContext.Instance.MilSystem;
 
 			// 윈도우 종료 이벤트 핸들러 추가
 			this.Closing += Window_Closing;
@@ -192,6 +201,38 @@ namespace DamoOneVision
 			}
 		}
 
+		private void DisplayConversionImage( byte[ ] pixelData )
+		{
+			int width = (int)MILContext.Width;
+			int height = (int)MILContext.Height;
+			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
+
+			if (bitmap == null || bitmap.PixelWidth != width || bitmap.PixelHeight != height)
+			{
+				PixelFormat pixelFormat = getPixelFormat();
+				//pixelFormat = PixelFormats.Rgb24;
+				bitmap = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
+				ConversionImage.Source = bitmap;
+			}
+
+			bitmap.Lock();
+			try
+			{
+				// 스트라이드 계산
+				int stride = width * bytesPerPixel;
+
+				// 픽셀 데이터를 WriteableBitmap에 쓰기
+				bitmap.WritePixels( new Int32Rect( 0, 0, width, height ), pixelData, stride, 0 );
+				this.RawPixelData = pixelData;
+			}
+			finally
+			{
+				bitmap.Unlock();
+			}
+		}
+
+
+
 		private static PixelFormat getPixelFormat()
 		{
 			PixelFormat pixelFormat;
@@ -252,29 +293,54 @@ namespace DamoOneVision
 
 		private async void TriggerButton_Click( object sender, RoutedEventArgs e )
 		{
-			if (!cameraManager.IsConnected)
+			if (!cameraManager.IsConnected && this.RawPixelData == null)
 			{
-				MessageBox.Show( "카메라가 연결되어 있지 않습니다." );
+				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 				return;
 			}
 
-			if (!isContinuous && !isCapturing)
+			if (isContinuous)
+			{
+				MessageBox.Show( "Continuous 모드에서는 Trigger 기능을 사용할 수 없습니다." );
+				return;
+			}
+			if (!isCapturing)
 			{
 				isCapturing = true;
 
 				try
 				{
-					// 단일 이미지 캡처
-					byte[] pixelData = await cameraManager.CaptureSingleImageAsync();
+					byte[] pixelData = null;
+
+					// 카메라 연결 상태에 따라 캡처 또는 로드된 이미지 사용
+					if (cameraManager.IsConnected)
+					{
+						pixelData = await cameraManager.CaptureSingleImageAsync();
+					}
+					else
+					{
+						// 로드된 이미지가 있다면 그 이미지를 사용
+						pixelData = this.RawPixelData;
+					}
 
 					if (pixelData != null)
 					{
-						DisplayImage( pixelData );
+						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
+						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
+						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
+						bool isGood = false;
+						Conversion.Model1( pixelData, ref isGood );
+
+
+
+
+
+						DisplayConversionImage( pixelData );
 					}
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show( $"이미지 캡처 중 오류 발생: {ex.Message}" );
+					MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
 				}
 				finally
 				{
@@ -347,6 +413,48 @@ namespace DamoOneVision
 			MessageBox.Show( "모델이 로드되었습니다: " + modelData );
 
 			// 예를 들어, modelData를 역직렬화하여 애플리케이션의 상태나 설정에 적용할 수 있습니다.
+		}
+
+		private void ListBox_SelectionChanged( object sender, System.Windows.Controls.SelectionChangedEventArgs e )
+		{
+			if (e.AddedItems.Count > 0)
+			{
+				string selectedImagePath = e.AddedItems[0] as string;
+				if (!string.IsNullOrEmpty( selectedImagePath ) && File.Exists( selectedImagePath ))
+				{
+					// 선택된 이미지를 VisionImage에 표시
+					try
+					{
+						byte [] pixelData = null;
+
+						pixelData = MatroxCamera.LoadImage( MilSystem, selectedImagePath );
+
+						// RawPixelData에 추출한 픽셀 데이터 저장
+						this.RawPixelData = pixelData;
+						DisplayImage( pixelData );
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
+					}
+				}
+			}
+		}
+
+
+
+		private void LoadAllTriggeredImagesButton_Click( object sender, RoutedEventArgs e )
+		{
+			// Images 폴더 내의 모든 BMP 파일 로드
+			ImagePaths.Clear(); // 기존 리스트 비우기(원하는 경우 생략)
+			string[] files = Directory.GetFiles(imagesFolder, "*.bmp");
+
+			foreach (var file in files)
+			{
+				ImagePaths.Add( file );
+			}
+
+			MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
 		}
 
 		private void DeserializeModelData( string serializedData )
