@@ -243,11 +243,15 @@ namespace DamoOneVision.Camera
 			MIL_ID Mil8bitImage = MIL.M_NULL;
 			MIL_ID BinarizedImage = MIL.M_NULL;
 			MIL_ID CircleMeasMarker = MIL.M_NULL;
+			MIL_ID BlobResult = MIL.M_NULL;
+			MIL_ID BlobContext = MIL.M_NULL;
 
 			double Radius = 0;
 			double XPos = 0;
 			double YPos = 0;
 			double Number = 0;
+
+			int holenumber = 0;
 
 			MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height,MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImage );
 			MIL.MbufAllocColor( MilSystem, 3, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref MilColorImage );
@@ -260,10 +264,10 @@ namespace DamoOneVision.Camera
 			//8bit Color 이미지를 8bit Gray 이미지로 변환
 			MIL.MimConvert( MilColorImage, Mil8bitImage, MIL.M_RGB_TO_L );
 
-			MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 50, MIL.M_NULL );
+			MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 90, MIL.M_NULL );
 
 
-
+			///
 
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref CircleMeasMarker );
 
@@ -277,6 +281,33 @@ namespace DamoOneVision.Camera
 			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_POSITION, ref XPos, ref YPos );	
 			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_NUMBER, ref Number, IntPtr.Zero );
 
+			Debug.WriteLine( $"Radius: {Radius}, XPos: {XPos}, YPos: {YPos}, Number: {Number}" );
+
+
+			///
+
+			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
+
+			MIL.MblobAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobContext );
+
+			MIL.MblobControl( BlobContext, MIL.M_BOX, MIL.M_ENABLE );
+			MIL.MblobControl( BlobContext, MIL.M_NUMBER_OF_HOLES, MIL.M_ENABLE );
+
+			MIL.MblobCalculate( BlobContext, BinarizedImage, MIL.M_NULL, BlobResult );
+
+			//MIL.MblobGetResult( BlobResult, MIL.M_DEFAULT, MIL.M_NUMBER_OF_HOLES , ref holenumber );
+			//MIL.MblobGetResult( BlobResult, M_GENERAL, M_NUMBER + M_TYPE_MIL_INT, &Number0 );
+			//MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+			MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( 0 ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+
+			if(holenumber == 1)
+			{
+				isGood = true;
+			}
+			else
+			{
+				isGood = false;
+			}
 
 			//MIL.MbufPut( BinarizedImage, imageData );
 			MIL.MbufGet( BinarizedImage, imageData );

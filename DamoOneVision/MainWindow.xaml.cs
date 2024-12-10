@@ -312,10 +312,7 @@ namespace DamoOneVision
 						byte[] ConversionpixelData = (byte[])pixelData.Clone();
 						Conversion.Model1( ConversionpixelData, ref isGood );
 
-
-
-
-
+						GoodLamp( isGood );
 						DisplayConversionImage( ConversionpixelData );
 					}
 				}
@@ -438,5 +435,27 @@ namespace DamoOneVision
 			// MILContext 해제
 			MILContext.Instance.Dispose();
 		}
+
+		private void GoodLamp( bool isGood )
+		{
+			if (!isGood)
+			{
+				GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
+				GoodRejectText.Content = "Reject";
+			}
+			else
+			{
+				GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
+				GoodRejectText.Content = "Good";
+			}
+		}
+
+		private void Show3DButton_Click( object sender, RoutedEventArgs e )
+		{
+			// 별도의 윈도우를 띄워서 3D 표시
+			_3DView _3dview = new _3DView( (byte[])RawPixelData.Clone());
+			_3dview.Show();
+		}
+
 	}
 }

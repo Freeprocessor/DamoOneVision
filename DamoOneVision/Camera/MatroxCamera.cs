@@ -180,19 +180,33 @@ namespace DamoOneVision.Camera
 
 			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
 			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
-			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
-			if (distinctNumbersDesc.Length > 1 )
-			{
-				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
-			}
+			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			//if (distinctNumbersDesc.Length > 1 )
+			//{
+			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			//}
 
 			ushort MinPixelValue = ImageData.Min();
 			ushort MaxPixelValue = ImageData.Max();
+
+			double dMinPixelValue = (30.0 / 190.0) * 65535.0;
+			double dMaxPixelValue = (50.0 / 190.0) * 65535.0;
+
+			MinPixelValue = (ushort) dMinPixelValue;
+			MaxPixelValue = (ushort) dMaxPixelValue;
 
 
 			for (int i = 0; i < ImageData.Length; i++)
 			{
 				ImageData[ i ] = (ushort) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
+				if (ImageData[ i ] > 65535)
+				{
+					ImageData[ i ] = 65535;
+				}
+				else if (ImageData[ i ] < 0)
+				{
+					ImageData[ i ] = 0;
+				}
 			}
 
 			return ImageData;
