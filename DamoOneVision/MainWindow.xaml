@@ -28,7 +28,7 @@
                        VerticalAlignment="Center" HorizontalAlignment="Center" Width="31" 
                        />
                 </MenuItem.Header>
-                <MenuItem Header="Model Load" IsCheckable="False" Click="LoadModelButton_Click"/>
+                <!--<MenuItem Header="Model Load" IsCheckable="False" Click="LoadModelButton_Click"/>-->
                 <MenuItem Header="Exit" IsCheckable="False" Click="ExitProgram"/>
             </MenuItem>
             <MenuItem Height="24" Width="45">
@@ -216,6 +216,7 @@
             </StatusBarItem>
         </StatusBar>
         <Button x:Name="LoadFileButton" Content="Load File" Margin="0,0,40,60" VerticalAlignment="Bottom" Grid.Row="2" Height="20" HorizontalAlignment="Right" Width="60" Click="LoadAllTriggeredImagesButton_Click" Grid.Column="1"/>
+        <TextBox x:Name="ThresholdText" Grid.Column="1" HorizontalAlignment="Left" Margin="280,0,0,121" Grid.Row="1" TextWrapping="Wrap" Text="20000" Width="120" Height="18" VerticalAlignment="Bottom" TextChanged="textBox_TextChanged"/>
 
     </Grid>
 </Window>

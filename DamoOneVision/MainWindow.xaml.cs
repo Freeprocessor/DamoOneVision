@@ -42,7 +42,7 @@ namespace DamoOneVision
 		private CameraManager cameraManager;
 		private MIL_ID MilSystem = MIL.M_NULL;
 		public ObservableCollection<string> ImagePaths { get; set; }
-		private string imagesFolder;
+		private string appFolder;
 
 		private WriteableBitmap bitmapVision;
 		private WriteableBitmap bitmapConversion;
@@ -55,16 +55,24 @@ namespace DamoOneVision
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
 
-		// SQLiteHelper를 위한 필드 추가
-		private SQLiteHelper dbHelper;
 
+		private int ThresholdValue = 0;
+
+		// Setting
+		SettingManager settingManager = new SettingManager();
 
 		public MainWindow( )
 		{
 			InitializeComponent();
 			this.DataContext = this;
 			ImagePaths = new ObservableCollection<string>();
-			imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+			appFolder = System.IO.Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "DamoOneVision");
+
+			if (!System.IO.Directory.Exists( appFolder ))
+			{
+				System.IO.Directory.CreateDirectory( appFolder );
+			}
+
 			MilSystem = MILContext.Instance.MilSystem;
 
 			// 윈도우 종료 이벤트 핸들러 추가
@@ -73,13 +81,6 @@ namespace DamoOneVision
 			cameraManager = new CameraManager();
 			cameraManager.ImageCaptured += OnImageCaptured;
 
-			string databasePath = System.IO.Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-				"DamoOneVision",
-				"models.db"
-			);
-			Directory.CreateDirectory( System.IO.Path.GetDirectoryName( databasePath ) );
-			dbHelper = new SQLiteHelper( databasePath );
 
 			//templateMatcher = new TemplateMatcher();
 		}
@@ -185,11 +186,11 @@ namespace DamoOneVision
 		{
 			int width = (int)MILContext.Width;
 			int height = (int)MILContext.Height;
-			int bytesPerPixel = 8*(int)MILContext.NbBands / 8;
+			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
 
 			if (bitmapConversion == null || bitmapConversion.PixelWidth != width || bitmapConversion.PixelHeight != height)
 			{
-				PixelFormat pixelFormat = PixelFormats.Gray8;
+				PixelFormat pixelFormat = PixelFormats.Gray16;
 				//pixelFormat = PixelFormats.Rgb24;
 				bitmapConversion = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
 				ConversionImage.Source = bitmapConversion;
@@ -310,7 +311,7 @@ namespace DamoOneVision
 						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
 						bool isGood = false;
 						byte[] ConversionpixelData = (byte[])pixelData.Clone();
-						Conversion.Model1( ConversionpixelData, ref isGood );
+						Conversion.InfraredCameraModel( ConversionpixelData, ref isGood, ThresholdValue );
 
 						GoodLamp( isGood );
 						DisplayConversionImage( ConversionpixelData );
@@ -341,32 +342,32 @@ namespace DamoOneVision
 		}
 
 
-		private void LoadModelButton_Click( object sender, RoutedEventArgs e )
-		{
-			// 데이터베이스에서 모델 리스트 가져오기
-			List<ModelItem> modelList = dbHelper.GetModelList();
+		//private void LoadModelButton_Click( object sender, RoutedEventArgs e )
+		//{
+		//	// 데이터베이스에서 모델 리스트 가져오기
+		//	List<ModelItem> modelList = dbHelper.GetModelList();
 
-			// ModelSelectionDialog 생성 및 표시
-			ModelSelectionDialog dialog = new ModelSelectionDialog(modelList);
-			bool? result = dialog.ShowDialog();
+		//	// ModelSelectionDialog 생성 및 표시
+		//	ModelSelectionDialog dialog = new ModelSelectionDialog(modelList);
+		//	bool? result = dialog.ShowDialog();
 
-			if (result == true)
-			{
-				int selectedModelId = dialog.SelectedModelId;
-				if (selectedModelId != -1)
-				{
-					// 모델 데이터 로드
-					string modelData = dbHelper.LoadModelData(selectedModelId);
+		//	if (result == true)
+		//	{
+		//		int selectedModelId = dialog.SelectedModelId;
+		//		if (selectedModelId != -1)
+		//		{
+		//			// 모델 데이터 로드
+		//			string modelData = dbHelper.LoadModelData(selectedModelId);
 
-					// 모델 데이터 처리
-					LoadModel( modelData );
-				}
-				else
-				{
-					MessageBox.Show( "모델이 선택되지 않았습니다." );
-				}
-			}
-		}
+		//			// 모델 데이터 처리
+		//			LoadModel( modelData );
+		//		}
+		//		else
+		//		{
+		//			MessageBox.Show( "모델이 선택되지 않았습니다." );
+		//		}
+		//	}
+		//}
 
 		private void LoadModel( string modelData )
 		{
@@ -403,13 +404,13 @@ namespace DamoOneVision
 			}
 		}
 
-
-
 		private void LoadAllTriggeredImagesButton_Click( object sender, RoutedEventArgs e )
 		{
 			// Images 폴더 내의 모든 BMP 파일 로드
 			ImagePaths.Clear(); // 기존 리스트 비우기(원하는 경우 생략)
-			string[] files = Directory.GetFiles(imagesFolder, "*.bmp");
+			//이미지가 있는지 확인, 없으면 만들기
+
+			string[] files = Directory.GetFiles(appFolder, "*.bmp");
 
 			foreach (var file in files)
 			{
@@ -457,5 +458,10 @@ namespace DamoOneVision
 			_3dview.Show();
 		}
 
+		private void textBox_TextChanged( object sender, TextChangedEventArgs e )
+		{
+
+			int.TryParse( ThresholdText.Text, out ThresholdValue );
+		}
 	}
 }

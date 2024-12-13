@@ -230,17 +230,13 @@ namespace DamoOneVision.Camera
 
 			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, MilImage , patXpos, patYpos, patWidth, patHeight, MIL.M_DEFAULT);
 
-
-
-
-
 		}
 
-		public static byte[ ] Model1( byte[ ] imageData, ref bool isGood)
+		public static byte[ ] InfraredCameraModel( byte[ ] imageData, ref bool isGood, int threshold)
 		{
 			MIL_ID MilImage = MIL.M_NULL;
-			MIL_ID MilColorImage = MIL.M_NULL;
-			MIL_ID Mil8bitImage = MIL.M_NULL;
+			//MIL_ID MilColorImage = MIL.M_NULL;
+			//MIL_ID Mil8bitImage = MIL.M_NULL;
 			MIL_ID BinarizedImage = MIL.M_NULL;
 			MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
@@ -254,18 +250,18 @@ namespace DamoOneVision.Camera
 			int holenumber = 0;
 
 			MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height,MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImage );
-			MIL.MbufAllocColor( MilSystem, 3, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref MilColorImage );
-			MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref Mil8bitImage );
-			MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref BinarizedImage );
+			//MIL.MbufAllocColor( MilSystem, 3, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref MilColorImage );
+			//MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height, 8, MIL.M_IMAGE + MIL.M_PROC, ref Mil8bitImage );
+			MIL.MbufAllocColor( MilSystem, 1, MILContext.Width, MILContext.Height, 16, MIL.M_IMAGE + MIL.M_PROC, ref BinarizedImage );
 
 			MIL.MbufPut( MilImage, imageData );
-			//16bit 이미지를 8bit Color 이미지로 변환
-			MIL.MimConvert( MilImage, MilColorImage, MIL.M_L_TO_RGB );
-			//8bit Color 이미지를 8bit Gray 이미지로 변환
-			MIL.MimConvert( MilColorImage, Mil8bitImage, MIL.M_RGB_TO_L );
+			////16bit 이미지를 8bit Color 이미지로 변환
+			//MIL.MimConvert( MilImage, MilColorImage, MIL.M_L_TO_RGB );
+			////8bit Color 이미지를 8bit Gray 이미지로 변환
+			//MIL.MimConvert( MilColorImage, Mil8bitImage, MIL.M_RGB_TO_L );
 
-			MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 90, MIL.M_NULL );
-
+			//MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 90, MIL.M_NULL );
+			MIL.MimBinarize( MilImage, BinarizedImage, MIL.M_GREATER, threshold, MIL.M_NULL );
 
 			///
 
@@ -298,9 +294,17 @@ namespace DamoOneVision.Camera
 			//MIL.MblobGetResult( BlobResult, MIL.M_DEFAULT, MIL.M_NUMBER_OF_HOLES , ref holenumber );
 			//MIL.MblobGetResult( BlobResult, M_GENERAL, M_NUMBER + M_TYPE_MIL_INT, &Number0 );
 			//MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
-			MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( 0 ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+			try
+			{
+				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( 0 ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine( $"MblobGetResult에서 예외 발생: {ex.Message}" );
+			}
 
-			if(holenumber == 1)
+
+			if (holenumber == 1)
 			{
 				isGood = true;
 			}
@@ -314,8 +318,8 @@ namespace DamoOneVision.Camera
 
 
 			MIL.MbufFree( MilImage );
-			MIL.MbufFree( MilColorImage );
-			MIL.MbufFree( Mil8bitImage );
+			//MIL.MbufFree( MilColorImage );
+			//MIL.MbufFree( Mil8bitImage );
 			MIL.MbufFree( BinarizedImage );
 			//MIL.MbufFree( CircleMeasMarker );
 

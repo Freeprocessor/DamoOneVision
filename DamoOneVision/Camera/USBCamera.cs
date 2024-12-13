@@ -57,13 +57,6 @@ namespace DamoOneVision.Camera
 				frame = null;
 			}
 
-			// MIL 리소스 해제
-			//if (MilImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( MilImage );
-			//	MilImage = MIL.M_NULL;
-			//}
-
 		}
 
 		public byte[ ] CaptureImage( )

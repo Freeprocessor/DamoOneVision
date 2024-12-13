@@ -32,6 +32,10 @@ namespace DamoOneVision.Camera
 			// 디지타이저(카메라) 할당
 			MIL.MdigAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
 
+			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerMode", MIL.M_TYPE_STRING, "On" );
+			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerSource", MIL.M_TYPE_STRING, "SoftwareSignal0" );
+
+
 			return MilDigitizer != MIL.M_NULL;
 		}
 
@@ -79,9 +83,11 @@ namespace DamoOneVision.Camera
 				MIL.MbufAllocColor(MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
 				isIRCamera = true;
 			}
-
+			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
 			// 이미지 캡처
+			MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
 			MIL.MdigGrab( MilDigitizer, MilImage );
+
 
 			if (true)
 			{
@@ -93,7 +99,7 @@ namespace DamoOneVision.Camera
 				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
 				//SaveImage( imageData, filePath );
-				MIL.MbufSave( filePath, MilImage );
+				//MIL.MbufSave( filePath, MilImage );
 			}
 
 			MIL_INT SizeByte = 0;
@@ -123,20 +129,8 @@ namespace DamoOneVision.Camera
 					MIL.MbufPut( MilImage, byteScaleImageData );
 					//MIL.MbufPut( MilImage, ushortScaleImageData );
 				}
-				//MIL_ID JETColorMap = MIL.M_NULL;
-				//MIL_ID MimLut = MIL.M_NULL;
-				//MIL_ID ChildImage = MIL.M_NULL;
 
-				//MIL.MbufImport( LUT_FILE, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref JETColorMap );
-				//MIL.MbufAllocColor(MilSystem, 3, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MimLut);
-
-				//MIL.MbufClear( MimLut, MIL.M_COLOR_BLACK );
-
-				//MIL.MbufChildColor(MimLut, MIL.M_PLANAR, 0, MIL.M_ALL_BANDS, MilImage, MIL.M_ALL_BANDS, 0, 0, MIL.M_NULL, ref ChildImage );
-
-				//MIL.MimLutMap(MilImage, MimLut, JETColorMap );
 			}
-
 
 			//Bayer 이미지일 경우 RGB로 변환
 			///TODO : Bayer 이미지를 RGB로 변환하는 코드 추가
@@ -164,7 +158,7 @@ namespace DamoOneVision.Camera
 				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
 				//SaveImage( imageData, filePath );
-				MIL.MbufSave( filePath, MilImage);
+				//MIL.MbufSave( filePath, MilImage);
 			}
 
 			return imageData;
@@ -189,6 +183,8 @@ namespace DamoOneVision.Camera
 			ushort MinPixelValue = ImageData.Min();
 			ushort MaxPixelValue = ImageData.Max();
 
+
+			// 30~50도 범위로 Scale
 			double dMinPixelValue = (30.0 / 190.0) * 65535.0;
 			double dMaxPixelValue = (50.0 / 190.0) * 65535.0;
 
@@ -221,11 +217,11 @@ namespace DamoOneVision.Camera
 
 			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
 			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
-			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
-			if (distinctNumbersDesc[ 1 ] != null)
-			{
-				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
-			}
+			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			//if (distinctNumbersDesc[ 1 ] != null)
+			//{
+			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			//}
 				
 
 			byte MinPixelValue = ImageData.Min();
@@ -273,6 +269,8 @@ namespace DamoOneVision.Camera
 
 
 				MIL.MbufGet( MilImage, imageData );
+
+				MIL.MbufFree( MilImage );
 			}
 			return imageData;
 		}

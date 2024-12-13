@@ -54,7 +54,6 @@ namespace DamoOneVision.ViewModels
 		public ICommand SaveModelCommand { get; set; }
 		public ICommand LoadModelCommand { get; set; }
 
-		private SQLiteHelper _dbHelper;
 
 		public TeachingViewModel( )
 		{
@@ -68,7 +67,7 @@ namespace DamoOneVision.ViewModels
 
 			//Model 저장을 위한 ICommand 추가
 			SaveModelCommand = new RelayCommand( SaveModel );
-			LoadModelCommand = new RelayCommand( LoadModel );
+			//LoadModelCommand = new RelayCommand( LoadModel );
 
 			// CollectionChanged 이벤트 핸들러 등록
 			ComboBoxItems.CollectionChanged += ComboBoxItems_CollectionChanged;
@@ -79,7 +78,6 @@ namespace DamoOneVision.ViewModels
 				"models.db"
 			);
 			Directory.CreateDirectory( Path.GetDirectoryName( databasePath ) );
-			_dbHelper = new SQLiteHelper( databasePath );
 		}
 
 		//CanExcute 메서드가 지정되지 않았으므로 기본적으로 이 명령은 항상 실행이 가능함
@@ -189,7 +187,7 @@ namespace DamoOneVision.ViewModels
 			// SQLiteHelper를 사용하여 데이터베이스에 저장
 			try
 			{
-				_dbHelper.SaveModel( modelName, serializedData );
+				//_dbHelper.SaveModel( modelName, serializedData );
 				MessageBox.Show( "모델이 성공적으로 저장되었습니다." );
 			}
 			catch (Exception ex)
@@ -197,63 +195,63 @@ namespace DamoOneVision.ViewModels
 				MessageBox.Show( $"모델 저장 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
 			}
 		}
-		private void LoadModel( object parameter )
-		{
-			// 데이터베이스에서 모델 목록 가져오기
-			List<ModelItem> modelList;
-			try
-			{
-				modelList = _dbHelper.GetModelList();
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show( $"모델 목록을 가져오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
-				return;
-			}
+		//private void LoadModel( object parameter )
+		//{
+		//	// 데이터베이스에서 모델 목록 가져오기
+		//	List<ModelItem> modelList;
+		//	try
+		//	{
+		//		modelList = _dbHelper.GetModelList();
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show( $"모델 목록을 가져오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+		//		return;
+		//	}
 
-			if (modelList.Count == 0)
-			{
-				MessageBox.Show( "저장된 모델이 없습니다." );
-				return;
-			}
+		//	if (modelList.Count == 0)
+		//	{
+		//		MessageBox.Show( "저장된 모델이 없습니다." );
+		//		return;
+		//	}
 
-			// 모델 선택을 위한 다이얼로그 표시
-			int selectedModelId = ShowModelSelectionDialog(modelList);
-			if (selectedModelId == -1)
-			{
-				// 선택 취소 또는 오류
-				return;
-			}
+		//	// 모델 선택을 위한 다이얼로그 표시
+		//	int selectedModelId = ShowModelSelectionDialog(modelList);
+		//	if (selectedModelId == -1)
+		//	{
+		//		// 선택 취소 또는 오류
+		//		return;
+		//	}
 
-			// 선택된 모델의 데이터를 불러오기
-			string serializedData;
-			try
-			{
-				serializedData = _dbHelper.LoadModelData( selectedModelId );
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show( $"모델 데이터를 불러오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
-				return;
-			}
+		//	// 선택된 모델의 데이터를 불러오기
+		//	string serializedData;
+		//	try
+		//	{
+		//		serializedData = _dbHelper.LoadModelData( selectedModelId );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show( $"모델 데이터를 불러오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+		//		return;
+		//	}
 
-			if (string.IsNullOrEmpty( serializedData ))
-			{
-				MessageBox.Show( "모델 데이터를 불러오지 못했습니다." );
-				return;
-			}
+		//	if (string.IsNullOrEmpty( serializedData ))
+		//	{
+		//		MessageBox.Show( "모델 데이터를 불러오지 못했습니다." );
+		//		return;
+		//	}
 
-			// 직렬화된 데이터를 역직렬화하여 ComboBoxItems에 반영
-			try
-			{
-				DeserializeModelData( serializedData );
-				MessageBox.Show( "모델이 성공적으로 불러와졌습니다." );
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show( $"모델 데이터를 역직렬화하는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
-			}
-		}
+		//	// 직렬화된 데이터를 역직렬화하여 ComboBoxItems에 반영
+		//	try
+		//	{
+		//		DeserializeModelData( serializedData );
+		//		MessageBox.Show( "모델이 성공적으로 불러와졌습니다." );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show( $"모델 데이터를 역직렬화하는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+		//	}
+		//}
 
 		// 직렬화된 데이터를 역직렬화하여 ComboBoxItems에 반영
 		private void DeserializeModelData( string serializedData )
