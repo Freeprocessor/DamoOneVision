@@ -408,13 +408,7 @@ namespace DamoOneVision
 					// 선택된 이미지를 VisionImage에 표시
 					try
 					{
-						byte [] pixelData = null;
-
-						pixelData = MatroxCamera.LoadImage( MilSystem, selectedImagePath );
-
-						// RawPixelData에 추출한 픽셀 데이터 저장
-						this.RawPixelData = pixelData;
-						DisplayImage( pixelData );
+						InfraredCameraImage = MatroxCamera.LoadImage( MilSystem, selectedImagePath );
 					}
 					catch (Exception ex)
 					{
@@ -471,17 +465,19 @@ namespace DamoOneVision
 			}
 		}
 
-		private void Show3DButton_Click( object sender, RoutedEventArgs e )
-		{
-			// 별도의 윈도우를 띄워서 3D 표시
-			_3DView _3dview = new _3DView( (byte[])RawPixelData.Clone());
-			_3dview.Show();
-		}
+		//private void Show3DButton_Click( object sender, RoutedEventArgs e )
+		//{
+		//	// 별도의 윈도우를 띄워서 3D 표시
+		//	_3DView _3dview = new _3DView( (byte[])RawPixelData.Clone());
+		//	_3dview.Show();
+		//}
 
 		private void textBox_TextChanged( object sender, TextChangedEventArgs e )
 		{
 
 			int.TryParse( ThresholdText.Text, out ThresholdValue );
 		}
+
+
 	}
 }

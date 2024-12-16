@@ -30,11 +30,11 @@ namespace DamoOneVision.Camera
 			}
 			else if (cameraModel == "Spinnaker")
 			{
-				camera = new SpinnakerCamera();
+				//camera = new SpinnakerCamera();
 			}
 			else if (cameraModel == "USB")
 			{
-				camera = new USBCamera();
+				//camera = new USBCamera();
 			}
 			else
 			{

@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace DamoOneVision.Camera
 {
-	public class USBCamera : ICamera
+	public class USBCamera //: ICamera
 	{
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;

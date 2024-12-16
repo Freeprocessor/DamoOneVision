@@ -270,23 +270,16 @@ namespace DamoOneVision.Camera
 		static public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
 			MIL_ID MilImage = MIL.M_NULL;
-			MIL.MbufAllocColor( MilSystem, 1, 464, 348, 16, MIL.M_IMAGE + MIL.M_PROC, ref MilImage );
-			byte[] imageData = null;
+			//MIL.MbufLoad( filePath, MilImage );
 			if (File.Exists( filePath ))
 			{
-				int SizeByte = 0;
-				MIL.MbufLoad( filePath, MilImage );
-
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
-				imageData = new byte[ SizeByte ];
+				//MIL.MbufLoad( filePath, MilImage );
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE, MilSystem, ref MilImage );
 
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref MILContext.Width );
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref MILContext.Height );
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref MILContext.NbBands );
 				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref MILContext.DataType );
-
-
-				MIL.MbufGet( MilImage, imageData );
 
 				MIL.MbufFree( MilImage );
 			}

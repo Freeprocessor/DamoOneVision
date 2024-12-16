@@ -38,7 +38,7 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center" Width="31" 
                        />
                 </MenuItem.Header>
-                <MenuItem x:Name="ContinuousMenuItem" Header="Continuous" IsCheckable="True" Checked="ContinuousMenuItem_Checked" Unchecked="ContinuousMenuItem_Unchecked" />
+                <!--<MenuItem x:Name="ContinuousMenuItem" Header="Continuous" IsCheckable="True" Checked="ContinuousMenuItem_Checked" Unchecked="ContinuousMenuItem_Unchecked" />-->
             </MenuItem>
             <MenuItem Height="24" Width="60">
                 <MenuItem.Header>
@@ -56,7 +56,7 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center" Width="31" 
                        />
                 </MenuItem.Header>
-                <MenuItem Header="3D" IsCheckable="False" Click="Show3DButton_Click"/>
+                <!--<MenuItem Header="3D" IsCheckable="False" Click="Show3DButton_Click"/>-->
             </MenuItem>
             <MenuItem Height="24" Width="76">
                 <MenuItem.Header>
@@ -157,8 +157,12 @@
                 <TabControl>
                     <TabItem Header="Vision">
                         <Grid>
-                            <milwpf:MILWPFDisplay x:Name="infraredCameraDisplay"  />
-                            <milwpf:MILWPFDisplay x:Name="infraredCameraConversionDisplay"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <milwpf:MILWPFDisplay x:Name="infraredCameraDisplay"/>
+                            <milwpf:MILWPFDisplay x:Name="infraredCameraConversionDisplay"  Grid.Column="1"/>
                         </Grid>
                     </TabItem>
                 </TabControl>

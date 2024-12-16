@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace DamoOneVision.Camera
 {
-	public class SpinnakerCamera : ICamera
+	public class SpinnakerCamera //: ICamera
 	{
 		private IManagedCamera camera = null;
 		private ManagedSystem system = null;
