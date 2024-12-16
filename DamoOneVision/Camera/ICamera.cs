@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Matrox.MatroxImagingLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace DamoOneVision.Camera
 	{
 		bool Connect( );
 		void Disconnect( );
-		byte[ ] CaptureImage( );
+		void CaptureImage( ref MIL_ID MilImage );
 	}
 }

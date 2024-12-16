@@ -19,8 +19,8 @@ namespace DamoOneVision.Camera
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;
 		private MIL_ID MilDigitizer = MIL.M_NULL;
-		private MIL_ID MilImage = MIL.M_NULL;
-		private bool isIRCamera = false;
+		string imagesFolder;
+
 		//private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
 
 
@@ -32,12 +32,39 @@ namespace DamoOneVision.Camera
 			// 디지타이저(카메라) 할당
 			MIL.MdigAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
 
-			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerMode", MIL.M_TYPE_STRING, "On" );
-			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerSource", MIL.M_TYPE_STRING, "SoftwareSignal0" );
+			//MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerMode", MIL.M_TYPE_STRING, "On" );
+			//MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerSource", MIL.M_TYPE_STRING, "SoftwareSignal0" );
 
 
 			return MilDigitizer != MIL.M_NULL;
 		}
+
+		private void InitImageSave()
+		{
+			// 'Images' 폴더 경로 설정
+			imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+
+			// 폴더가 없으면 생성
+			if (!Directory.Exists( imagesFolder ))
+			{
+				Directory.CreateDirectory( imagesFolder );
+			}
+
+		}
+
+		private void SaveImage( ref MIL_ID MilImage)
+		{
+			// 현재 시간과 날짜 가져오기
+			string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+			// 파일 이름 생성
+			string fileName = $"RAWImage_{timeStamp}.bmp";
+			// 전체 파일 경로
+			string filePath = System.IO.Path.Combine(imagesFolder, fileName);
+
+			//SaveImage( imageData, filePath );
+			MIL.MbufSave( filePath, MilImage );
+		}
+
 
 		public void Disconnect( )
 		{
@@ -47,24 +74,15 @@ namespace DamoOneVision.Camera
 				MilDigitizer = MIL.M_NULL;
 			}
 
-			if (MilImage != MIL.M_NULL)
-			{
-				MIL.MbufFree( MilImage );
-				MilImage = MIL.M_NULL;
-			}
+			//if (MilImage != MIL.M_NULL)
+			//{
+			//	MIL.MbufFree( MilImage );
+			//	MilImage = MIL.M_NULL;
+			//}
 		}
 
-		public byte[ ] CaptureImage( )
+		public void CaptureImage( ref MIL_ID MilImage )
 		{
-			// 'Images' 폴더 경로 설정
-			string imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
-
-			// 폴더가 없으면 생성
-			if (!Directory.Exists( imagesFolder ))
-			{
-				Directory.CreateDirectory( imagesFolder );
-			}
-
 			// 이미지 버퍼 할당
 			if (MilImage == MIL.M_NULL)
 			{
@@ -81,27 +99,30 @@ namespace DamoOneVision.Camera
 				//Bayer 이미지일 경우 NbBand 확인
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
 				MIL.MbufAllocColor(MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
-				isIRCamera = true;
 			}
 			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
 			// 이미지 캡처
-			MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
+			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
 			MIL.MdigGrab( MilDigitizer, MilImage );
 
 
 			if (true)
 			{
-				// 현재 시간과 날짜 가져오기
-				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-				// 파일 이름 생성
-				string fileName = $"RAWImage_{timeStamp}.bmp";
-				// 전체 파일 경로
-				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
-
-				//SaveImage( imageData, filePath );
-				//MIL.MbufSave( filePath, MilImage );
+				SaveImage( ref MilImage );
 			}
 
+			if (true)
+			{
+				InfraredCameraScaleImage( ref MilImage );
+			}
+
+
+
+		}
+
+
+		private void InfraredCameraScaleImage(ref MIL_ID MilImage ) 
+		{
 			MIL_INT SizeByte = 0;
 			MIL_ID MilBayerImage = MIL.M_NULL;
 			//버퍼에 쓴 Scale 데이터를 byte로 변환
@@ -111,7 +132,7 @@ namespace DamoOneVision.Camera
 
 			///
 			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
-			if (isIRCamera == true)
+			if (true)
 			{
 				if (MILContext.DataType == 16 && MILContext.NbBands == 1)
 				{
@@ -160,9 +181,6 @@ namespace DamoOneVision.Camera
 				//SaveImage( imageData, filePath );
 				//MIL.MbufSave( filePath, MilImage);
 			}
-
-			return imageData;
-
 		}
 
 		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
@@ -249,7 +267,7 @@ namespace DamoOneVision.Camera
 			return ImageData;
 		}
 
-		static public byte[ ] LoadImage( MIL_ID MilSystem, string filePath )
+		static public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
 			MIL_ID MilImage = MIL.M_NULL;
 			MIL.MbufAllocColor( MilSystem, 1, 464, 348, 16, MIL.M_IMAGE + MIL.M_PROC, ref MilImage );
@@ -272,7 +290,7 @@ namespace DamoOneVision.Camera
 
 				MIL.MbufFree( MilImage );
 			}
-			return imageData;
+			return MilImage;
 		}
 	}
 }

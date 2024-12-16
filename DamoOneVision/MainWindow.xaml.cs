@@ -27,6 +27,7 @@ using DamoOneVision.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System;
 
 
 namespace DamoOneVision
@@ -40,13 +41,19 @@ namespace DamoOneVision
 		//private ICamera camera;
 		//private TemplateMatcher templateMatcher;
 		private CameraManager cameraManager;
-		private MIL_ID MilSystem = MIL.M_NULL;
+
 		public ObservableCollection<string> ImagePaths { get; set; }
 		private string appFolder;
 
-		private WriteableBitmap bitmapVision;
-		private WriteableBitmap bitmapConversion;
-		private byte[ ] RawPixelData;
+
+		private MIL_ID MilSystem = MIL.M_NULL;
+
+		private MIL_ID InfraredCameraDisplay;
+		private MIL_ID InfraredCameraConversionDisplay;
+
+		private MIL_ID InfraredCameraImage;
+		private MIL_ID InfraredCameraConversionImage;
+
 
 		private int frameCount = 0;
 		private DateTime fpsStartTime = DateTime.Now;
@@ -64,26 +71,41 @@ namespace DamoOneVision
 		public MainWindow( )
 		{
 			InitializeComponent();
+			InitLocalAppFolder();
+			InitMILSystem();
+			//DATA BINDING
 			this.DataContext = this;
-			ImagePaths = new ObservableCollection<string>();
-			appFolder = System.IO.Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "DamoOneVision");
-
-			if (!System.IO.Directory.Exists( appFolder ))
-			{
-				System.IO.Directory.CreateDirectory( appFolder );
-			}
-
-			MilSystem = MILContext.Instance.MilSystem;
 
 			// 윈도우 종료 이벤트 핸들러 추가
 			this.Closing += Window_Closing;
 
 			cameraManager = new CameraManager();
-			cameraManager.ImageCaptured += OnImageCaptured;
+			//cameraManager.ImageCaptured += OnImageCaptured;
 
-
-			//templateMatcher = new TemplateMatcher();
 		}
+
+		private void InitLocalAppFolder( )
+		{
+			ImagePaths = new ObservableCollection<string>();
+			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
+			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
+			if (!Directory.Exists( appFolder ))
+			{
+				Directory.CreateDirectory( appFolder );
+			}
+		}
+
+		private void InitMILSystem()
+		{
+			MilSystem = MILContext.Instance.MilSystem;
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref InfraredCameraDisplay );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref InfraredCameraConversionDisplay );
+
+			infraredCameraDisplay.DisplayId = InfraredCameraDisplay;
+			infraredCameraConversionDisplay.DisplayId = InfraredCameraConversionDisplay;
+
+		}
+
 		private string DetectCameraModel( )
 		{
 			// 카메라 모델을 결정하는 로직을 구현
@@ -118,10 +140,8 @@ namespace DamoOneVision
 		{
 			await cameraManager.DisconnectAsync();
 
-			VisionImage.Source = null;
-			ConversionImage.Source = null;
-			bitmapVision = null;
-			bitmapConversion = null;
+			MIL.MbufFree( InfraredCameraImage );
+			MIL.MbufFree( InfraredCameraConversionImage );
 			FpsLabel.Content = "FPS: 0";
 
 			ConnectButton.IsEnabled = true;
@@ -129,28 +149,29 @@ namespace DamoOneVision
 		}
 
 		
-		private void OnImageCaptured( byte[ ] pixelData )
-		{
-			Dispatcher.Invoke( ( ) =>
-			{
-				DisplayImage( (byte[ ])pixelData.Clone() );
+		//private void OnImageCaptured( byte[ ] pixelData )
+		//{
+		//	Dispatcher.Invoke( ( ) =>
+		//	{
+		//		DisplayImage( (byte[ ])pixelData.Clone() );
 
-				// FPS 계산
-				frameCount++;
-				TimeSpan elapsed = DateTime.Now - fpsStartTime;
+		//		// FPS 계산
+		//		frameCount++;
+		//		TimeSpan elapsed = DateTime.Now - fpsStartTime;
 
-				if (elapsed.TotalSeconds >= 1.0)
-				{
-					currentFps = frameCount / elapsed.TotalSeconds;
-					frameCount = 0;
-					fpsStartTime = DateTime.Now;
+		//		if (elapsed.TotalSeconds >= 1.0)
+		//		{
+		//			currentFps = frameCount / elapsed.TotalSeconds;
+		//			frameCount = 0;
+		//			fpsStartTime = DateTime.Now;
 
-					FpsLabel.Content = $"FPS: {currentFps:F2}";
-					Debug.WriteLine( $"FPS 업데이트: {currentFps:F2}" );
-				}
-			} );
-		}
+		//			FpsLabel.Content = $"FPS: {currentFps:F2}";
+		//			Debug.WriteLine( $"FPS 업데이트: {currentFps:F2}" );
+		//		}
+		//	} );
+		//}
 
+		/*
 
 		private void DisplayImage( byte[ ] pixelData )
 		{
@@ -210,7 +231,7 @@ namespace DamoOneVision
 			{
 				bitmapConversion.Unlock();
 			}
-		}
+		}*/
 
 
 		private static PixelFormat getPixelFormat()
@@ -251,39 +272,39 @@ namespace DamoOneVision
 		{
 			Application.Current.Shutdown();
 		}
-		private void ContinuousMenuItem_Checked( object sender, RoutedEventArgs e )
-		{
-			isContinuous = true;
+		//private void ContinuousMenuItem_Checked( object sender, RoutedEventArgs e )
+		//{
+		//	isContinuous = true;
 
-			if (cameraManager.IsConnected)
-			{
-				cameraManager.StartContinuousCapture();
-			}
-		}
+		//	if (cameraManager.IsConnected)
+		//	{
+		//		cameraManager.StartContinuousCapture();
+		//	}
+		//}
 
-		private void ContinuousMenuItem_Unchecked( object sender, RoutedEventArgs e )
-		{
-			isContinuous = false;
+		//private void ContinuousMenuItem_Unchecked( object sender, RoutedEventArgs e )
+		//{
+		//	isContinuous = false;
 
-			if (cameraManager.IsConnected)
-			{
-				cameraManager.StopContinuousCapture();
-			}
-		}
+		//	if (cameraManager.IsConnected)
+		//	{
+		//		cameraManager.StopContinuousCapture();
+		//	}
+		//}
 
 		private async void TriggerButton_Click( object sender, RoutedEventArgs e )
 		{
-			if (!cameraManager.IsConnected && this.RawPixelData == null)
+			if (!cameraManager.IsConnected && MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
 			{
 				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 				return;
 			}
 
-			if (isContinuous)
-			{
-				MessageBox.Show( "Continuous 모드에서는 Trigger 기능을 사용할 수 없습니다." );
-				return;
-			}
+			//if (isContinuous)
+			//{
+			//	MessageBox.Show( "Continuous 모드에서는 Trigger 기능을 사용할 수 없습니다." );
+			//	return;
+			//}
 			if (!isCapturing)
 			{
 				isCapturing = true;
@@ -295,13 +316,12 @@ namespace DamoOneVision
 					// 카메라 연결 상태에 따라 캡처 또는 로드된 이미지 사용
 					if (cameraManager.IsConnected)
 					{
-						pixelData = await cameraManager.CaptureSingleImageAsync();
-						DisplayImage( pixelData );
+						cameraManager.CaptureSingleImage( ref InfraredCameraImage );
+						//DisplayImage( pixelData );
 					}
 					else
 					{
 						// 로드된 이미지가 있다면 그 이미지를 사용
-						pixelData = this.RawPixelData;
 					}
 
 					if (pixelData != null)
@@ -314,7 +334,7 @@ namespace DamoOneVision
 						Conversion.InfraredCameraModel( ConversionpixelData, ref isGood, ThresholdValue );
 
 						GoodLamp( isGood );
-						DisplayConversionImage( ConversionpixelData );
+						//DisplayConversionImage( ConversionpixelData );
 					}
 				}
 				catch (Exception ex)
@@ -331,12 +351,12 @@ namespace DamoOneVision
 		private void TeachingButton_Click( object sender, RoutedEventArgs e )
 		{
 			// 템플릿 학습 윈도우 열기
-			if (this.RawPixelData == null)
+			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
 			{
 				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
 				return;
 			}
-			TeachingWindow teachingWindow = new TeachingWindow((byte[])this.RawPixelData.Clone(), (int)MILContext.Width, (int)MILContext.Height, getPixelFormat());
+			TeachingWindow teachingWindow = new TeachingWindow(InfraredCameraImage, (int)MILContext.Width, (int)MILContext.Height, getPixelFormat());
 			teachingWindow.ShowDialog();
 
 		}

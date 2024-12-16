@@ -39,17 +39,17 @@ namespace DamoOneVision
 		private bool isDragging = false;
 
 
-		public TeachingWindow( byte[ ] LocalPixelData, int width, int height, PixelFormat pixelFormat )
+		public TeachingWindow( MIL_ID MilImage, int width, int height, PixelFormat pixelFormat )
 		{
 			InitializeComponent();
 			_viewModel = DataContext as TeachingViewModel;
 
-			_viewModel.RawPixelData = (byte[ ]) LocalPixelData.Clone();
+			//_viewModel.RawPixelData = (byte[ ]) LocalPixelData.Clone();
 
-			this.pixelData = (byte[ ])LocalPixelData.Clone();
+			//this.pixelData = (byte[ ])LocalPixelData.Clone();
 
 			Conversion.ImageProcessed += Conversion_ImageProcessed;
-			ConversionImageDisplay( LocalPixelData );
+			//ConversionImageDisplay( LocalPixelData );
 
 		}
 
