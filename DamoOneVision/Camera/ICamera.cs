@@ -11,6 +11,6 @@ namespace DamoOneVision.Camera
 	{
 		bool Connect( );
 		void Disconnect( );
-		void CaptureImage( ref MIL_ID MilImage );
+		MIL_ID CaptureImage( );
 	}
 }

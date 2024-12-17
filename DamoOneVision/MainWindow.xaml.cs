@@ -44,6 +44,7 @@ namespace DamoOneVision
 
 		public ObservableCollection<string> ImagePaths { get; set; }
 		private string appFolder;
+		private string imageFolder;
 
 
 		private MIL_ID MilSystem = MIL.M_NULL;
@@ -89,6 +90,7 @@ namespace DamoOneVision
 			ImagePaths = new ObservableCollection<string>();
 			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
+			imageFolder = System.IO.Path.Combine( appFolder, "Images" );
 			if (!Directory.Exists( appFolder ))
 			{
 				Directory.CreateDirectory( appFolder );
@@ -98,8 +100,14 @@ namespace DamoOneVision
 		private void InitMILSystem()
 		{
 			MilSystem = MILContext.Instance.MilSystem;
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref InfraredCameraDisplay );
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref InfraredCameraConversionDisplay );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref InfraredCameraDisplay );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref InfraredCameraConversionDisplay );
+
+			MIL.MdispControl( InfraredCameraDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( InfraredCameraConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			/// 컬러맵 설정은 필요에 따라 변경 가능
+			MIL.MdispLut( InfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
 
 			infraredCameraDisplay.DisplayId = InfraredCameraDisplay;
 			infraredCameraConversionDisplay.DisplayId = InfraredCameraConversionDisplay;
@@ -140,13 +148,18 @@ namespace DamoOneVision
 		{
 			await cameraManager.DisconnectAsync();
 
-			MIL.MbufFree( InfraredCameraImage );
-			MIL.MbufFree( InfraredCameraConversionImage );
+			if( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
+			if( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
+
+			InfraredCameraImage = MIL.M_NULL;
+			InfraredCameraConversionImage = MIL.M_NULL;
+
 			FpsLabel.Content = "FPS: 0";
 
 			ConnectButton.IsEnabled = true;
 			DisconnectButton.IsEnabled = false;
 		}
+		
 
 		
 		//private void OnImageCaptured( byte[ ] pixelData )
@@ -171,67 +184,6 @@ namespace DamoOneVision
 		//	} );
 		//}
 
-		/*
-
-		private void DisplayImage( byte[ ] pixelData )
-		{
-			int width = (int)MILContext.Width;
-			int height = (int)MILContext.Height;
-			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
-
-			if (bitmapVision == null || bitmapVision.PixelWidth != width || bitmapVision.PixelHeight != height )
-			{
-				PixelFormat pixelFormat = getPixelFormat();
-				//pixelFormat = PixelFormats.Rgb24;
-				bitmapVision = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
-				VisionImage.Source = bitmapVision;
-			}
-
-			bitmapVision.Lock();
-			try
-			{
-				// 스트라이드 계산
-				int stride = width * bytesPerPixel;
-
-				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmapVision.WritePixels( new Int32Rect( 0, 0, width, height ), (byte[ ]) pixelData.Clone(), stride, 0 );
-				this.RawPixelData = pixelData;
-			}
-			finally
-			{
-				bitmapVision.Unlock();
-			}
-		}
-
-		private void DisplayConversionImage( byte[ ] pixelData )
-		{
-			int width = (int)MILContext.Width;
-			int height = (int)MILContext.Height;
-			int bytesPerPixel = (int)MILContext.DataType*(int)MILContext.NbBands / 8;
-
-			if (bitmapConversion == null || bitmapConversion.PixelWidth != width || bitmapConversion.PixelHeight != height)
-			{
-				PixelFormat pixelFormat = PixelFormats.Gray16;
-				//pixelFormat = PixelFormats.Rgb24;
-				bitmapConversion = new WriteableBitmap( width, height, 96, 96, pixelFormat, null );
-				ConversionImage.Source = bitmapConversion;
-			}
-
-			bitmapConversion.Lock();
-			try
-			{
-				// 스트라이드 계산
-				int stride = width * bytesPerPixel;
-
-				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmapConversion.WritePixels( new Int32Rect( 0, 0, width, height ), (byte[ ]) pixelData.Clone(), stride, 0 );
-				//this.RawPixelData = pixelData;
-			}
-			finally
-			{
-				bitmapConversion.Unlock();
-			}
-		}*/
 
 
 		private static PixelFormat getPixelFormat()
@@ -292,9 +244,9 @@ namespace DamoOneVision
 		//	}
 		//}
 
-		private async void TriggerButton_Click( object sender, RoutedEventArgs e )
+		private void TriggerButton_Click( object sender, RoutedEventArgs e )
 		{
-			if (!cameraManager.IsConnected && MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
+			if (!cameraManager.IsConnected && InfraredCameraImage == MIL.M_NULL)
 			{
 				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 				return;
@@ -311,27 +263,29 @@ namespace DamoOneVision
 
 				try
 				{
-					byte[] pixelData = null;
-
-					// 카메라 연결 상태에 따라 캡처 또는 로드된 이미지 사용
 					if (cameraManager.IsConnected)
 					{
-						cameraManager.CaptureSingleImage( ref InfraredCameraImage );
-						//DisplayImage( pixelData );
+						InfraredCameraImage = cameraManager.CaptureSingleImage( );
+						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 					}
 					else
 					{
 						// 로드된 이미지가 있다면 그 이미지를 사용
 					}
 
-					if (pixelData != null)
+					if (InfraredCameraImage != MIL.M_NULL)
 					{
 						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
 						bool isGood = false;
-						byte[] ConversionpixelData = (byte[])pixelData.Clone();
-						Conversion.InfraredCameraModel( ConversionpixelData, ref isGood, ThresholdValue );
+
+						if( InfraredCameraConversionImage == MIL.M_NULL ) MIL.MbufFree( InfraredCameraConversionImage );
+						InfraredCameraConversionImage = MIL.M_NULL;
+
+
+						InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, ThresholdValue );
+						MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
 
 						GoodLamp( isGood );
 						//DisplayConversionImage( ConversionpixelData );
@@ -408,7 +362,8 @@ namespace DamoOneVision
 					// 선택된 이미지를 VisionImage에 표시
 					try
 					{
-						InfraredCameraImage = MatroxCamera.LoadImage( MilSystem, selectedImagePath );
+						InfraredCameraImage = MatroxCamera.LoadImage( MilSystem, selectedImagePath);
+						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 					}
 					catch (Exception ex)
 					{
@@ -424,7 +379,7 @@ namespace DamoOneVision
 			ImagePaths.Clear(); // 기존 리스트 비우기(원하는 경우 생략)
 			//이미지가 있는지 확인, 없으면 만들기
 
-			string[] files = Directory.GetFiles(appFolder, "*.bmp");
+			string[] files = Directory.GetFiles(imageFolder, "*.bmp");
 
 			foreach (var file in files)
 			{
@@ -442,6 +397,47 @@ namespace DamoOneVision
 		protected async override void OnClosed( EventArgs e )
 		{
 			base.OnClosed( e );
+
+			// 1. UI 요소의 DisplayId를 MIL.M_NULL로 설정하여 참조 해제
+			if (infraredCameraDisplay != null)
+			{
+				infraredCameraDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (infraredCameraConversionDisplay != null)
+			{
+				infraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			// 2. disp 버퍼 해제
+			if (InfraredCameraDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( InfraredCameraDisplay );
+				InfraredCameraDisplay = MIL.M_NULL;
+				Console.WriteLine( "InfraredCameraDisplay 해제 완료." );
+			}
+
+			if (InfraredCameraConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( InfraredCameraConversionDisplay );
+				InfraredCameraConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "InfraredCameraConversionDisplay 해제 완료." );
+			}
+
+			// 3. 이미지 버퍼 해제
+			if (InfraredCameraImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( InfraredCameraImage );
+				InfraredCameraImage = MIL.M_NULL;
+				Console.WriteLine( "InfraredCameraImage 해제 완료." );
+			}
+
+			if (InfraredCameraConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( InfraredCameraConversionImage );
+				InfraredCameraConversionImage = MIL.M_NULL;
+				Console.WriteLine( "InfraredCameraConversionImage 해제 완료." );
+			}
 
 			// 리소스 해제
 			//templateMatcher?.Dispose();

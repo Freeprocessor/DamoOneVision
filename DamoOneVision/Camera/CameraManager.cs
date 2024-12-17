@@ -11,6 +11,7 @@ namespace DamoOneVision.Camera
 {
 	internal class CameraManager
 	{
+		private MIL_ID MilImage = MIL.M_NULL;
 		private ICamera camera;
 		//private CancellationTokenSource cts;
 		//private Task captureTask;
@@ -88,12 +89,14 @@ namespace DamoOneVision.Camera
 		}
 
 
-		public void CaptureSingleImage( ref MIL_ID MilImage )
+		public MIL_ID CaptureSingleImage( )
 		{
 			if (camera == null)
 				throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
 
-			camera.CaptureImage( ref MilImage );
+			MilImage = camera.CaptureImage( );
+
+			return MilImage;
 
 		}
 

@@ -60,7 +60,7 @@ namespace DamoOneVision.Camera
 			{
 				throw new Exception( "MilSystem을 초기화할 수 없습니다." );
 			}
-			//MIL.MappControl( MIL.M_ERROR, MIL.M_PRINT_DISABLE );
+			MIL.MappControl( MIL.M_ERROR, MIL.M_PRINT_DISABLE );
 			//MIL.MappControl( MIL.M_ERROR, MIL );
 		}
 

@@ -126,33 +126,33 @@ namespace DamoOneVision.ViewModels
 
 						switch (item.SelectedProcessingOption)
 						{ 
-							case "HSV":
-								Conversion.RunHSLThreshold( item.HMinValue ?? 0, item.HMaxValue ?? 0, 
-									item.SMinValue ?? 0, item.SMaxValue ?? 0, item.VMinValue ?? 0, 
-									item.VMaxValue ?? 0, ProcessingPixelData ) ;
+							//case "HSV":
+							//	Conversion.RunHSLThreshold( item.HMinValue ?? 0, item.HMaxValue ?? 0, 
+							//		item.SMinValue ?? 0, item.SMaxValue ?? 0, item.VMinValue ?? 0, 
+							//		item.VMaxValue ?? 0, ProcessingPixelData ) ;
 
-								break;
-							case "Template Matching":
-								TemplateMatcher templateMatcher = new TemplateMatcher();
-								//await Task.Run( ( ) => templateMatcher.FindTemplate( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ) );
-								break;
+							//	break;
+							//case "Template Matching":
+							//	TemplateMatcher templateMatcher = new TemplateMatcher();
+							//	//await Task.Run( ( ) => templateMatcher.FindTemplate( item.HMinValue, item.HMaxValue, item.SMinValue, item.SMaxValue, item.VMinValue, item.VMaxValue, PixelData ) );
+							//	break;
 
-							case "Clip":
-								// 문자열을 상수로 매핑
-								if (ClipOptionMapping.TryGetValue( item.SelectedClipOption, out MIL_ID clipOption ))
-								{
-									 Conversion.RunClip(
-										clipOption,
-										item.LowerLimit ?? 0, item.UpperLimit ?? 0,
-										item.WriteLow ?? 0, item.WriteHigh ?? 0,
-										ProcessingPixelData ) ;
-								}
-								else
-								{
-									// 매핑 실패 시 예외 처리 또는 기본값 설정
-									throw new Exception( "유효하지 않은 Clip 옵션입니다." );
-								}
-								break;
+							//case "Clip":
+							//	// 문자열을 상수로 매핑
+							//	if (ClipOptionMapping.TryGetValue( item.SelectedClipOption, out MIL_ID clipOption ))
+							//	{
+							//		 Conversion.RunClip(
+							//			clipOption,
+							//			item.LowerLimit ?? 0, item.UpperLimit ?? 0,
+							//			item.WriteLow ?? 0, item.WriteHigh ?? 0,
+							//			ProcessingPixelData ) ;
+							//	}
+							//	else
+							//	{
+							//		// 매핑 실패 시 예외 처리 또는 기본값 설정
+							//		throw new Exception( "유효하지 않은 Clip 옵션입니다." );
+							//	}
+							//	break;
 
 						}
 

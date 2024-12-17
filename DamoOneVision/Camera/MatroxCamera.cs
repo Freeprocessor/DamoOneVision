@@ -19,9 +19,17 @@ namespace DamoOneVision.Camera
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;
 		private MIL_ID MilDigitizer = MIL.M_NULL;
+		//private MIL_ID MilGrabImage = MIL.M_NULL;
+		private MIL_ID MilImage = MIL.M_NULL;
+		string appfolder;
 		string imagesFolder;
 
 		//private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
+
+		public MatroxCamera()
+		{
+			InitImageSave();
+		}
 
 
 		public bool Connect( )
@@ -32,58 +40,6 @@ namespace DamoOneVision.Camera
 			// 디지타이저(카메라) 할당
 			MIL.MdigAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
 
-			//MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerMode", MIL.M_TYPE_STRING, "On" );
-			//MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "TriggerSource", MIL.M_TYPE_STRING, "SoftwareSignal0" );
-
-
-			return MilDigitizer != MIL.M_NULL;
-		}
-
-		private void InitImageSave()
-		{
-			// 'Images' 폴더 경로 설정
-			imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
-
-			// 폴더가 없으면 생성
-			if (!Directory.Exists( imagesFolder ))
-			{
-				Directory.CreateDirectory( imagesFolder );
-			}
-
-		}
-
-		private void SaveImage( ref MIL_ID MilImage)
-		{
-			// 현재 시간과 날짜 가져오기
-			string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-			// 파일 이름 생성
-			string fileName = $"RAWImage_{timeStamp}.bmp";
-			// 전체 파일 경로
-			string filePath = System.IO.Path.Combine(imagesFolder, fileName);
-
-			//SaveImage( imageData, filePath );
-			MIL.MbufSave( filePath, MilImage );
-		}
-
-
-		public void Disconnect( )
-		{
-			if (MilDigitizer != MIL.M_NULL)
-			{
-				MIL.MdigFree( MilDigitizer );
-				MilDigitizer = MIL.M_NULL;
-			}
-
-			//if (MilImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( MilImage );
-			//	MilImage = MIL.M_NULL;
-			//}
-		}
-
-		public void CaptureImage( ref MIL_ID MilImage )
-		{
-			// 이미지 버퍼 할당
 			if (MilImage == MIL.M_NULL)
 			{
 
@@ -98,30 +54,83 @@ namespace DamoOneVision.Camera
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
-				MIL.MbufAllocColor(MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB, ref MilImage );
+				MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
 			}
-			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
-			// 이미지 캡처
-			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_TRIGGER_SOFTWARE, MIL.M_ACTIVATE );
-			MIL.MdigGrab( MilDigitizer, MilImage );
 
 
+			return MilDigitizer != MIL.M_NULL;
+		}
+
+		private void InitImageSave()
+		{
+			// 'Images' 폴더 경로 설정
+			string localappdata = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData);
+			appfolder = System.IO.Path.Combine( localappdata, "DamoOneVision" );
+			imagesFolder = System.IO.Path.Combine( appfolder, "Images");
+
+			// 폴더가 없으면 생성
+			if (!Directory.Exists( imagesFolder ))
+			{
+				Directory.CreateDirectory( imagesFolder );
+			}
+
+		}
+
+		private void SaveImage( ref MIL_ID MilImage, string name )
+		{
 			if (true)
 			{
-				SaveImage( ref MilImage );
+				// 현재 시간과 날짜 가져오기
+				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+				// 파일 이름 생성
+				string fileName = $"{name}_{timeStamp}.bmp";
+				// 전체 파일 경로
+				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
+
+				//SaveImage( imageData, filePath );
+				MIL.MbufSave( filePath, MilImage );
 			}
-
-			if (true)
-			{
-				InfraredCameraScaleImage( ref MilImage );
-			}
-
-
 
 		}
 
 
-		private void InfraredCameraScaleImage(ref MIL_ID MilImage ) 
+		public void Disconnect( )
+		{
+
+			if (MilDigitizer != MIL.M_NULL) MIL.MdigFree( MilDigitizer );
+			MilDigitizer = MIL.M_NULL;
+
+			//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
+			//MilImage = MIL.M_NULL;
+
+		}
+
+		public MIL_ID CaptureImage( )
+		{
+
+			//MIL_ID MilDisplay = MIL.M_NULL;
+
+			MIL.MdigGrab( MilDigitizer, MilImage );
+
+			//MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref MilDisplay );
+			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
+			//MIL.MdispSelect( MilDisplay, MilImage );
+
+
+			SaveImage( ref MilImage , "RAWImage" );
+
+
+			if (true)
+			{
+				InfraredCameraScaleImage( MilImage );
+			}
+			//MIL.MdispFree( MilDisplay );
+			return MilImage;
+
+		}
+
+
+		private void InfraredCameraScaleImage( MIL_ID MilImage ) 
 		{
 			MIL_INT SizeByte = 0;
 			MIL_ID MilBayerImage = MIL.M_NULL;
@@ -153,34 +162,14 @@ namespace DamoOneVision.Camera
 
 			}
 
-			//Bayer 이미지일 경우 RGB로 변환
-			///TODO : Bayer 이미지를 RGB로 변환하는 코드 추가
-
-			SizeByte = 0;
-			//버퍼에 쓴 Scale 데이터를 byte로 변환
-			MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
-			byte[] imageData = new byte[SizeByte];
-
-			MIL.MbufGet( MilImage, imageData );
-
 			int imageDataType = (int) MIL.MbufInquire(MilImage, MIL.M_TYPE);
 			int nbBands = (int) MIL.MbufInquire(MilImage, MIL.M_SIZE_BAND);
 
 			Debug.WriteLine( "Image DataType: " + imageDataType );
 			Debug.WriteLine( "Number of Bands (NbBands): " + nbBands );
 
-			if (true)
-			{
-				// 현재 시간과 날짜 가져오기
-				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-				// 파일 이름 생성
-				string fileName = $"Image_{timeStamp}.bmp";
-				// 전체 파일 경로
-				string filePath = System.IO.Path.Combine(imagesFolder, fileName);
 
-				//SaveImage( imageData, filePath );
-				//MIL.MbufSave( filePath, MilImage);
-			}
+			SaveImage( ref MilImage , "Image" );
 		}
 
 		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
@@ -270,18 +259,17 @@ namespace DamoOneVision.Camera
 		static public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
 			MIL_ID MilImage = MIL.M_NULL;
-			//MIL.MbufLoad( filePath, MilImage );
+
 			if (File.Exists( filePath ))
 			{
-				//MIL.MbufLoad( filePath, MilImage );
-				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE, MilSystem, ref MilImage );
+
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref MilImage );
 
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref MILContext.Width );
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref MILContext.Height );
 				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref MILContext.NbBands );
 				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref MILContext.DataType );
 
-				MIL.MbufFree( MilImage );
 			}
 			return MilImage;
 		}
