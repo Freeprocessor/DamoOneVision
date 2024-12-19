@@ -12,7 +12,7 @@ using System.Windows.Media;
 
 using Newtonsoft.Json;
 using System.IO;
-using DamoOneVision.Models;
+
 
 namespace DamoOneVision.ViewModels
 {
@@ -66,7 +66,7 @@ namespace DamoOneVision.ViewModels
 			ConversionProcessCommand = new AsyncRelayCommand( ConversionProcessAsync, CanExecuteConversionProcess );
 
 			//Model 저장을 위한 ICommand 추가
-			SaveModelCommand = new RelayCommand( SaveModel );
+			//SaveModelCommand = new RelayCommand( SaveModel );
 			//LoadModelCommand = new RelayCommand( LoadModel );
 
 			// CollectionChanged 이벤트 핸들러 등록
@@ -171,30 +171,30 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private void SaveModel( object parameter )
-		{
-			// 모델 이름을 입력받기 위한 다이얼로그 표시
-			string modelName = ShowInputDialog("모델 이름을 입력하세요:");
-			if (string.IsNullOrEmpty( modelName ))
-			{
-				MessageBox.Show( "모델 이름이 유효하지 않습니다." );
-				return;
-			}
+		//private void SaveModel( object parameter )
+		//{
+		//	// 모델 이름을 입력받기 위한 다이얼로그 표시
+		//	string modelName = ShowInputDialog("모델 이름을 입력하세요:");
+		//	if (string.IsNullOrEmpty( modelName ))
+		//	{
+		//		MessageBox.Show( "모델 이름이 유효하지 않습니다." );
+		//		return;
+		//	}
 
-			// 모든 ComboBoxItems를 직렬화하여 저장
-			string serializedData = JsonConvert.SerializeObject(ComboBoxItems.ToList());
+		//	// 모든 ComboBoxItems를 직렬화하여 저장
+		//	string serializedData = JsonConvert.SerializeObject(ComboBoxItems.ToList());
 
-			// SQLiteHelper를 사용하여 데이터베이스에 저장
-			try
-			{
-				//_dbHelper.SaveModel( modelName, serializedData );
-				MessageBox.Show( "모델이 성공적으로 저장되었습니다." );
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show( $"모델 저장 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
-			}
-		}
+		//	// SQLiteHelper를 사용하여 데이터베이스에 저장
+		//	try
+		//	{
+		//		//_dbHelper.SaveModel( modelName, serializedData );
+		//		MessageBox.Show( "모델이 성공적으로 저장되었습니다." );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show( $"모델 저장 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error );
+		//	}
+		//}
 		//private void LoadModel( object parameter )
 		//{
 		//	// 데이터베이스에서 모델 목록 가져오기
@@ -276,26 +276,26 @@ namespace DamoOneVision.ViewModels
 		}
 
 		// 사용자 입력 다이얼로그 표시 메서드
-		private string ShowInputDialog( string message )
-		{
-			InputDialog inputDialog = new InputDialog(message);
-			if (inputDialog.ShowDialog() == true)
-			{
-				return inputDialog.ResponseText;
-			}
-			return null;
-		}
+		//private string ShowInputDialog( string message )
+		//{
+		//	InputDialog inputDialog = new InputDialog(message);
+		//	if (inputDialog.ShowDialog() == true)
+		//	{
+		//		return inputDialog.ResponseText;
+		//	}
+		//	return null;
+		//}
 
 		// 모델 선택 다이얼로그 표시 메서드
-		private int ShowModelSelectionDialog( List<ModelItem> modelList )
-		{
-			ModelSelectionDialog selectionDialog = new ModelSelectionDialog(modelList);
-			if (selectionDialog.ShowDialog() == true)
-			{
-				return selectionDialog.SelectedModelId;
-			}
-			return -1;
-		}
+		//private int ShowModelSelectionDialog( List<ModelItem> modelList )
+		//{
+		//	ModelSelectionDialog selectionDialog = new ModelSelectionDialog(modelList);
+		//	if (selectionDialog.ShowDialog() == true)
+		//	{
+		//		return selectionDialog.SelectedModelId;
+		//	}
+		//	return -1;
+		//}
 
 
 		private static readonly Dictionary<string, MIL_ID> ClipOptionMapping = new Dictionary<string, MIL_ID>

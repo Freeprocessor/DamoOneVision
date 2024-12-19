@@ -36,7 +36,7 @@ namespace DamoOneVision.Camera
 
 
 
-		public static MIL_ID InfraredCameraModel( MIL_ID InfraredCameraImage, ref bool isGood, int threshold)
+		public static MIL_ID InfraredCameraModel( MIL_ID InfraredCameraImage, ref bool isGood, Data.InfraredCameraModel infraredCameraModels)
 		{
 
 			if(BinarizedImage != MIL.M_NULL)
@@ -70,15 +70,15 @@ namespace DamoOneVision.Camera
 			//MIL.MimConvert( MilColorImage, Mil8bitImage, MIL.M_RGB_TO_L );
 
 			//MIL.MimBinarize( Mil8bitImage, BinarizedImage, MIL.M_GREATER, 90, MIL.M_NULL );
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, threshold, MIL.M_NULL );
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, infraredCameraModels.BinarizedThreshold, MIL.M_NULL );
 
 			///
 
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref CircleMeasMarker );
 
 			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
-			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_CENTER, 219.0, 184.0 );
-			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_RADII, 115.0, 183.5 );
+			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_CENTER, infraredCameraModels.CircleCenterX, infraredCameraModels.CircleCenterY );
+			MIL.MmeasSetMarker( CircleMeasMarker, MIL.M_RING_RADII, infraredCameraModels.CircleMinRadius, infraredCameraModels.CircleMaxRadius );
 
 			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, CircleMeasMarker, MIL.M_DEFAULT );
 

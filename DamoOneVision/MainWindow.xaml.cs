@@ -22,12 +22,13 @@ using DamoOneVision.Data;
 using System.IO;
 using Microsoft.Win32;
 using System.Diagnostics;
-using DamoOneVision.Models;
+
 using DamoOneVision.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System;
+using DamoOneVision.Services;
 
 
 namespace DamoOneVision
@@ -45,6 +46,9 @@ namespace DamoOneVision
 		public ObservableCollection<string> ImagePaths { get; set; }
 		private string appFolder;
 		private string imageFolder;
+		private string modelfolder;
+		private string modelfile;
+
 
 
 		private MIL_ID MilSystem = MIL.M_NULL;
@@ -63,11 +67,13 @@ namespace DamoOneVision
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
 
+		private readonly JsonHandler _jsonHandler;
+		public ObservableCollection<InfraredCameraModel> InfraredCameraModels { get; set; }
 
-		private int ThresholdValue = 0;
+		private InfraredCameraModel currentInfraredCameraModel;
 
 		// Setting
-		SettingManager settingManager = new SettingManager();
+		SettingManager settingManager;
 
 		public MainWindow( )
 		{
@@ -77,6 +83,11 @@ namespace DamoOneVision
 			//DATA BINDING
 			this.DataContext = this;
 
+			settingManager = new SettingManager();
+			_jsonHandler = new JsonHandler( modelfile );
+			InfraredCameraModels = new ObservableCollection<InfraredCameraModel>();
+			LoadInfraredModelsAsync();
+
 			// 윈도우 종료 이벤트 핸들러 추가
 			this.Closing += Window_Closing;
 
@@ -84,6 +95,19 @@ namespace DamoOneVision
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
+		// JSON 파일에서 모델 데이터를 불러오는 메서드
+		private async Task LoadInfraredModelsAsync( )
+		{
+			var data = await _jsonHandler.LoadInfraredModelsAsync();
+			InfraredCameraModels.Clear();
+			foreach (var model in data.InfraredCameraModels)
+			{
+				InfraredCameraModels.Add( model );
+			}
+			currentInfraredCameraModel = InfraredCameraModels[ 0 ];
+			await Task.CompletedTask;
+		}
+
 
 		private void InitLocalAppFolder( )
 		{
@@ -91,6 +115,8 @@ namespace DamoOneVision
 			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
 			imageFolder = System.IO.Path.Combine( appFolder, "Images" );
+			modelfolder = System.IO.Path.Combine( appFolder, "Model" );
+			modelfile = System.IO.Path.Combine( modelfolder, "Models.model" );
 			if (!Directory.Exists( appFolder ))
 			{
 				Directory.CreateDirectory( appFolder );
@@ -284,7 +310,7 @@ namespace DamoOneVision
 						InfraredCameraConversionImage = MIL.M_NULL;
 
 
-						InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, ThresholdValue );
+						InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
 						MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
 
 						GoodLamp( isGood );
@@ -468,11 +494,7 @@ namespace DamoOneVision
 		//	_3dview.Show();
 		//}
 
-		private void textBox_TextChanged( object sender, TextChangedEventArgs e )
-		{
 
-			int.TryParse( ThresholdText.Text, out ThresholdValue );
-		}
 
 
 	}

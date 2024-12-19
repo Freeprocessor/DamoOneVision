@@ -277,8 +277,6 @@
             </StatusBarItem>
         </StatusBar>
 
-        <TextBox x:Name="ThresholdText" HorizontalAlignment="Left" Margin="205,0,0,-95" Grid.Row="2" TextWrapping="Wrap" Text="12500" Width="120" Height="18" VerticalAlignment="Bottom" TextChanged="textBox_TextChanged" Grid.Column="1"/>
-
 
     </Grid>
 </Window>
