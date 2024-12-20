@@ -71,11 +71,11 @@
             <MenuItem Height="24" Width="58">
                 <MenuItem.Header>
                     <TextBlock Text="Setting" 
-                TextAlignment="Center"
-                VerticalAlignment="Center" HorizontalAlignment="Center" Width="42" 
+                TextAlignment="Center" 
+                VerticalAlignment="Center" HorizontalAlignment="Center" Width="42"
                        />
                 </MenuItem.Header>
-                <MenuItem Header="파일생성" IsCheckable="False" Click="Click"/>
+                <MenuItem Header="파일생성" IsCheckable="False" Click="EditModelButton_Click"/>
             </MenuItem>
         </Menu>
 

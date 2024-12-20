@@ -48,6 +48,7 @@ namespace DamoOneVision.Camera
 			MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
 			MIL_ID BlobContext = MIL.M_NULL;
+			MIL_ID GraphicsContext = MIL.M_NULL;
 
 			double Radius = 0;
 			double XPos = 0;
@@ -90,6 +91,7 @@ namespace DamoOneVision.Camera
 
 
 			///
+			MIL.MgraAlloc( MilSystem, ref GraphicsContext );
 
 			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
 
@@ -100,12 +102,39 @@ namespace DamoOneVision.Camera
 
 			MIL.MblobCalculate( BlobContext, BinarizedImage, MIL.M_NULL, BlobResult );
 
+			MIL_INT selectedBlobCount = 0;
+
+			MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
+
+			Debug.WriteLine( $"Blob Number: {selectedBlobCount}" );
+
+			for ( MIL_INT i = 0; i < selectedBlobCount; i++ )
+			{
+				MIL_INT blobIndex = 0;
+
+				// M_BLOB_INDEX 속성 가져오기
+				// 블롭 인덱스는 보통 1부터 시작
+				MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_BLOB_INDEX (i), ref blobIndex );
+
+				Debug.WriteLine( "블롭 {i}}의 인덱스: {blobIndex}\n" );
+			}
+
+
+
+			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius*2 - 20 );
+			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_LESS_OR_EQUAL, Radius * 2 + 20 );
+
+			
+
+			MIL.MblobDraw( GraphicsContext, BlobResult, BinarizedImage, MIL.M_DRAW_BOX, MIL.M_DEFAULT, MIL.M_DEFAULT );
+
 			//MIL.MblobGetResult( BlobResult, MIL.M_DEFAULT, MIL.M_NUMBER_OF_HOLES , ref holenumber );
 			//MIL.MblobGetResult( BlobResult, M_GENERAL, M_NUMBER + M_TYPE_MIL_INT, &Number0 );
 			//MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+
 			try
 			{
-				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( 0 ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
+				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( 1 ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref holenumber );
 			}
 			catch (Exception ex)
 			{
@@ -128,6 +157,7 @@ namespace DamoOneVision.Camera
 			MIL.MmeasFree( CircleMeasMarker );
 			MIL.MblobFree( BlobResult );
 			MIL.MblobFree( BlobContext );
+			MIL.MgraFree( GraphicsContext );
 			//MIL.MblobFree( BlobResult );
 			//MIL.MbufFree( BinarizedImage );
 

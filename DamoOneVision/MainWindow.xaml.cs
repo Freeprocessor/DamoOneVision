@@ -95,6 +95,51 @@ namespace DamoOneVision
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
+		// 모델 수정 버튼 클릭 이벤트 핸들러
+		private void EditModelButton_Click( object sender, RoutedEventArgs e )
+		{
+			if (true)
+			{
+				// 선택된 모델의 복사본 생성 (원본 변경을 방지)
+				var modelCopy = new InfraredCameraModel
+				{
+					Name = currentInfraredCameraModel.Name,
+					CircleCenterX = currentInfraredCameraModel.CircleCenterX,
+					CircleCenterY = currentInfraredCameraModel.CircleCenterY,
+					CircleMinRadius = currentInfraredCameraModel.CircleMinRadius,
+					CircleMaxRadius = currentInfraredCameraModel.CircleMaxRadius,
+					BinarizedThreshold = currentInfraredCameraModel.BinarizedThreshold
+				};
+
+				var saveWindow = new SettingWindow(modelCopy);
+				if (saveWindow.ShowDialog() == true)
+				{
+					// 원본 모델 업데이트
+					currentInfraredCameraModel.Name = saveWindow.Model.Name;
+					currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
+					currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
+					currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
+					currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
+					currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
+
+					SaveInfraredModelsAsync(); // 자동 저장
+				}
+			}
+			else
+			{
+				MessageBox.Show( "수정할 모델을 선택하세요.", "선택 오류", MessageBoxButton.OK, MessageBoxImage.Warning );
+			}
+		}
+
+		// 모델 데이터를 JSON 파일로 저장하는 메서드
+		private async Task SaveInfraredModelsAsync( )
+		{
+			var data = new InfraredCameraModelData { InfraredCameraModels = new List<InfraredCameraModel>(InfraredCameraModels) };
+			await _jsonHandler.SaveInfraredModelsAsync( data );
+		}
+
+
+
 		// JSON 파일에서 모델 데이터를 불러오는 메서드
 		private async Task LoadInfraredModelsAsync( )
 		{

@@ -21,12 +21,12 @@ namespace DamoOneVision
     /// </summary>
     public partial class SettingWindow : Window
     {
-		string InfraredCameraModelName;
-		double CircleCenterX;
-		double CircleCenterY;
-		double CircleMinRadius;
-		double CircleMaxRadius;
-		double BinarizedThreshold;
+		//string InfraredCameraModelName;
+		//double CircleCenterX;
+		//double CircleCenterY;
+		//double CircleMinRadius;
+		//double CircleMaxRadius;
+		//double BinarizedThreshold;
 
 		public InfraredCameraModel Model { get; private set; }
 
@@ -37,12 +37,13 @@ namespace DamoOneVision
 			if (model != null)
 			{
 				Model = model;
-				InfraredCameraModelName = model.Name;
-				CircleCenterX = model.CircleCenterX;
-				CircleCenterY = model.CircleCenterY;
-				CircleMinRadius = model.CircleMinRadius;
-				CircleMaxRadius = model.CircleMaxRadius;
-				BinarizedThreshold = model.BinarizedThreshold;
+				InfraredCameraModelNameText.Text = model.Name;
+				CircleCenterXText.Text = model.CircleCenterX.ToString();
+				CircleCenterYText.Text = model.CircleCenterY.ToString();
+				CircleMinRadiusText.Text = model.CircleMinRadius.ToString();
+				CircleMaxRadiusText.Text = model.CircleMaxRadius.ToString();
+				BinarizedThresholdText.Text = model.BinarizedThreshold.ToString();
+
 			}
 			else
 			{
@@ -53,17 +54,17 @@ namespace DamoOneVision
 
 		private void textBox_TextChanged( object sender, TextChangedEventArgs e )
 		{
-			double.TryParse( CircleCenterXText.Text, out CircleCenterX );
-			double.TryParse( CircleCenterYText.Text, out CircleCenterY );
-			double.TryParse( CircleMinRadiusText.Text, out CircleMinRadius );
-			double.TryParse( CircleMaxRadiusText.Text, out CircleMaxRadius );
-			double.TryParse( BinarizedThresholdText.Text, out BinarizedThreshold );
+			//double.TryParse( CircleCenterXText.Text, out CircleCenterX );
+			//double.TryParse( CircleCenterYText.Text, out CircleCenterY );
+			//double.TryParse( CircleMinRadiusText.Text, out CircleMinRadius );
+			//double.TryParse( CircleMaxRadiusText.Text, out CircleMaxRadius );
+			//double.TryParse( BinarizedThresholdText.Text, out BinarizedThreshold );
 		}
 
 		private void SaveButton_Click( object sender, RoutedEventArgs e )
 		{
 			// 입력 검증
-			if (string.IsNullOrWhiteSpace( InfraredCameraText.Text ))
+			if (string.IsNullOrWhiteSpace( InfraredCameraModelNameText.Text ))
 			{
 				MessageBox.Show( "모델 이름을 입력하세요.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Warning );
 				return;
@@ -80,7 +81,7 @@ namespace DamoOneVision
 			}
 
 			// 모델 데이터 설정
-			Model.Name = InfraredCameraText.Text.Trim();
+			Model.Name = InfraredCameraModelNameText.Text.Trim();
 			Model.CircleCenterX = CircleCenterX;
 			Model.CircleCenterY = CircleCenterY;
 			Model.CircleMinRadius = CircleMinRadius;
