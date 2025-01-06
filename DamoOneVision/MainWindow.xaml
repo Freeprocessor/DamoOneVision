@@ -188,7 +188,34 @@
 
         <Grid Margin="0,0,0,125" Grid.Row="1" Grid.RowSpan="2">
             <TabControl>
-                <TabItem Header="infraredCamera">
+                <TabItem Header="Main" Margin="0,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="1" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="0,0,0,95">
+                            <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" Margin="0,0,0,0"/>
+                        </Border>
+                        <milwpf:MILWPFDisplay x:Name="mainInfraredCameraConversionDisplay" Margin="0,96,0,0" Grid.RowSpan="2" Grid.Row="1" Grid.ColumnSpan="2"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera1Display" Grid.Column="2" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera1ConversionDisplay" Grid.Column="3" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera2Display" Grid.Column="2" Grid.Row="1" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera2ConversionDisplay" Grid.Column="3" Grid.Row="1" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3Display" Grid.Column="2" Grid.Row="2" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3ConversionDisplay" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0"/>
+
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="infraredCamera" Margin="49,0,-49,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -198,7 +225,7 @@
                         <milwpf:MILWPFDisplay x:Name="infraredCameraConversionDisplay"  Grid.Column="1"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="SideCamera1" Margin="37,0,-37,0">
+                <TabItem Header="SideCamera1" Margin="86,0,-86,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -208,7 +235,7 @@
                         <milwpf:MILWPFDisplay x:Name="SideCamera1CameraConversionDisplay"  Grid.Column="1"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="SideCamera2" Margin="37,0,-37,0">
+                <TabItem Header="SideCamera2" Margin="86,0,-86,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -218,7 +245,7 @@
                         <milwpf:MILWPFDisplay x:Name="SideCamera2CameraConversionDisplay"  Grid.Column="1"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="SideCamera3" Margin="35,0,-39,0">
+                <TabItem Header="SideCamera3" Margin="84,0,-87,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

@@ -24,6 +24,14 @@ namespace DamoOneVision.Camera
 		string appfolder;
 		string imagesFolder;
 
+		public MIL_INT Width;
+
+		public MIL_INT Height;
+
+		public MIL_INT NbBands;
+
+		public MIL_INT DataType;
+
 		//private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
 
 		public MatroxCamera()
@@ -44,17 +52,17 @@ namespace DamoOneVision.Camera
 			{
 
 				// 이미지 크기 및 속성 가져오기
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref MILContext.Width );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref MILContext.Height );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref MILContext.NbBands );
-				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref MILContext.DataType );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref this.Width );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref this.Height );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref this.NbBands );
+				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref this.DataType );
 
-				MILContext.NbBands = 1;
+				this.NbBands = 1;
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
-				MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
+				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
 			}
 
 
@@ -143,7 +151,7 @@ namespace DamoOneVision.Camera
 			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
 			if (true)
 			{
-				if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+				if (this.DataType == 16 && this.NbBands == 1)
 				{
 					ushort [] ushortScaleImageData = ShortMilImageShortScale(MilImage);
 
@@ -152,7 +160,7 @@ namespace DamoOneVision.Camera
 					//MIL.MbufPut( MilImage, ushortScaleImageData );
 					MIL.MbufPut( MilImage, ushortScaleImageData );
 				}
-				else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+				else if (this.DataType == 8 && this.NbBands == 1)
 				{
 					byte [] byteScaleImageData = ByteMilImageShortScale(MilImage);
 					// Scale된 이미지 데이터 Buffer에 전송
@@ -174,7 +182,7 @@ namespace DamoOneVision.Camera
 
 		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
 		{
-			ushort [] ImageData = new ushort[ MILContext.Width * MILContext.Height ];
+			ushort [] ImageData = new ushort[ this.Width * this.Height ];
 
 			MIL.MbufGet( MilImage, ImageData );
 
@@ -217,7 +225,7 @@ namespace DamoOneVision.Camera
 
 		private byte[ ] ByteMilImageShortScale( MIL_ID MilImage )
 		{
-			byte [] ImageData = new byte[ MILContext.Width * MILContext.Height ];
+			byte [] ImageData = new byte[ this.Width * this.Height ];
 
 			MIL.MbufGet( MilImage, ImageData );
 
@@ -245,7 +253,7 @@ namespace DamoOneVision.Camera
 
 		private byte[ ] ShortToByte( ushort[ ] ushortImageData )
 		{
-			byte [] ImageData = new byte[ MILContext.Width * MILContext.Height ];
+			byte [] ImageData = new byte[ this.Width * this.Height ];
 
 			for (int i = 0; i < ImageData.Length; i++)
 			{
@@ -256,7 +264,7 @@ namespace DamoOneVision.Camera
 			return ImageData;
 		}
 
-		static public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
+		public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
 			MIL_ID MilImage = MIL.M_NULL;
 
@@ -265,10 +273,10 @@ namespace DamoOneVision.Camera
 
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref MilImage );
 
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref MILContext.Width );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref MILContext.Height );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref MILContext.NbBands );
-				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref MILContext.DataType );
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref this.Width );
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref this.Height );
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref this.NbBands );
+				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref this.DataType );
 
 			}
 			return MilImage;

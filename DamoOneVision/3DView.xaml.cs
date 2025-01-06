@@ -63,8 +63,8 @@ namespace DamoOneVision
 
 		private void LoadAndDisplay3DColumns( byte[] pixels )
 		{
-			int width = (int)MILContext.Width;
-			int height = (int)MILContext.Height;
+			int width=0;// = (int)MILContext.Width;
+			int height=0;// = (int)MILContext.Height;
 			int bytesPerPixel = 2; // Gray16 => 16bit = 2bytes
 			int stride = width * bytesPerPixel;
 

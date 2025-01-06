@@ -26,13 +26,13 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		public static MIL_INT Width;
+		//public static MIL_INT Width;
 
-		public static MIL_INT Height;
+		//public static MIL_INT Height;
 
-		public static MIL_INT NbBands;
+		//public static MIL_INT NbBands;
 
-		public static MIL_INT DataType;
+		//public static MIL_INT DataType;
 
 
 		// 속성 대신 필드로 선언
