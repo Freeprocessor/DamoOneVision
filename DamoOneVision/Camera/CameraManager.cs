@@ -100,6 +100,29 @@ namespace DamoOneVision.Camera
 
 		}
 
+		public MIL_INT Width( )
+		{
+			return camera.Width;
+		}
+
+		public MIL_INT Height( )
+		{
+			return camera.Height;
+		}
+		public MIL_INT NbBands()
+		{
+			return camera.NbBands;
+		}
+		public MIL_INT DataType( )
+		{
+			return camera.DataType;
+		}
+
+		public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
+		{
+			return camera.LoadImage( MilSystem, filePath );
+		}
+
 		//public void StartContinuousCapture( )
 		//{
 		//	if (camera == null)

@@ -41,7 +41,8 @@ namespace DamoOneVision
 	{
 		//private ICamera camera;
 		//private TemplateMatcher templateMatcher;
-		private CameraManager cameraManager;
+		private CameraManager InfraredCamera;
+
 
 		public ObservableCollection<string> ImagePaths { get; set; }
 		private string appFolder;
@@ -91,7 +92,7 @@ namespace DamoOneVision
 			// 윈도우 종료 이벤트 핸들러 추가
 			this.Closing += Window_Closing;
 
-			cameraManager = new CameraManager();
+			InfraredCamera = new CameraManager();
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
@@ -185,24 +186,13 @@ namespace DamoOneVision
 
 		}
 
-		private string DetectCameraModel( )
-		{
-			// 카메라 모델을 결정하는 로직을 구현
-			// 예를 들어, 사용자 입력이나 설정 파일을 통해 결정
-			// 또는 연결된 카메라를 검색하여 모델명 확인
 
-			// 예시로 수동 설정
-			return "Matrox"; // 또는 "Matrox"
-							 //return "Spinnaker";
-							 //return "USB";
-		}
 		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
 			try
 			{
-				string cameraModel = DetectCameraModel();
 
-				cameraManager.Connect( cameraModel );
+				InfraredCamera.Connect( "Matrox" );
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
@@ -211,13 +201,13 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
-				await cameraManager.DisconnectAsync();
+				await InfraredCamera.DisconnectAsync();
 			}
 		}
 
 		private async void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
-			await cameraManager.DisconnectAsync();
+			await InfraredCamera.DisconnectAsync();
 
 			if( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
 			if( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
@@ -257,18 +247,18 @@ namespace DamoOneVision
 
 
 
-		private static PixelFormat getPixelFormat()
+		private PixelFormat getPixelFormat()
 		{
 			PixelFormat pixelFormat;
-			if (MILContext.DataType == 8 && MILContext.NbBands == 3)
+			if (InfraredCamera.DataType() == 8 && InfraredCamera.NbBands() == 3)
 			{
 				pixelFormat = PixelFormats.Rgb24;
 			}
-			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+			else if (InfraredCamera.DataType() == 8 && InfraredCamera.NbBands() == 1)
 			{
 				pixelFormat = PixelFormats.Gray8;
 			}
-			else if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			else if (InfraredCamera.DataType() == 16 && InfraredCamera.NbBands() == 1)
 			{
 				pixelFormat = PixelFormats.Gray16;
 			}
@@ -283,7 +273,7 @@ namespace DamoOneVision
 
 		private async void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			await cameraManager.DisconnectAsync();
+			await InfraredCamera.DisconnectAsync();
 		}
 
 		private void Click( object sender, RoutedEventArgs e )
@@ -317,7 +307,7 @@ namespace DamoOneVision
 
 		private void TriggerButton_Click( object sender, RoutedEventArgs e )
 		{
-			if (!cameraManager.IsConnected && InfraredCameraImage == MIL.M_NULL)
+			if (!InfraredCamera.IsConnected && InfraredCameraImage == MIL.M_NULL)
 			{
 				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 				return;
@@ -334,9 +324,9 @@ namespace DamoOneVision
 
 				try
 				{
-					if (cameraManager.IsConnected)
+					if (InfraredCamera.IsConnected)
 					{
-						InfraredCameraImage = cameraManager.CaptureSingleImage( );
+						InfraredCameraImage = InfraredCamera.CaptureSingleImage( );
 						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 					}
 					else
@@ -375,13 +365,15 @@ namespace DamoOneVision
 		
 		private void TeachingButton_Click( object sender, RoutedEventArgs e )
 		{
+			MIL_ID TeachingImage = MIL.M_NULL;
+			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref TeachingImage );
 			// 템플릿 학습 윈도우 열기
-			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
+			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL )
 			{
 				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
 				return;
 			}
-			TeachingWindow teachingWindow = new TeachingWindow(InfraredCameraImage, (int)MILContext.Width, (int)MILContext.Height, getPixelFormat());
+			TeachingWindow teachingWindow = new TeachingWindow(TeachingImage, (int)InfraredCamera.Width(), (int)InfraredCamera.Height(), (int)InfraredCamera.NbBands(), (int)InfraredCamera.DataType(), getPixelFormat());
 			teachingWindow.ShowDialog();
 
 		}
@@ -433,7 +425,7 @@ namespace DamoOneVision
 					// 선택된 이미지를 VisionImage에 표시
 					try
 					{
-						InfraredCameraImage = MatroxCamera.LoadImage( MilSystem, selectedImagePath);
+						InfraredCameraImage = InfraredCamera.LoadImage( MilSystem, selectedImagePath);
 						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 					}
 					catch (Exception ex)
@@ -512,7 +504,7 @@ namespace DamoOneVision
 
 			// 리소스 해제
 			//templateMatcher?.Dispose();
-			await cameraManager?.DisconnectAsync();
+			await InfraredCamera?.DisconnectAsync();
 
 			// MILContext 해제
 			MILContext.Instance.Dispose();

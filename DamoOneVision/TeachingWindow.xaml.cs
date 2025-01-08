@@ -38,8 +38,15 @@ namespace DamoOneVision
 		private System.Windows.Point startPoint;
 		private bool isDragging = false;
 
+		private MIL_ID milImage = MIL.M_NULL;
+		
+		private int ImageWidth = 0;
+		private int ImageHeight = 0;
+		private int ImageNbBands = 0;
+		private int ImageDataType = 0;
 
-		public TeachingWindow( MIL_ID MilImage, int width, int height, PixelFormat pixelFormat )
+
+		public TeachingWindow( MIL_ID MilImage, int width, int height, int nbBands, int datatype, PixelFormat pixelFormat )
 		{
 			InitializeComponent();
 			_viewModel = DataContext as TeachingViewModel;
@@ -48,7 +55,19 @@ namespace DamoOneVision
 
 			//this.pixelData = (byte[ ])LocalPixelData.Clone();
 
+			ImageWidth = width;
+			ImageHeight = height;
+			ImageNbBands = nbBands;
+			ImageDataType = datatype;
+
+			MIL.MbufClone( MilImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref milImage );
+
+			MIL.MbufFree( MilImage );
+
 			Conversion.ImageProcessed += Conversion_ImageProcessed;
+
+			// 윈도우 종료 이벤트 핸들러 추가
+			this.Closing += Window_Closing;
 			//ConversionImageDisplay( LocalPixelData );
 
 		}
@@ -73,11 +92,11 @@ namespace DamoOneVision
 		private void ConversionImageDisplay( byte[ ] LocalPixelData )
 		{
 			this.pixelData = LocalPixelData;
-			int bytesPerPixel = (int)MILContext.DataType * (int)MILContext.NbBands / 8;
+			int bytesPerPixel = (int)this.ImageDataType * (int)this.ImageNbBands / 8;
 
-			if (bitmap == null || bitmap.PixelWidth != MILContext.Width || bitmap.PixelHeight != MILContext.Height )
+			if (bitmap == null || bitmap.PixelWidth != this.ImageWidth || bitmap.PixelHeight != this.ImageHeight)
 			{
-				bitmap = new WriteableBitmap( (int)MILContext.Width, (int)MILContext.Height, 96, 96, getPixelFormat(), null );
+				bitmap = new WriteableBitmap( (int)this.ImageWidth, (int)this.ImageHeight, 96, 96, getPixelFormat(), null );
 				ConversionImage.Source = bitmap;
 			}
 
@@ -86,10 +105,10 @@ namespace DamoOneVision
 			{
 				// 스트라이드 계산
 				//int stride = width * bytesPerPixel;
-				int stride = (int)MILContext.Width * bytesPerPixel ;
+				int stride = (int)this.ImageWidth * bytesPerPixel ;
 
 				// 픽셀 데이터를 WriteableBitmap에 쓰기
-				bitmap.WritePixels( new Int32Rect( 0, 0, (int) MILContext.Width, (int) MILContext.Height ), this.pixelData, stride, 0 );
+				bitmap.WritePixels( new Int32Rect( 0, 0, (int) this.ImageWidth, (int) this.ImageHeight ), this.pixelData, stride, 0 );
 			}
 			catch (Exception ex)
 			{
@@ -102,18 +121,18 @@ namespace DamoOneVision
 			}
 		}
 
-		private static PixelFormat getPixelFormat( )
+		private PixelFormat getPixelFormat( )
 		{
 			PixelFormat pixelFormat;
-			if (MILContext.DataType == 8 && MILContext.NbBands == 3)
+			if (this.ImageDataType == 8 && this.ImageNbBands == 3)
 			{
 				pixelFormat = PixelFormats.Rgb24;
 			}
-			else if (MILContext.DataType == 8 && MILContext.NbBands == 1)
+			else if (this.ImageDataType == 8 && this.ImageNbBands == 1)
 			{
 				pixelFormat = PixelFormats.Gray8;
 			}
-			else if (MILContext.DataType == 16 && MILContext.NbBands == 1)
+			else if (this.ImageDataType == 16 && this.ImageNbBands == 1)
 			{
 				pixelFormat = PixelFormats.Gray16;
 			}
@@ -383,6 +402,11 @@ namespace DamoOneVision
 					encoder.Save( stream );
 				}
 			}
+		}
+
+		private async void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
+		{
+			MIL.MbufFree( milImage );
 		}
 
 

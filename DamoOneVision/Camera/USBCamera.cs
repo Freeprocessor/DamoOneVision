@@ -23,6 +23,12 @@ namespace DamoOneVision.Camera
 		private VideoCapture capture;
 		private Mat frame;
 
+		public MIL_INT Width { get; set; }
+		public MIL_INT Height { get; set; }
+		public MIL_INT NbBands { get; set; }
+		public MIL_INT DataType { get; set; }
+
+
 		public bool Connect( )
 		{
 			// MILContext에서 MilSystem 가져오기
@@ -89,10 +95,10 @@ namespace DamoOneVision.Camera
 
 			try
 			{
-				MILContext.Width = mat.Width;
-				MILContext.Height = mat.Height;
-				MILContext.NbBands = mat.Channels();
-				MILContext.DataType = 8;
+				this.Width = mat.Width;
+				this.Height = mat.Height;
+				this.NbBands = mat.Channels();
+				this.DataType = 8;
 
 				Cv2.CvtColor( mat, mat, ColorConversionCodes.BGR2RGB );
 
@@ -101,12 +107,12 @@ namespace DamoOneVision.Camera
 
 				// MIL 버퍼 할당
 				//TODO 필요한 구문이 아닌 것 같으니 최적화 대상
-				if(MILContext.NbBands == 1)
+				if(this.NbBands == 1)
 				{
 					//gray
 
 				}
-				else if(MILContext.NbBands == 3)
+				else if(this.NbBands == 3)
 				{
 					//color
 					attribute += MIL.M_RGB24;
@@ -116,7 +122,7 @@ namespace DamoOneVision.Camera
 					Debug.WriteLine( "지원하지 않는 채널 수입니다." );
 					return null;
 				}
-				MIL.MbufAllocColor( MilSystem, MILContext.NbBands, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImageLocal );
+				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_PROC, ref MilImageLocal );
 
 				// OpenCV Mat 데이터가 연속적인지 확인
 				if (!mat.IsContinuous())

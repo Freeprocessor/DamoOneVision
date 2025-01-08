@@ -24,13 +24,13 @@ namespace DamoOneVision.Camera
 		string appfolder;
 		string imagesFolder;
 
-		public MIL_INT Width;
+		public MIL_INT Width { get; set; }
 
-		public MIL_INT Height;
+		public MIL_INT Height { get; set; }
 
-		public MIL_INT NbBands;
+		public MIL_INT NbBands { get; set; }
 
-		public MIL_INT DataType;
+		public MIL_INT DataType { get; set; }
 
 		//private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
 
@@ -52,12 +52,20 @@ namespace DamoOneVision.Camera
 			{
 
 				// 이미지 크기 및 속성 가져오기
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref this.Width );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref this.Height );
-				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref this.NbBands );
-				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref this.DataType );
+				MIL_INT width = 0;
+				MIL_INT height = 0;
+				MIL_INT nbBands = 0;
+				MIL_INT dataType = 0;
 
-				this.NbBands = 1;
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_X, ref width );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_Y, ref height );
+				MIL.MdigInquire( MilDigitizer, MIL.M_SIZE_BAND, ref nbBands );
+				MIL.MdigInquire( MilDigitizer, MIL.M_TYPE, ref dataType );
+
+				this.Width = width;
+				this.Height = height;
+				this.NbBands = nbBands;
+				this.DataType = dataType;
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
@@ -273,10 +281,21 @@ namespace DamoOneVision.Camera
 
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref MilImage );
 
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref this.Width );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref this.Height );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref this.NbBands );
-				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref this.DataType );
+				// 이미지 속성 가져오기
+				MIL_INT width = 0;
+				MIL_INT height = 0;
+				MIL_INT nbBands = 0;
+				MIL_INT dataType = 0;
+
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref width );
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref height );
+				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref nbBands );
+				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref dataType );
+
+				this.Width = width;
+				this.Height = height;
+				this.NbBands = nbBands;
+				this.DataType = dataType;
 
 			}
 			return MilImage;
