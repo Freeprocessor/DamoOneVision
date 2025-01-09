@@ -378,6 +378,14 @@ namespace DamoOneVision
 
 		}
 
+		private void ManualButton_Click( object sender, RoutedEventArgs e )
+		{
+
+			ManualWindow manualWindow = new ManualWindow();
+			manualWindow.ShowDialog();
+
+		}
+
 
 		//private void LoadModelButton_Click( object sender, RoutedEventArgs e )
 		//{

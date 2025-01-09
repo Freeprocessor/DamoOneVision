@@ -1,0 +1,20 @@
+﻿<Window x:Class="DamoOneVision.ManualWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DamoOneVision"
+        mc:Ignorable="d"
+        Title="ManualWindow" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="ModbusIPTextBox" HorizontalAlignment="Left" Margin="129,51,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="ModbusIPlabel" Content="Modbus IP" HorizontalAlignment="Left" Margin="45,47,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ModbusPortTextBox" HorizontalAlignment="Left" Margin="129,82,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="ModbusPortlabel" Content="Modbus Port" HorizontalAlignment="Left" Margin="45,78,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="45,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="ConnectButton_Click"/>
+        <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="183,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="DisconnectButton_Click"/>
+        <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="375,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseDown" />
+        <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="510,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseDown"/>
+
+    </Grid>
+</Window>

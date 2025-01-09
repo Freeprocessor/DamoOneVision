@@ -21,8 +21,8 @@ namespace DamoOneVision.Camera
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
-		string appfolder;
-		string imagesFolder;
+		string appfolder="";
+		string imagesFolder="";
 
 		public MIL_INT Width { get; set; }
 

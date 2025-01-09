@@ -303,6 +303,7 @@
                 <TextBlock>Go!</TextBlock>
             </StatusBarItem>
         </StatusBar>
+        <Button x:Name="ManualButton" Content="Manual" Click="ManualButton_Click" Margin="105,0,200,10" VerticalAlignment="Bottom" Grid.Row="1" Height="20" Grid.Column="1" />
 
 
     </Grid>

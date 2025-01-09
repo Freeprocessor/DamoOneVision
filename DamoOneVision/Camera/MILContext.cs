@@ -12,7 +12,7 @@ namespace DamoOneVision.Camera
 	//Dispose 메서드를 구현하여 자원을 해제
 	//비관리 자원을 명시적으로 해제할 수 있음
 	{
-		private static MILContext instance;
+		private static MILContext? instance;
 
 		public static MILContext Instance
 		{
