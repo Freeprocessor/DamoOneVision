@@ -42,23 +42,50 @@ namespace DamoOneVision
 		//private ICamera camera;
 		//private TemplateMatcher templateMatcher;
 		private CameraManager InfraredCamera;
-
+		private CameraManager SideCamera1;
+		private CameraManager SideCamera2;
+		private CameraManager SideCamera3;
 
 		public ObservableCollection<string> ImagePaths { get; set; }
-		private string appFolder;
-		private string imageFolder;
-		private string modelfolder;
-		private string modelfile;
-
+		private string appFolder = "";
+		private string imageFolder = "";
+		private string modelfolder = "";
+		private string modelfile = "";
 
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
 		private MIL_ID InfraredCameraDisplay;
 		private MIL_ID InfraredCameraConversionDisplay;
+		private MIL_ID MainInfraredCameraDisplay;
+		private MIL_ID MainInfraredCameraConversionDisplay;
+
+		private MIL_ID SideCamera1Display;
+		private MIL_ID SideCamera1ConversionDisplay;
+		private MIL_ID MainSideCamera1Display;
+		private MIL_ID MainSideCamera1ConversionDisplay;
+
+		private MIL_ID SideCamera2Display;
+		private MIL_ID SideCamera2ConversionDisplay;
+		private MIL_ID MainSideCamera2Display;
+		private MIL_ID MainSideCamera2ConversionDisplay;
+
+		private MIL_ID SideCamera3Display;
+		private MIL_ID SideCamera3ConversionDisplay;
+		private MIL_ID MainSideCamera3Display;
+		private MIL_ID MainSideCamera3ConversionDisplay;
 
 		private MIL_ID InfraredCameraImage;
 		private MIL_ID InfraredCameraConversionImage;
+
+		private MIL_ID SideCamera1Image;
+		private MIL_ID SideCamera1ConversionImage;
+
+		private MIL_ID SideCamera2Image;
+		private MIL_ID SideCamera2ConversionImage;
+
+		private MIL_ID SideCamera3Image;
+		private MIL_ID SideCamera3ConversionImage;
 
 
 		private int frameCount = 0;
@@ -81,6 +108,7 @@ namespace DamoOneVision
 			InitializeComponent();
 			InitLocalAppFolder();
 			InitMILSystem();
+			StartClockAsync();
 			//DATA BINDING
 			this.DataContext = this;
 
@@ -93,47 +121,16 @@ namespace DamoOneVision
 			this.Closing += Window_Closing;
 
 			InfraredCamera = new CameraManager();
+			SideCamera1 = new CameraManager();
+			SideCamera2 = new CameraManager();
+			SideCamera3 = new CameraManager();
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
-		// 모델 수정 버튼 클릭 이벤트 핸들러
-		private void EditModelButton_Click( object sender, RoutedEventArgs e )
-		{
-			if (true)
-			{
-				// 선택된 모델의 복사본 생성 (원본 변경을 방지)
-				var modelCopy = new InfraredCameraModel
-				{
-					Name = currentInfraredCameraModel.Name,
-					CircleCenterX = currentInfraredCameraModel.CircleCenterX,
-					CircleCenterY = currentInfraredCameraModel.CircleCenterY,
-					CircleMinRadius = currentInfraredCameraModel.CircleMinRadius,
-					CircleMaxRadius = currentInfraredCameraModel.CircleMaxRadius,
-					BinarizedThreshold = currentInfraredCameraModel.BinarizedThreshold
-				};
 
-				var saveWindow = new SettingWindow(modelCopy);
-				if (saveWindow.ShowDialog() == true)
-				{
-					// 원본 모델 업데이트
-					currentInfraredCameraModel.Name = saveWindow.Model.Name;
-					currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
-					currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
-					currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
-					currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
-					currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
 
-					SaveInfraredModelsAsync(); // 자동 저장
-				}
-			}
-			else
-			{
-				MessageBox.Show( "수정할 모델을 선택하세요.", "선택 오류", MessageBoxButton.OK, MessageBoxImage.Warning );
-			}
-		}
-
-		// 모델 데이터를 JSON 파일로 저장하는 메서드
-		private async Task SaveInfraredModelsAsync( )
+		// 모델 데이터를 JSON 파일로 저장하는 메서드eh
+		private async void SaveInfraredModelsAsync( )
 		{
 			var data = new InfraredCameraModelData { InfraredCameraModels = new List<InfraredCameraModel>(InfraredCameraModels) };
 			await _jsonHandler.SaveInfraredModelsAsync( data );
@@ -142,7 +139,7 @@ namespace DamoOneVision
 
 
 		// JSON 파일에서 모델 데이터를 불러오는 메서드
-		private async Task LoadInfraredModelsAsync( )
+		private async void LoadInfraredModelsAsync( )
 		{
 			var data = await _jsonHandler.LoadInfraredModelsAsync();
 			InfraredCameraModels.Clear();
@@ -175,14 +172,82 @@ namespace DamoOneVision
 			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref InfraredCameraDisplay );
 			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref InfraredCameraConversionDisplay );
 
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainInfraredCameraDisplay );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainInfraredCameraConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera1Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera1ConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera1Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera1ConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera2Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera2ConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera2Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera2ConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera3Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref SideCamera3ConversionDisplay );
+
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera3Display );
+			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref MainSideCamera3ConversionDisplay );
+
 			MIL.MdispControl( InfraredCameraDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
 			MIL.MdispControl( InfraredCameraConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
 
+			MIL.MdispControl( MainInfraredCameraDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( MainInfraredCameraConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( SideCamera1Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( SideCamera1ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( MainSideCamera1Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( MainSideCamera1ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( SideCamera2Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( SideCamera2ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( MainSideCamera2Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( MainSideCamera2ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( SideCamera3Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( SideCamera3ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+			MIL.MdispControl( MainSideCamera3Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( MainSideCamera3ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+
+
 			/// 컬러맵 설정은 필요에 따라 변경 가능
 			MIL.MdispLut( InfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
+			
 
 			infraredCameraDisplay.DisplayId = InfraredCameraDisplay;
 			infraredCameraConversionDisplay.DisplayId = InfraredCameraConversionDisplay;
+
+			mainInfraredCameraDisplay.DisplayId = MainInfraredCameraDisplay;
+			mainInfraredCameraConversionDisplay.DisplayId = MainInfraredCameraConversionDisplay;
+
+			sideCamera1Display.DisplayId = SideCamera1Display;
+			sideCamera1ConversionDisplay.DisplayId = SideCamera1ConversionDisplay;
+
+			mainSideCamera1Display.DisplayId = MainSideCamera1Display;
+			mainSideCamera1ConversionDisplay.DisplayId = MainSideCamera1ConversionDisplay;
+
+			sideCamera2Display.DisplayId = SideCamera2Display;
+			sideCamera2ConversionDisplay.DisplayId = SideCamera2ConversionDisplay;
+
+			mainSideCamera2Display.DisplayId = MainSideCamera2Display;
+			mainSideCamera2ConversionDisplay.DisplayId = MainSideCamera2ConversionDisplay;
+
+			sideCamera3Display.DisplayId = SideCamera3Display;
+			sideCamera3ConversionDisplay.DisplayId = SideCamera3ConversionDisplay;
+
+			mainSideCamera3Display.DisplayId = MainSideCamera3Display;
+			mainSideCamera3ConversionDisplay.DisplayId = MainSideCamera3ConversionDisplay;
+
+
+
 
 		}
 
@@ -193,6 +258,9 @@ namespace DamoOneVision
 			{
 
 				InfraredCamera.Connect( "Matrox" );
+				SideCamera1.Connect( "Matrox" );
+				SideCamera2.Connect( "Matrox" );
+				SideCamera3.Connect( "Matrox" );
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
@@ -208,21 +276,174 @@ namespace DamoOneVision
 		private async void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
 			await InfraredCamera.DisconnectAsync();
+			await SideCamera1.DisconnectAsync();
+			await SideCamera2.DisconnectAsync();
+			await SideCamera3.DisconnectAsync();
 
-			if( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
-			if( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
+			if ( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
+			if ( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
+			if ( SideCamera1Image != MIL.M_NULL ) MIL.MbufFree( SideCamera1Image );
+			if ( SideCamera1ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera1ConversionImage );
+			if ( SideCamera2Image != MIL.M_NULL ) MIL.MbufFree( SideCamera2Image );
+			if ( SideCamera2ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera2ConversionImage );
+			if ( SideCamera3Image != MIL.M_NULL ) MIL.MbufFree( SideCamera3Image );
+			if ( SideCamera3ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera3ConversionImage );
+
 
 			InfraredCameraImage = MIL.M_NULL;
 			InfraredCameraConversionImage = MIL.M_NULL;
+			SideCamera1Image = MIL.M_NULL;
+			SideCamera1ConversionImage = MIL.M_NULL;
+			SideCamera2Image = MIL.M_NULL;
+			SideCamera2ConversionImage = MIL.M_NULL;
+			SideCamera3Image = MIL.M_NULL;
+			SideCamera3ConversionImage = MIL.M_NULL;
 
-			FpsLabel.Content = "FPS: 0";
+			//FpsLabel.Content = "FPS: 0";
 
 			ConnectButton.IsEnabled = true;
 			DisconnectButton.IsEnabled = false;
 		}
-		
 
-		
+		// 모델 수정 버튼 클릭 이벤트 핸들러
+		private void EditModelButton_Click( object sender, RoutedEventArgs e )
+		{
+			if (true)
+			{
+				// 선택된 모델의 복사본 생성 (원본 변경을 방지)
+				var modelCopy = new InfraredCameraModel
+				{
+					Name = currentInfraredCameraModel.Name,
+					CircleCenterX = currentInfraredCameraModel.CircleCenterX,
+					CircleCenterY = currentInfraredCameraModel.CircleCenterY,
+					CircleMinRadius = currentInfraredCameraModel.CircleMinRadius,
+					CircleMaxRadius = currentInfraredCameraModel.CircleMaxRadius,
+					BinarizedThreshold = currentInfraredCameraModel.BinarizedThreshold
+				};
+
+				var saveWindow = new SettingWindow(modelCopy);
+				if (saveWindow.ShowDialog() == true)
+				{
+					// 원본 모델 업데이트
+					currentInfraredCameraModel.Name = saveWindow.Model.Name;
+					currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
+					currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
+					currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
+					currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
+					currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
+
+					SaveInfraredModelsAsync(); // 자동 저장
+				}
+			}
+			//else
+			//{
+			//	MessageBox.Show( "수정할 모델을 선택하세요.", "선택 오류", MessageBoxButton.OK, MessageBoxImage.Warning );
+			//}
+		}
+
+		private void TriggerButton_Click( object sender, RoutedEventArgs e )
+		{
+			if ((!InfraredCamera.IsConnected && !SideCamera1.IsConnected && !SideCamera2.IsConnected && !SideCamera3.IsConnected) &&
+				(InfraredCameraImage == MIL.M_NULL && SideCamera1Image == MIL.M_NULL && SideCamera2Image == MIL.M_NULL && SideCamera3Image == MIL.M_NULL))
+			{
+				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+				return;
+			}
+
+			//if (isContinuous)
+			//{
+			//	MessageBox.Show( "Continuous 모드에서는 Trigger 기능을 사용할 수 없습니다." );
+			//	return;
+			//}
+			if (!isCapturing)
+			{
+				isCapturing = true;
+
+				try
+				{
+					if (InfraredCamera.IsConnected && SideCamera1.IsConnected && SideCamera2.IsConnected && SideCamera3.IsConnected)
+					{
+						InfraredCameraImage = InfraredCamera.CaptureSingleImage();
+						SideCamera1Image = SideCamera1.CaptureSingleImage();
+						SideCamera2Image = SideCamera2.CaptureSingleImage();
+						SideCamera3Image = SideCamera3.CaptureSingleImage();
+						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
+						MIL.MdispSelect( MainInfraredCameraDisplay, InfraredCameraImage );
+						MIL.MdispSelect( SideCamera1Display, SideCamera1Image );
+						MIL.MdispSelect( MainSideCamera1Display, SideCamera1Image );
+						MIL.MdispSelect( SideCamera2Display, SideCamera2Image );
+						MIL.MdispSelect( MainSideCamera2Display, SideCamera2Image );
+						MIL.MdispSelect( SideCamera3Display, SideCamera3Image );
+						MIL.MdispSelect( MainSideCamera3Display, SideCamera3Image );
+					}
+					else
+					{
+						// 로드된 이미지가 있다면 그 이미지를 사용
+					}
+
+					if (InfraredCameraImage != MIL.M_NULL && SideCamera1Image != MIL.M_NULL && SideCamera2Image != MIL.M_NULL && SideCamera3Image != MIL.M_NULL)
+					{
+						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
+						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
+						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
+						bool isGood = true;
+
+						if (InfraredCameraConversionImage == MIL.M_NULL) MIL.MbufFree( InfraredCameraConversionImage );
+						InfraredCameraConversionImage = MIL.M_NULL;
+						if (SideCamera1ConversionImage == MIL.M_NULL) MIL.MbufFree( SideCamera1ConversionImage );
+						SideCamera1ConversionImage = MIL.M_NULL;
+						if (SideCamera2ConversionImage == MIL.M_NULL) MIL.MbufFree( SideCamera2ConversionImage );
+						SideCamera2ConversionImage = MIL.M_NULL;
+						if (SideCamera3ConversionImage == MIL.M_NULL) MIL.MbufFree( SideCamera3ConversionImage );
+						SideCamera3ConversionImage = MIL.M_NULL;
+
+
+						//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
+						MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
+
+						GoodLamp( isGood );
+						//DisplayConversionImage( ConversionpixelData );
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
+				}
+				finally
+				{
+					isCapturing = false;
+				}
+			}
+		}
+
+		private void TeachingButton_Click( object sender, RoutedEventArgs e )
+		{
+			MIL_ID TeachingImage = MIL.M_NULL;
+			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref TeachingImage );
+			// 템플릿 학습 윈도우 열기
+			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
+			{
+				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
+				return;
+			}
+			TeachingWindow teachingWindow = new TeachingWindow(TeachingImage, (int)InfraredCamera.Width(), (int)InfraredCamera.Height(), (int)InfraredCamera.NbBands(), (int)InfraredCamera.DataType() );
+			teachingWindow.ShowDialog();
+
+		}
+
+		private void ManualButton_Click( object sender, RoutedEventArgs e )
+		{
+
+			ManualWindow manualWindow = new ManualWindow();
+			manualWindow.ShowDialog();
+
+		}
+
+		private void Click( object sender, RoutedEventArgs e )
+		{
+			MessageBox.Show( "버튼이 클릭되었습니다." );
+		}
+
 		//private void OnImageCaptured( byte[ ] pixelData )
 		//{
 		//	Dispatcher.Invoke( ( ) =>
@@ -246,45 +467,6 @@ namespace DamoOneVision
 		//}
 
 
-
-		private PixelFormat getPixelFormat()
-		{
-			PixelFormat pixelFormat;
-			if (InfraredCamera.DataType() == 8 && InfraredCamera.NbBands() == 3)
-			{
-				pixelFormat = PixelFormats.Rgb24;
-			}
-			else if (InfraredCamera.DataType() == 8 && InfraredCamera.NbBands() == 1)
-			{
-				pixelFormat = PixelFormats.Gray8;
-			}
-			else if (InfraredCamera.DataType() == 16 && InfraredCamera.NbBands() == 1)
-			{
-				pixelFormat = PixelFormats.Gray16;
-			}
-			else
-			{
-				pixelFormat = PixelFormats.Default;
-			}
-
-
-			return pixelFormat;
-		}
-
-		private async void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
-		{
-			await InfraredCamera.DisconnectAsync();
-		}
-
-		private void Click( object sender, RoutedEventArgs e )
-		{
-			MessageBox.Show( "버튼이 클릭되었습니다." );
-		}
-
-		private void ExitProgram( object sender, EventArgs e )
-		{
-			Application.Current.Shutdown();
-		}
 		//private void ContinuousMenuItem_Checked( object sender, RoutedEventArgs e )
 		//{
 		//	isContinuous = true;
@@ -305,114 +487,21 @@ namespace DamoOneVision
 		//	}
 		//}
 
-		private void TriggerButton_Click( object sender, RoutedEventArgs e )
+
+
+		private void GoodLamp( bool isGood )
 		{
-			if (!InfraredCamera.IsConnected && InfraredCameraImage == MIL.M_NULL)
+			if (!isGood)
 			{
-				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
-				return;
+				GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
+				GoodRejectText.Content = "Reject";
 			}
-
-			//if (isContinuous)
-			//{
-			//	MessageBox.Show( "Continuous 모드에서는 Trigger 기능을 사용할 수 없습니다." );
-			//	return;
-			//}
-			if (!isCapturing)
+			else
 			{
-				isCapturing = true;
-
-				try
-				{
-					if (InfraredCamera.IsConnected)
-					{
-						InfraredCameraImage = InfraredCamera.CaptureSingleImage( );
-						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
-					}
-					else
-					{
-						// 로드된 이미지가 있다면 그 이미지를 사용
-					}
-
-					if (InfraredCameraImage != MIL.M_NULL)
-					{
-						// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
-						// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
-						// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-						bool isGood = false;
-
-						if( InfraredCameraConversionImage == MIL.M_NULL ) MIL.MbufFree( InfraredCameraConversionImage );
-						InfraredCameraConversionImage = MIL.M_NULL;
-
-
-						InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
-						MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
-
-						GoodLamp( isGood );
-						//DisplayConversionImage( ConversionpixelData );
-					}
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
-				}
-				finally
-				{
-					isCapturing = false;
-				}
+				GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
+				GoodRejectText.Content = "Good";
 			}
 		}
-		
-		private void TeachingButton_Click( object sender, RoutedEventArgs e )
-		{
-			MIL_ID TeachingImage = MIL.M_NULL;
-			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref TeachingImage );
-			// 템플릿 학습 윈도우 열기
-			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL )
-			{
-				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
-				return;
-			}
-			TeachingWindow teachingWindow = new TeachingWindow(TeachingImage, (int)InfraredCamera.Width(), (int)InfraredCamera.Height(), (int)InfraredCamera.NbBands(), (int)InfraredCamera.DataType(), getPixelFormat());
-			teachingWindow.ShowDialog();
-
-		}
-
-		private void ManualButton_Click( object sender, RoutedEventArgs e )
-		{
-
-			ManualWindow manualWindow = new ManualWindow();
-			manualWindow.ShowDialog();
-
-		}
-
-
-		//private void LoadModelButton_Click( object sender, RoutedEventArgs e )
-		//{
-		//	// 데이터베이스에서 모델 리스트 가져오기
-		//	List<ModelItem> modelList = dbHelper.GetModelList();
-
-		//	// ModelSelectionDialog 생성 및 표시
-		//	ModelSelectionDialog dialog = new ModelSelectionDialog(modelList);
-		//	bool? result = dialog.ShowDialog();
-
-		//	if (result == true)
-		//	{
-		//		int selectedModelId = dialog.SelectedModelId;
-		//		if (selectedModelId != -1)
-		//		{
-		//			// 모델 데이터 로드
-		//			string modelData = dbHelper.LoadModelData(selectedModelId);
-
-		//			// 모델 데이터 처리
-		//			LoadModel( modelData );
-		//		}
-		//		else
-		//		{
-		//			MessageBox.Show( "모델이 선택되지 않았습니다." );
-		//		}
-		//	}
-		//}
 
 		private void LoadModel( string modelData )
 		{
@@ -427,7 +516,7 @@ namespace DamoOneVision
 		{
 			if (e.AddedItems.Count > 0)
 			{
-				string selectedImagePath = e.AddedItems[0] as string;
+				string? selectedImagePath = e.AddedItems[0] as string;
 				if (!string.IsNullOrEmpty( selectedImagePath ) && File.Exists( selectedImagePath ))
 				{
 					// 선택된 이미지를 VisionImage에 표시
@@ -480,6 +569,76 @@ namespace DamoOneVision
 				infraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
 			}
 
+			if (mainInfraredCameraDisplay != null)
+			{
+				mainInfraredCameraDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainInfraredCameraConversionDisplay != null)
+			{
+				mainInfraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera1Display != null)
+			{
+				sideCamera1Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera1ConversionDisplay != null)
+			{
+				sideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera1Display != null)
+			{
+				mainSideCamera1Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera1ConversionDisplay != null)
+			{
+				mainSideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera2Display != null)
+			{
+				sideCamera2Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera2ConversionDisplay != null)
+			{
+				sideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera2Display != null)
+			{
+				mainSideCamera2Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera2ConversionDisplay != null)
+			{
+				mainSideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera3Display != null)
+			{
+				sideCamera3Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (sideCamera3ConversionDisplay != null)
+			{
+				sideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera3Display != null)
+			{
+				mainSideCamera3Display.DisplayId = MIL.M_NULL;
+			}
+
+			if (mainSideCamera3ConversionDisplay != null)
+			{
+				mainSideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
+			}
+
 			// 2. disp 버퍼 해제
 			if (InfraredCameraDisplay != MIL.M_NULL)
 			{
@@ -493,6 +652,104 @@ namespace DamoOneVision
 				MIL.MdispFree( InfraredCameraConversionDisplay );
 				InfraredCameraConversionDisplay = MIL.M_NULL;
 				Console.WriteLine( "InfraredCameraConversionDisplay 해제 완료." );
+			}
+
+			if (MainInfraredCameraDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainInfraredCameraDisplay );
+				MainInfraredCameraDisplay = MIL.M_NULL;
+				Console.WriteLine( "MainInfraredCameraDisplay 해제 완료." );
+			}
+
+			if (MainInfraredCameraConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainInfraredCameraConversionDisplay );
+				MainInfraredCameraConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "MainInfraredCameraConversionDisplay 해제 완료." );
+			}
+
+			if (SideCamera1Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera1Display );
+				SideCamera1Display = MIL.M_NULL;
+				Console.WriteLine( "SideCamera1Display 해제 완료." );
+			}
+
+			if (SideCamera1ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera1ConversionDisplay );
+				SideCamera1ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "SideCamera1ConversionDisplay 해제 완료." );
+			}
+
+			if (MainSideCamera1Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera1Display );
+				MainSideCamera1Display = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera1Display 해제 완료." );
+			}
+
+			if (MainSideCamera1ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera1ConversionDisplay );
+				MainSideCamera1ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera1ConversionDisplay 해제 완료." );
+			}
+
+			if (SideCamera2Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera2Display );
+				SideCamera2Display = MIL.M_NULL;
+				Console.WriteLine( "SideCamera2Display 해제 완료." );
+			}
+
+			if (SideCamera2ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera2ConversionDisplay );
+				SideCamera2ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "SideCamera2ConversionDisplay 해제 완료." );
+			}
+
+			if (MainSideCamera2Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera2Display );
+				MainSideCamera2Display = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera2Display 해제 완료." );
+			}
+
+			if (MainSideCamera2ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera2ConversionDisplay );
+				MainSideCamera2ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera2ConversionDisplay 해제 완료." );
+			}
+
+			if (SideCamera3Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera3Display );
+				SideCamera3Display = MIL.M_NULL;
+				Console.WriteLine( "SideCamera3Display 해제 완료." );
+			}
+
+			if (SideCamera3ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( SideCamera3ConversionDisplay );
+				SideCamera3ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "SideCamera3ConversionDisplay 해제 완료." );
+			}
+
+			if (MainSideCamera3Display != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera3Display );
+				MainSideCamera3Display = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera3Display 해제 완료." );
+			}
+
+			if (MainSideCamera3ConversionDisplay != MIL.M_NULL)
+			{
+				MIL.MdispFree( MainSideCamera3ConversionDisplay );
+				MainSideCamera3ConversionDisplay = MIL.M_NULL;
+				Console.WriteLine( "MainSideCamera3ConversionDisplay 해제 완료." );
 			}
 
 			// 3. 이미지 버퍼 해제
@@ -510,26 +767,85 @@ namespace DamoOneVision
 				Console.WriteLine( "InfraredCameraConversionImage 해제 완료." );
 			}
 
+			if (SideCamera1Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera1Image );
+				SideCamera1Image = MIL.M_NULL;
+				Console.WriteLine( "SideCamera1Image 해제 완료." );
+			}
+
+			if (SideCamera1ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera1ConversionImage );
+				SideCamera1ConversionImage = MIL.M_NULL;
+				Console.WriteLine( "SideCamera1ConversionImage 해제 완료." );
+			}
+
+			if (SideCamera2Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera2Image );
+				SideCamera2Image = MIL.M_NULL;
+				Console.WriteLine( "SideCamera2Image 해제 완료." );
+			}
+
+			if (SideCamera2ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera2ConversionImage );
+				SideCamera2ConversionImage = MIL.M_NULL;
+				Console.WriteLine( "SideCamera2ConversionImage 해제 완료." );
+			}
+
+			if (SideCamera3Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera3Image );
+				SideCamera3Image = MIL.M_NULL;
+				Console.WriteLine( "SideCamera3Image 해제 완료." );
+			}
+
+			if (SideCamera3ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera3ConversionImage );
+				SideCamera3ConversionImage = MIL.M_NULL;
+				Console.WriteLine( "SideCamera3ConversionImage 해제 완료." );
+			}
+
+
+
 			// 리소스 해제
 			//templateMatcher?.Dispose();
-			await InfraredCamera?.DisconnectAsync();
+			await InfraredCamera.DisconnectAsync();
+			await SideCamera1.DisconnectAsync();
+			await SideCamera2.DisconnectAsync();
+			await SideCamera3.DisconnectAsync();
 
 			// MILContext 해제
 			MILContext.Instance.Dispose();
 		}
 
-		private void GoodLamp( bool isGood )
+		private async void StartClockAsync()
 		{
-			if (!isGood)
+			await Task.Run( ( ) =>
 			{
-				GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
-				GoodRejectText.Content = "Reject";
-			}
-			else
-			{
-				GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
-				GoodRejectText.Content = "Good";
-			}
+				while (true)
+				{
+					Dispatcher.Invoke( ( ) =>
+					{
+						TimeLabel.Content = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" );
+					} );
+					System.Threading.Thread.Sleep( 1000 );
+				}
+			} );
+
+		}
+
+		private async void Window_Closing( object? sender, System.ComponentModel.CancelEventArgs e )
+		{
+			await InfraredCamera.DisconnectAsync();
+		}
+
+		private void ExitProgram( object sender, EventArgs e )
+		{
+			Application.Current.Shutdown();
 		}
 
 		//private void Show3DButton_Click( object sender, RoutedEventArgs e )

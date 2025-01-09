@@ -46,7 +46,7 @@ namespace DamoOneVision
 		private int ImageDataType = 0;
 
 
-		public TeachingWindow( MIL_ID MilImage, int width, int height, int nbBands, int datatype, PixelFormat pixelFormat )
+		public TeachingWindow( MIL_ID MilImage, int width, int height, int nbBands, int datatype )
 		{
 			InitializeComponent();
 			_viewModel = DataContext as TeachingViewModel;
