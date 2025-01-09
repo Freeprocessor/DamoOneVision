@@ -76,33 +76,49 @@ namespace DamoOneVision
 
 
 
-		private void TowerLampREDONButton_MouseDown( object sender, RoutedEventArgs e )
+		private async void TowerLampREDONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
 			bool[] towerlamp;
 			modbus.WriteSingleCoil( 0, 0, true );
-			while( true ) 
+			await Task.Run( ( ) =>
 			{
-				towerlamp = modbus.ReadInputs( 0, 0, 1 );
-				if (towerlamp[0] == true )
+				while (true)
 				{
-					modbus.WriteSingleCoil( 0, 0, false );
-					break;
+					towerlamp = modbus.ReadInputs( 0, 0, 1 );
+					if (towerlamp[ 0 ] == true)
+					{
+						modbus.WriteSingleCoil( 0, 0, false );
+						break;
+					}
+					Thread.Sleep( 10 );
 				}
-				Thread.Sleep( 100 );
-			}
-			Thread.Sleep( 100 );
-			//modbus.
+				//modbus.
+			} );
 		}
 
-		private async void TowerLampREDOFFButton_MouseDown( object sender, RoutedEventArgs e )
+
+
+		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			modbus.WriteSingleCoil( 0, 1, false );
+			bool[] towerlamp;
+			modbus.WriteSingleCoil( 0, 1, true );
+			await Task.Run( ( ) =>
+			{
+				while (true)
+				{
+					towerlamp = modbus.ReadInputs( 0, 1, 1 );
+					if (towerlamp[ 0 ] == true)
+					{
+						modbus.WriteSingleCoil( 0, 1, false );
+						break;
+					}
+					Thread.Sleep( 10 );
+				}
+				//modbus.
+			} );
 		}
 
-		public async void SelfHoldingHandShacking( int num )
-		{
 
-		}
 
 	}
 

@@ -13,8 +13,8 @@
         <Label x:Name="ModbusPortlabel" Content="Modbus Port" HorizontalAlignment="Left" Margin="45,78,0,0" VerticalAlignment="Top"/>
         <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="45,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="ConnectButton_Click"/>
         <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="183,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="DisconnectButton_Click"/>
-        <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="375,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseDown" />
-        <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="510,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseDown"/>
+        <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="375,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseClick" />
+        <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="510,61,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseClick"/>
 
     </Grid>
 </Window>
