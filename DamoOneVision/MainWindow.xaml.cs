@@ -164,6 +164,10 @@ namespace DamoOneVision
 			{
 				Directory.CreateDirectory( appFolder );
 			}
+			if (!Directory.Exists( imageFolder ))
+			{
+				Directory.CreateDirectory( imageFolder );
+			}
 		}
 
 		private void InitMILSystem()
@@ -220,7 +224,8 @@ namespace DamoOneVision
 
 			/// 컬러맵 설정은 필요에 따라 변경 가능
 			MIL.MdispLut( InfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
-			
+			MIL.MdispLut(MainInfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
+
 
 			infraredCameraDisplay.DisplayId = InfraredCameraDisplay;
 			infraredCameraConversionDisplay.DisplayId = InfraredCameraConversionDisplay;
@@ -257,10 +262,10 @@ namespace DamoOneVision
 			try
 			{
 
-				InfraredCamera.Connect( "Matrox" );
-				SideCamera1.Connect( "Matrox" );
-				SideCamera2.Connect( "Matrox" );
-				SideCamera3.Connect( "Matrox" );
+				InfraredCamera.Connect( "Matrox", "InfraredCamera" );
+				SideCamera1.Connect( "Matrox", "SideCamera1" );
+				SideCamera2.Connect( "Matrox", "SideCamera2" );
+				SideCamera3.Connect( "Matrox", "SideCamera3" );
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
@@ -271,6 +276,7 @@ namespace DamoOneVision
 				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
 				await InfraredCamera.DisconnectAsync();
 			}
+			await Task.CompletedTask;
 		}
 
 		private async void DisconnectButton_Click( object sender, RoutedEventArgs e )
@@ -364,9 +370,13 @@ namespace DamoOneVision
 					if (InfraredCamera.IsConnected && SideCamera1.IsConnected && SideCamera2.IsConnected && SideCamera3.IsConnected)
 					{
 						InfraredCameraImage = InfraredCamera.CaptureSingleImage();
+						Thread.Sleep( 1000 );
 						SideCamera1Image = SideCamera1.CaptureSingleImage();
+						Thread.Sleep( 1000 );
 						SideCamera2Image = SideCamera2.CaptureSingleImage();
+						Thread.Sleep( 1000 );
 						SideCamera3Image = SideCamera3.CaptureSingleImage();
+						Thread.Sleep( 1000 );
 						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 						MIL.MdispSelect( MainInfraredCameraDisplay, InfraredCameraImage );
 						MIL.MdispSelect( SideCamera1Display, SideCamera1Image );

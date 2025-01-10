@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DamoOneVision"
         xmlns:milwpf="clr-namespace:Matrox.MatroxImagingLibrary.WPF;assembly=Matrox.MatroxImagingLibrary.WPF"
         mc:Ignorable="d"
-        Title="DamoOne Vision" Height="768" Width="1366" Background="#FFD2D2D2" Icon="/Logo.png" Topmost="True">
+        Title="DamoOne Vision" Height="768" Width="1366" Background="#FFD2D2D2" Icon="/Logo.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>

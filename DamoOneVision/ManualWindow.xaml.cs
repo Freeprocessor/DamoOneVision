@@ -28,6 +28,11 @@ namespace DamoOneVision
     {
 		Modbus modbus = new Modbus();
 
+		bool lifeBitOFFRequire = false;
+		bool lifeBitOFF = false;
+		bool PCLifeBit = false;
+		bool PLCLifeBit = false;
+
 		public ManualWindow()
         {
             InitializeComponent();
@@ -59,6 +64,8 @@ namespace DamoOneVision
 			{
 				MessageBox.Show( $"Modbus 연결 중 오류 발생: {ex.Message}" );
 			}
+			lifeBitOFFRequire = true;
+			StartLifeBitAsync();
 		}
 
 		public void DisconnectButton_Click( object sender, RoutedEventArgs e )
@@ -66,56 +73,216 @@ namespace DamoOneVision
 			try
 			{
 				Modbus.master.Dispose();
+				lifeBitOFFRequire = true;
+
 				Debug.WriteLine( "Disconnect Success\r\n\r\n" );
+				
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show( $"Modbus 연결 해제 중 오류 발생: {ex.Message}" );
 			}
+
+			lifeBitOFFRequire = false;
+			while (!lifeBitOFF)
+			{
+				System.Threading.Thread.Sleep( 1000 );
+			}
+			lifeBitOFF = false;
+
 		}
 
 
 
 		private async void TowerLampREDONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			bool[] towerlamp;
-			modbus.WriteSingleCoil( 0, 0, true );
-			await Task.Run( ( ) =>
-			{
-				while (true)
-				{
-					towerlamp = modbus.ReadInputs( 0, 0, 1 );
-					if (towerlamp[ 0 ] == true)
-					{
-						modbus.WriteSingleCoil( 0, 0, false );
-						break;
-					}
-					Thread.Sleep( 10 );
-				}
-				//modbus.
-			} );
+			await SelfHolding( 0, 0 );
+		}
+
+		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 1, 1 );		
+		}
+
+		private async void TowerLampYELONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 2, 2 );
+		}
+
+		private async void TowerLampYELOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 3, 3 );
+		}
+
+		private async void TowerLampGRNONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 4, 4 );
+		}
+
+		private async void TowerLampGRNOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 5, 5 );
+		}
+
+		private async void MainCVONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x10, 0x10 );
+		}
+
+		private async void MainCVOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x11, 0x11 );
+		}
+
+		private async void Vision1LampONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x20, 0x20 );
+		}
+
+		private async void Vision1LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x21, 0x21 );
+		}
+
+		private async void Vision2LampONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x22, 0x22 );
+		}
+
+		private async void Vision2LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x23, 0x23 );
+		}
+
+		private async void Vision3LampONButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x24, 0x24 );
+		}
+
+		private async void Vision3LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x25, 0x25 );
 		}
 
 
 
-		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
+
+
+		//private async void EjectONButton_MouseClick( object sender, RoutedEventArgs e )
+		//{
+		//	await SelfHolding( 0x18, 0x18 );
+		//}
+		//private async void EjectOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		//{
+		//	await SelfHolding( 0x19, 0x19 );
+		//}
+
+		private async void EjectManualONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			bool[] towerlamp;
-			modbus.WriteSingleCoil( 0, 1, true );
+			await SelfHolding( 0x1a, 0x1a );
+		}
+		private async void EjectManualOFFButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			await SelfHolding( 0x1b, 0x1b );
+		}
+		private async void EjectRoutineButton_MouseClick( object sender, RoutedEventArgs e )
+		{
+			bool[] coil;
+
 			await Task.Run( ( ) =>
 			{
+				modbus.WriteSingleCoil( 0, 0x18, true );
+				var startTime = DateTime.Now;
 				while (true)
 				{
-					towerlamp = modbus.ReadInputs( 0, 1, 1 );
-					if (towerlamp[ 0 ] == true)
+					coil = modbus.ReadInputs( 0, 0x18, 1 );
+					if (coil[ 0 ] == true)
 					{
-						modbus.WriteSingleCoil( 0, 1, false );
+						modbus.WriteSingleCoil( 0, 0x19, true );
+						while (true)
+						{
+							coil = modbus.ReadInputs( 0, 0x19, 1 );
+							if (coil[ 0 ] == false)
+							{
+								break;
+							}
+						}
 						break;
 					}
-					Thread.Sleep( 10 );
+					if ((DateTime.Now - startTime).TotalMilliseconds > 10000) // 10초 타임아웃
+					{
+						throw new TimeoutException( "SelfHolding operation timed out." );
+					}
+					//Thread.Sleep( 10 );
 				}
-				//modbus.
 			} );
+		}
+
+
+		private async Task SelfHolding(ushort input, ushort output )
+		{
+			bool[] coil;
+			
+			await Task.Run( ( ) =>
+			{
+				modbus.WriteSingleCoil( 0, output, true );
+				var startTime = DateTime.Now;
+				while (true)
+				{
+					coil = modbus.ReadInputs( 0, input, 1 );
+					if (coil[ 0 ] == true)
+					{
+						modbus.WriteSingleCoil( 0, output, false );
+						break;
+					}
+					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
+					{
+						throw new TimeoutException( "SelfHolding operation timed out." );
+					}
+					//Thread.Sleep( 10 );
+				}
+			} );
+		}
+
+		private async void StartLifeBitAsync( )
+		{
+			await Task.Run( ( ) =>
+			{
+				while (lifeBitOFFRequire)
+				{
+					Dispatcher.Invoke( ( ) =>
+					{
+						if (PCLifeBit)
+						{
+							modbus.WriteSingleCoil( 0, 0x0f, false );
+							PCLifeBit = false;
+							pcLifeBit.Fill = Brushes.Green;
+						}
+						else
+						{
+							modbus.WriteSingleCoil( 0, 0x0f, true );
+							PCLifeBit = true;
+							pcLifeBit.Fill = Brushes.White;
+						}
+
+						PLCLifeBit = modbus.ReadInputs( 0, 0x0f, 1 )[ 0 ];
+
+						if ( PLCLifeBit )
+						{
+							plcLifeBit.Fill = Brushes.Green;
+						}
+						else
+						{
+							plcLifeBit.Fill = Brushes.White;
+						}
+
+					} );
+					System.Threading.Thread.Sleep( 1000 );
+				}
+				lifeBitOFF = true;
+			} );
+
+
 		}
 
 

@@ -23,17 +23,17 @@ namespace DamoOneVision.Camera
 
 		private bool isContinuous = false;
 
-		public void Connect( string cameraModel )
+		public void Connect( string Library, string CameraName )
 		{
-			if (cameraModel == "Matrox")
+			if (Library == "Matrox")
 			{
-				camera = new MatroxCamera();
+				camera = new MatroxCamera( CameraName );
 			}
-			else if (cameraModel == "Spinnaker")
+			else if (Library == "Spinnaker")
 			{
 				//camera = new SpinnakerCamera();
 			}
-			else if (cameraModel == "USB")
+			else if (Library == "USB")
 			{
 				//camera = new USBCamera();
 			}
@@ -42,7 +42,7 @@ namespace DamoOneVision.Camera
 				throw new Exception( "지원되지 않는 카메라 모델입니다." );
 			}
 
-			if (camera.Connect())
+			if (camera.Connect( ))
 			{
 				//cts = new CancellationTokenSource();
 				//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );

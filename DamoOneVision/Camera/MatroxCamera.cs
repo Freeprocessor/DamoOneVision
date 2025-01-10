@@ -32,22 +32,59 @@ namespace DamoOneVision.Camera
 
 		public MIL_INT DataType { get; set; }
 
+		private string CameraName { get; set; }
+
 		//private string LUT_FILE = @"C:\Users\LEE\Desktop\DamoOneVision\DamoOneVision\ColorMap\JETColorMap.mim";
 
-		public MatroxCamera()
+		public MatroxCamera( string CameraName )
 		{
 			InitImageSave();
+			this.CameraName = CameraName;
 		}
 
 
-		public bool Connect( )
+		public bool Connect(  )
 		{
+
+
+
+
+
+
+
+
+
 			// MILContext에서 MilSystem 가져오기
 			MilSystem = MILContext.Instance.MilSystem;
+			//string selectionString = $" M_GC_DEVICE_NAME={CameraName}";
+			int dev = 0;
+			switch(CameraName)
+			{
+				case "InfraredCamera":
+					dev = 0;
+					break;
+				case "SideCamera1":
+					dev = 1;
+					break;
+				case "SideCamera2":
+					dev = 2;
+					break;
+				case "SideCamera3":
+					dev = 3;
+					break;
+			}
+			//if (CameraName == "InfraredCamera") dev = MIL.M_DEV0;
+			//else if (CameraName == "Sidecamera1") dev = MIL.M_DEV1;
+			//else if (CameraName == "Sidecamera2") dev = MIL.M_DEV2;
+			//else if (CameraName == "Sidecamera3") dev = MIL.M_DEV3;
+
+			Debug.WriteLine($"{CameraName},{(int)dev}");
+
 
 			// 디지타이저(카메라) 할당
-			MIL.MdigAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
 
+			MIL.MdigAlloc( MilSystem, dev, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
+			//MIL.M_GC_CAMERA_ID( CameraName );
 			if (MilImage == MIL.M_NULL)
 			{
 
