@@ -87,7 +87,7 @@ namespace DamoOneVision.Camera
 			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_POSITION, ref XPos, ref YPos );	
 			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_NUMBER, ref Number, IntPtr.Zero );
 
-			Debug.WriteLine( $"Radius: {Radius}, XPos: {XPos}, YPos: {YPos}, Number: {Number}" );
+			Log.WriteLine( $"Radius: {Radius}, XPos: {XPos}, YPos: {YPos}, Number: {Number}" );
 
 
 			///
@@ -106,7 +106,7 @@ namespace DamoOneVision.Camera
 
 			MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
 
-			Debug.WriteLine( $"Blob Number: {selectedBlobCount}" );
+			Log.WriteLine( $"Blob Number: {selectedBlobCount}" );
 
 			for ( MIL_INT i = 0; i < selectedBlobCount; i++ )
 			{
@@ -116,7 +116,7 @@ namespace DamoOneVision.Camera
 				// 블롭 인덱스는 보통 1부터 시작
 				MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_BLOB_INDEX (i), ref blobIndex );
 
-				Debug.WriteLine( "블롭 {i}}의 인덱스: {blobIndex}\n" );
+				Log.WriteLine( "블롭 {i}}의 인덱스: {blobIndex}\n" );
 			}
 
 
@@ -138,7 +138,7 @@ namespace DamoOneVision.Camera
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine( $"MblobGetResult에서 예외 발생: {ex.Message}" );
+				Log.WriteLine( $"MblobGetResult에서 예외 발생: {ex.Message}" );
 			}
 
 
@@ -175,7 +175,7 @@ namespace DamoOneVision.Camera
 			{
 				if (milImage == MIL.M_NULL)
 				{
-					Debug.WriteLine( "milImage가 유효하지 않습니다." );
+					Log.WriteLine( "milImage가 유효하지 않습니다." );
 					throw new ArgumentNullException( nameof( milImage ) );
 				}
 
@@ -203,7 +203,7 @@ namespace DamoOneVision.Camera
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine( $"ExtractPixelData에서 예외 발생: {ex.Message}" );
+				Log.WriteLine( $"ExtractPixelData에서 예외 발생: {ex.Message}" );
 				throw;
 			}
 		}

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DamoOneVision"
         xmlns:milwpf="clr-namespace:Matrox.MatroxImagingLibrary.WPF;assembly=Matrox.MatroxImagingLibrary.WPF"
         mc:Ignorable="d"
-        Title="DamoOne Vision" Height="768" Width="1366" Background="#FFD2D2D2" Icon="/Logo.png">
+        Title="DamoOne Vision" Height="768" Width="1366" Background="#FFD2D2D2" Icon="/Logo.png" WindowStyle="None" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
@@ -144,26 +144,37 @@
 
             <Label x:Name="RejectPercentText" Content="%" HorizontalContentAlignment ="Left" FontSize="14" Foreground="#FF3A3A3A" FontFamily="Bahnschrift SemiLight" Margin="345,315,0,0" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="25"/>
             <Grid Margin="0,0,0,40" Height="231" VerticalAlignment="Bottom">
-                <ScrollViewer Margin="10,10,10,40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ListBox ItemsSource="{Binding ImagePaths}" SelectionChanged="ListBox_SelectionChanged" 
-             ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-             ScrollViewer.VerticalScrollBarVisibility="Auto">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
+                <TabControl>
+                    <TabItem Header="ImageLoad" Margin="0,0,0,0" Height="30">
+                        <Grid>
+                            <ScrollViewer Margin="10,10,10,40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <ListBox ItemsSource="{Binding ImagePaths}" SelectionChanged="ListBox_SelectionChanged" 
+ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
 
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
-                                    <Image Source="{Binding}" Width="120" Height="120" Stretch="Uniform"/>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </ScrollViewer>
-                <Button x:Name="LoadFileButton" Content="Load File" Margin="0,0,20,10" VerticalAlignment="Bottom" Height="20" HorizontalAlignment="Right" Width="60" Click="LoadAllTriggeredImagesButton_Click" RenderTransformOrigin="0.583,1"/>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
+                                                <Image Source="{Binding}" Width="120" Height="120" Stretch="Uniform"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </ScrollViewer>
+                            <Button x:Name="LoadFileButton" Content="Load File" Margin="0,0,20,10" VerticalAlignment="Bottom" Height="20" HorizontalAlignment="Right" Width="60" Click="LoadAllTriggeredImagesButton_Click" RenderTransformOrigin="0.583,1"/>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Log" Margin="10,0,-10,0" Height="30">
+                        <TextBlock x:Name="LogTextBlock" Margin="10,10,10,10" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontSize="14"/>
+                    </TabItem>
+
+                </TabControl>
+                
             </Grid>
 
         </Grid>

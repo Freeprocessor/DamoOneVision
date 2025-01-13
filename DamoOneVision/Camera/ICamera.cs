@@ -15,6 +15,8 @@ namespace DamoOneVision.Camera
 
 		MIL_ID LoadImage( MIL_ID MilSystem, string filePath );
 
+		MIL_ID ReciveImage( );
+
 		MIL_INT Width { get; set; }
 
 		MIL_INT Height { get; set; }

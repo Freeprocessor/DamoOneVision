@@ -1,17 +1,10 @@
-﻿using System.Text;
+﻿
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 using Matrox.MatroxImagingLibrary;
 using System.Windows.Threading;
-using System.Runtime.InteropServices;
+
 
 using SpinnakerNET;
 using SpinnakerNET.GenApi;
@@ -29,6 +22,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System;
 using DamoOneVision.Services;
+
 
 
 namespace DamoOneVision
@@ -259,13 +253,19 @@ namespace DamoOneVision
 
 		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
+			ConnectButton.IsEnabled = false;
+			DisconnectButton.IsEnabled = false;
 			try
 			{
+				var tasks = new[]
+				{
+					InfraredCamera.ConnectAsync( "Matrox", "InfraredCamera" ),
+					SideCamera1.ConnectAsync( "Matrox", "SideCamera1" ),
+					SideCamera2.ConnectAsync( "Matrox", "SideCamera2" ),
+					SideCamera3.ConnectAsync( "Matrox", "SideCamera3" )
+				};
 
-				InfraredCamera.Connect( "Matrox", "InfraredCamera" );
-				SideCamera1.Connect( "Matrox", "SideCamera1" );
-				SideCamera2.Connect( "Matrox", "SideCamera2" );
-				SideCamera3.Connect( "Matrox", "SideCamera3" );
+				await Task.WhenAll( tasks );
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
@@ -274,38 +274,118 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
-				await InfraredCamera.DisconnectAsync();
+				var tasks = new[]
+				{
+					InfraredCamera.DisconnectAsync(),
+					SideCamera1.DisconnectAsync(),
+					SideCamera2.DisconnectAsync(),
+					SideCamera3.DisconnectAsync()
+				};
+
+				await Task.WhenAll( tasks );
+
 			}
-			await Task.CompletedTask;
 		}
 
 		private async void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
-			await InfraredCamera.DisconnectAsync();
-			await SideCamera1.DisconnectAsync();
-			await SideCamera2.DisconnectAsync();
-			await SideCamera3.DisconnectAsync();
+			ConnectButton.IsEnabled = false;
+			DisconnectButton.IsEnabled = false;
 
-			if ( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
-			if ( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
-			if ( SideCamera1Image != MIL.M_NULL ) MIL.MbufFree( SideCamera1Image );
-			if ( SideCamera1ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera1ConversionImage );
-			if ( SideCamera2Image != MIL.M_NULL ) MIL.MbufFree( SideCamera2Image );
-			if ( SideCamera2ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera2ConversionImage );
-			if ( SideCamera3Image != MIL.M_NULL ) MIL.MbufFree( SideCamera3Image );
-			if ( SideCamera3ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera3ConversionImage );
+			InfraredCameraImage = InfraredCamera.ReciveImage();
+			SideCamera1Image = SideCamera1.ReciveImage();
+			SideCamera2Image = SideCamera2.ReciveImage();
+			SideCamera3Image = SideCamera3.ReciveImage();
+
+			var tasks = new[]
+				{
+					InfraredCamera.DisconnectAsync(),
+					SideCamera1.DisconnectAsync(),
+					SideCamera2.DisconnectAsync(),
+					SideCamera3.DisconnectAsync()
+				};
+
+			await Task.WhenAll( tasks );
+
+			if (InfraredCameraImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( InfraredCameraImage );
+				InfraredCameraImage = MIL.M_NULL;
+				Data.Log.WriteLine( "InfraredCameraImage 해제 완료." );
+			}
+
+			if (InfraredCameraConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( InfraredCameraConversionImage );
+				InfraredCameraConversionImage = MIL.M_NULL;
+				Data.Log.WriteLine( "InfraredCameraConversionImage 해제 완료." );
+			}
+
+			if (SideCamera1Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera1Image );
+				SideCamera1Image = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera1Image 해제 완료." );
+			}
+
+			if (SideCamera1ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera1ConversionImage );
+				SideCamera1ConversionImage = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera1ConversionImage 해제 완료." );
+			}
+
+			if (SideCamera2Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera2Image );
+				SideCamera2Image = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera2Image 해제 완료." );
+			}
+
+			if (SideCamera2ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera2ConversionImage );
+				SideCamera2ConversionImage = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera2ConversionImage 해제 완료." );
+			}
+
+			if (SideCamera3Image != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera3Image );
+				SideCamera3Image = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera3Image 해제 완료." );
+			}
+
+			if (SideCamera3ConversionImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( SideCamera3ConversionImage );
+				SideCamera3ConversionImage = MIL.M_NULL;
+				Data.Log.WriteLine( "SideCamera3ConversionImage 해제 완료." );
+			}
 
 
-			InfraredCameraImage = MIL.M_NULL;
-			InfraredCameraConversionImage = MIL.M_NULL;
-			SideCamera1Image = MIL.M_NULL;
-			SideCamera1ConversionImage = MIL.M_NULL;
-			SideCamera2Image = MIL.M_NULL;
-			SideCamera2ConversionImage = MIL.M_NULL;
-			SideCamera3Image = MIL.M_NULL;
-			SideCamera3ConversionImage = MIL.M_NULL;
 
-			//FpsLabel.Content = "FPS: 0";
+				//if ( InfraredCameraImage != MIL.M_NULL ) MIL.MbufFree( InfraredCameraImage );
+				//if ( InfraredCameraConversionImage != MIL.M_NULL )MIL.MbufFree( InfraredCameraConversionImage );
+				//if ( SideCamera1Image != MIL.M_NULL ) MIL.MbufFree( SideCamera1Image );
+				//if ( SideCamera1ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera1ConversionImage );
+				//if ( SideCamera2Image != MIL.M_NULL ) MIL.MbufFree( SideCamera2Image );
+				//if ( SideCamera2ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera2ConversionImage );
+				//if ( SideCamera3Image != MIL.M_NULL ) MIL.MbufFree( SideCamera3Image );
+				//if ( SideCamera3ConversionImage != MIL.M_NULL ) MIL.MbufFree( SideCamera3ConversionImage );
+
+
+
+				//InfraredCameraImage = MIL.M_NULL;
+				//InfraredCameraConversionImage = MIL.M_NULL;
+				//SideCamera1Image = MIL.M_NULL;
+				//SideCamera1ConversionImage = MIL.M_NULL;
+				//SideCamera2Image = MIL.M_NULL;
+				//SideCamera2ConversionImage = MIL.M_NULL;
+				//SideCamera3Image = MIL.M_NULL;
+				//SideCamera3ConversionImage = MIL.M_NULL;
+
+				//FpsLabel.Content = "FPS: 0";
 
 			ConnectButton.IsEnabled = true;
 			DisconnectButton.IsEnabled = false;
@@ -347,12 +427,13 @@ namespace DamoOneVision
 			//}
 		}
 
-		private void TriggerButton_Click( object sender, RoutedEventArgs e )
+		private async void TriggerButton_Click( object sender, RoutedEventArgs e )
 		{
 			if ((!InfraredCamera.IsConnected && !SideCamera1.IsConnected && !SideCamera2.IsConnected && !SideCamera3.IsConnected) &&
 				(InfraredCameraImage == MIL.M_NULL && SideCamera1Image == MIL.M_NULL && SideCamera2Image == MIL.M_NULL && SideCamera3Image == MIL.M_NULL))
 			{
 				MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+				Data.Log.WriteLine( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 				return;
 			}
 
@@ -369,14 +450,28 @@ namespace DamoOneVision
 				{
 					if (InfraredCamera.IsConnected && SideCamera1.IsConnected && SideCamera2.IsConnected && SideCamera3.IsConnected)
 					{
-						InfraredCameraImage = InfraredCamera.CaptureSingleImage();
-						Thread.Sleep( 1000 );
-						SideCamera1Image = SideCamera1.CaptureSingleImage();
-						Thread.Sleep( 1000 );
-						SideCamera2Image = SideCamera2.CaptureSingleImage();
-						Thread.Sleep( 1000 );
-						SideCamera3Image = SideCamera3.CaptureSingleImage();
-						Thread.Sleep( 1000 );
+						// 카메라에서 이미지 캡처
+						var tasks = new[]
+						{
+							InfraredCamera.CaptureSingleImageAsync(),
+							SideCamera1.CaptureSingleImageAsync(),
+							SideCamera2.CaptureSingleImageAsync(),
+							SideCamera3.CaptureSingleImageAsync()
+						};
+						await Task.WhenAll( tasks );
+
+						InfraredCameraImage = InfraredCamera.ReciveImage();
+						SideCamera1Image = SideCamera1.ReciveImage();
+						SideCamera2Image = SideCamera2.ReciveImage();
+						SideCamera3Image = SideCamera3.ReciveImage();
+						//InfraredCameraImage = InfraredCamera.CaptureSingleImage();
+						//Thread.Sleep( 1000 );
+						//SideCamera1Image = SideCamera1.CaptureSingleImage();
+						//Thread.Sleep( 1000 );
+						//SideCamera2Image = SideCamera2.CaptureSingleImage();
+						//Thread.Sleep( 1000 );
+						//SideCamera3Image = SideCamera3.CaptureSingleImage();
+						//Thread.Sleep( 1000 );
 						MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
 						MIL.MdispSelect( MainInfraredCameraDisplay, InfraredCameraImage );
 						MIL.MdispSelect( SideCamera1Display, SideCamera1Image );
@@ -418,6 +513,7 @@ namespace DamoOneVision
 				catch (Exception ex)
 				{
 					MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
+					Data.Log.WriteLine( $"이미지 처리 중 오류 발생: {ex.Message}" );
 				}
 				finally
 				{
@@ -434,6 +530,7 @@ namespace DamoOneVision
 			if (MIL.MbufInquire( InfraredCameraImage, MIL.M_TYPE, MIL.M_NULL ) != MIL.M_NULL)
 			{
 				MessageBox.Show( "이미지가 캡처되지 않았습니다." );
+				Data.Log.WriteLine( "이미지가 캡처되지 않았습니다." );
 				return;
 			}
 			TeachingWindow teachingWindow = new TeachingWindow(TeachingImage, (int)InfraredCamera.Width(), (int)InfraredCamera.Height(), (int)InfraredCamera.NbBands(), (int)InfraredCamera.DataType() );
@@ -452,6 +549,7 @@ namespace DamoOneVision
 		private void Click( object sender, RoutedEventArgs e )
 		{
 			MessageBox.Show( "버튼이 클릭되었습니다." );
+			Data.Log.WriteLine( "버튼이 클릭되었습니다." );
 		}
 
 		//private void OnImageCaptured( byte[ ] pixelData )
@@ -517,7 +615,9 @@ namespace DamoOneVision
 		{
 			// 여기에 모델 로딩 로직을 구현하세요
 			DeserializeModelData( modelData );
-			MessageBox.Show( "모델이 로드되었습니다: " + modelData );
+			MessageBox.Show( "모델이 로드되었습니다 : {modelData}");
+			Data.Log.WriteLine( "모델이 로드되었습니다 : {modelData}" );
+
 
 			// 예를 들어, modelData를 역직렬화하여 애플리케이션의 상태나 설정에 적용할 수 있습니다.
 		}
@@ -538,6 +638,7 @@ namespace DamoOneVision
 					catch (Exception ex)
 					{
 						MessageBox.Show( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
+						Data.Log.WriteLine( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
 					}
 				}
 			}
@@ -557,6 +658,7 @@ namespace DamoOneVision
 			}
 
 			MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
+			Data.Log.WriteLine( $"{files.Length}개의 이미지가 로드되었습니다." );
 		}
 
 		private void DeserializeModelData( string serializedData )
@@ -564,9 +666,80 @@ namespace DamoOneVision
 			var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
 		}
 
-		protected async override void OnClosed( EventArgs e )
+		protected override void OnClosed( EventArgs e )
 		{
+
+
 			base.OnClosed( e );
+
+
+			//var tasks = new[]
+			//	{
+			//		InfraredCamera.DisconnectAsync(),
+			//		SideCamera1.DisconnectAsync(),
+			//		SideCamera2.DisconnectAsync(),
+			//		SideCamera3.DisconnectAsync()
+			//	};
+
+			//await Task.WhenAll( tasks );
+
+			//await InfraredCamera.DisconnectAsync();
+			//await SideCamera1.DisconnectAsync();
+			//await SideCamera2.DisconnectAsync();
+			//await SideCamera3.DisconnectAsync();
+
+			// 리소스 해제
+			//templateMatcher?.Dispose();
+
+
+			// MILContext 해제
+			MILContext.Instance.Dispose();
+		}
+
+		private async void StartClockAsync()
+		{
+			await Task.Run( ( ) =>
+			{
+				while (true)
+				{
+					Dispatcher.Invoke( ( ) =>
+					{
+						TimeLabel.Content = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" );
+					} );
+					System.Threading.Thread.Sleep( 1000 );
+				}
+			} );
+
+		}
+
+		private async void Window_Closing( object? sender, System.ComponentModel.CancelEventArgs e )
+		{
+
+			Data.Log.WriteLine( "Window_Closing 이벤트 발생" );
+
+		}
+
+		private async void ExitProgram( object sender, EventArgs e )
+		{
+			if (InfraredCamera.IsConnected) InfraredCameraImage = InfraredCamera.ReciveImage();
+			if (SideCamera1.IsConnected) SideCamera1Image = SideCamera1.ReciveImage();
+			if (SideCamera2.IsConnected) SideCamera2Image = SideCamera2.ReciveImage();
+			if (SideCamera3.IsConnected) SideCamera3Image = SideCamera3.ReciveImage();
+
+			var tasks = new[]
+				{
+					InfraredCamera.DisconnectAsync(),
+					SideCamera1.DisconnectAsync(),
+					SideCamera2.DisconnectAsync(),
+					SideCamera3.DisconnectAsync()
+				};
+
+			await Task.WhenAll( tasks );
+
+			//InfraredCamera.DisconnectAsync();
+			//SideCamera1.DisconnectAsync();
+			//SideCamera2.DisconnectAsync();
+			//SideCamera3.DisconnectAsync();
 
 			// 1. UI 요소의 DisplayId를 MIL.M_NULL로 설정하여 참조 해제
 			if (infraredCameraDisplay != null)
@@ -654,112 +827,112 @@ namespace DamoOneVision
 			{
 				MIL.MdispFree( InfraredCameraDisplay );
 				InfraredCameraDisplay = MIL.M_NULL;
-				Console.WriteLine( "InfraredCameraDisplay 해제 완료." );
+				Data.Log.WriteLine( "InfraredCameraDisplay 해제 완료." );
 			}
 
 			if (InfraredCameraConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( InfraredCameraConversionDisplay );
 				InfraredCameraConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "InfraredCameraConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "InfraredCameraConversionDisplay 해제 완료." );
 			}
 
 			if (MainInfraredCameraDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainInfraredCameraDisplay );
 				MainInfraredCameraDisplay = MIL.M_NULL;
-				Console.WriteLine( "MainInfraredCameraDisplay 해제 완료." );
+				Data.Log.WriteLine( "MainInfraredCameraDisplay 해제 완료." );
 			}
 
 			if (MainInfraredCameraConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainInfraredCameraConversionDisplay );
 				MainInfraredCameraConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "MainInfraredCameraConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "MainInfraredCameraConversionDisplay 해제 완료." );
 			}
 
 			if (SideCamera1Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera1Display );
 				SideCamera1Display = MIL.M_NULL;
-				Console.WriteLine( "SideCamera1Display 해제 완료." );
+				Data.Log.WriteLine( "SideCamera1Display 해제 완료." );
 			}
 
 			if (SideCamera1ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera1ConversionDisplay );
 				SideCamera1ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "SideCamera1ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "SideCamera1ConversionDisplay 해제 완료." );
 			}
 
 			if (MainSideCamera1Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera1Display );
 				MainSideCamera1Display = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera1Display 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera1Display 해제 완료." );
 			}
 
 			if (MainSideCamera1ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera1ConversionDisplay );
 				MainSideCamera1ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera1ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera1ConversionDisplay 해제 완료." );
 			}
 
 			if (SideCamera2Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera2Display );
 				SideCamera2Display = MIL.M_NULL;
-				Console.WriteLine( "SideCamera2Display 해제 완료." );
+				Data.Log.WriteLine( "SideCamera2Display 해제 완료." );
 			}
 
 			if (SideCamera2ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera2ConversionDisplay );
 				SideCamera2ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "SideCamera2ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "SideCamera2ConversionDisplay 해제 완료." );
 			}
 
 			if (MainSideCamera2Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera2Display );
 				MainSideCamera2Display = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera2Display 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera2Display 해제 완료." );
 			}
 
 			if (MainSideCamera2ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera2ConversionDisplay );
 				MainSideCamera2ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera2ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera2ConversionDisplay 해제 완료." );
 			}
 
 			if (SideCamera3Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera3Display );
 				SideCamera3Display = MIL.M_NULL;
-				Console.WriteLine( "SideCamera3Display 해제 완료." );
+				Data.Log.WriteLine( "SideCamera3Display 해제 완료." );
 			}
 
 			if (SideCamera3ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCamera3ConversionDisplay );
 				SideCamera3ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "SideCamera3ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "SideCamera3ConversionDisplay 해제 완료." );
 			}
 
 			if (MainSideCamera3Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera3Display );
 				MainSideCamera3Display = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera3Display 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera3Display 해제 완료." );
 			}
 
 			if (MainSideCamera3ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( MainSideCamera3ConversionDisplay );
 				MainSideCamera3ConversionDisplay = MIL.M_NULL;
-				Console.WriteLine( "MainSideCamera3ConversionDisplay 해제 완료." );
+				Data.Log.WriteLine( "MainSideCamera3ConversionDisplay 해제 완료." );
 			}
 
 			// 3. 이미지 버퍼 해제
@@ -767,94 +940,58 @@ namespace DamoOneVision
 			{
 				MIL.MbufFree( InfraredCameraImage );
 				InfraredCameraImage = MIL.M_NULL;
-				Console.WriteLine( "InfraredCameraImage 해제 완료." );
+				Data.Log.WriteLine( "InfraredCameraImage 해제 완료." );
 			}
 
 			if (InfraredCameraConversionImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( InfraredCameraConversionImage );
 				InfraredCameraConversionImage = MIL.M_NULL;
-				Console.WriteLine( "InfraredCameraConversionImage 해제 완료." );
+				Data.Log.WriteLine( "InfraredCameraConversionImage 해제 완료." );
 			}
 
 			if (SideCamera1Image != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera1Image );
 				SideCamera1Image = MIL.M_NULL;
-				Console.WriteLine( "SideCamera1Image 해제 완료." );
+				Data.Log.WriteLine( "SideCamera1Image 해제 완료." );
 			}
 
 			if (SideCamera1ConversionImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera1ConversionImage );
 				SideCamera1ConversionImage = MIL.M_NULL;
-				Console.WriteLine( "SideCamera1ConversionImage 해제 완료." );
+				Data.Log.WriteLine( "SideCamera1ConversionImage 해제 완료." );
 			}
 
 			if (SideCamera2Image != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera2Image );
 				SideCamera2Image = MIL.M_NULL;
-				Console.WriteLine( "SideCamera2Image 해제 완료." );
+				Data.Log.WriteLine( "SideCamera2Image 해제 완료." );
 			}
 
 			if (SideCamera2ConversionImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera2ConversionImage );
 				SideCamera2ConversionImage = MIL.M_NULL;
-				Console.WriteLine( "SideCamera2ConversionImage 해제 완료." );
+				Data.Log.WriteLine( "SideCamera2ConversionImage 해제 완료." );
 			}
 
 			if (SideCamera3Image != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera3Image );
 				SideCamera3Image = MIL.M_NULL;
-				Console.WriteLine( "SideCamera3Image 해제 완료." );
+				Data.Log.WriteLine( "SideCamera3Image 해제 완료." );
 			}
 
 			if (SideCamera3ConversionImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( SideCamera3ConversionImage );
 				SideCamera3ConversionImage = MIL.M_NULL;
-				Console.WriteLine( "SideCamera3ConversionImage 해제 완료." );
+				Data.Log.WriteLine( "SideCamera3ConversionImage 해제 완료." );
 			}
 
-
-
-			// 리소스 해제
-			//templateMatcher?.Dispose();
-			await InfraredCamera.DisconnectAsync();
-			await SideCamera1.DisconnectAsync();
-			await SideCamera2.DisconnectAsync();
-			await SideCamera3.DisconnectAsync();
-
-			// MILContext 해제
-			MILContext.Instance.Dispose();
-		}
-
-		private async void StartClockAsync()
-		{
-			await Task.Run( ( ) =>
-			{
-				while (true)
-				{
-					Dispatcher.Invoke( ( ) =>
-					{
-						TimeLabel.Content = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" );
-					} );
-					System.Threading.Thread.Sleep( 1000 );
-				}
-			} );
-
-		}
-
-		private async void Window_Closing( object? sender, System.ComponentModel.CancelEventArgs e )
-		{
-			await InfraredCamera.DisconnectAsync();
-		}
-
-		private void ExitProgram( object sender, EventArgs e )
-		{
 			Application.Current.Shutdown();
 		}
 

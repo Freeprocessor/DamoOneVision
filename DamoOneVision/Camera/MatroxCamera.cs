@@ -39,23 +39,17 @@ namespace DamoOneVision.Camera
 		public MatroxCamera( string CameraName )
 		{
 			InitImageSave();
+			MilSystem = MILContext.Instance.MilSystem;
 			this.CameraName = CameraName;
+			Log.WriteLine($"{CameraName} is Created" );
+			Log.WriteLine( $"System ID : {MilSystem} " );
 		}
 
 
 		public bool Connect(  )
 		{
-
-
-
-
-
-
-
-
-
 			// MILContext에서 MilSystem 가져오기
-			MilSystem = MILContext.Instance.MilSystem;
+			//MilSystem = MILContext.Instance.MilSystem;
 			//string selectionString = $" M_GC_DEVICE_NAME={CameraName}";
 			int dev = 0;
 			switch(CameraName)
@@ -78,7 +72,7 @@ namespace DamoOneVision.Camera
 			//else if (CameraName == "Sidecamera2") dev = MIL.M_DEV2;
 			//else if (CameraName == "Sidecamera3") dev = MIL.M_DEV3;
 
-			Debug.WriteLine($"{CameraName},{(int)dev}");
+			Log.WriteLine($"{CameraName},{(int)dev}");
 
 
 			// 디지타이저(카메라) 할당
@@ -114,6 +108,22 @@ namespace DamoOneVision.Camera
 			return MilDigitizer != MIL.M_NULL;
 		}
 
+		public void Disconnect( )
+		{
+
+			if (MilDigitizer != MIL.M_NULL) MIL.MdigFree( MilDigitizer );
+			MilDigitizer = MIL.M_NULL;
+
+			Log.WriteLine($"{CameraName} is Disconnect");
+
+			//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
+			//MilImage = MIL.M_NULL;
+
+		}
+
+
+
+
 		private void InitImageSave()
 		{
 			// 'Images' 폴더 경로 설정
@@ -147,16 +157,6 @@ namespace DamoOneVision.Camera
 		}
 
 
-		public void Disconnect( )
-		{
-
-			if (MilDigitizer != MIL.M_NULL) MIL.MdigFree( MilDigitizer );
-			MilDigitizer = MIL.M_NULL;
-
-			//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
-			//MilImage = MIL.M_NULL;
-
-		}
 
 		public MIL_ID CaptureImage( )
 		{
@@ -164,22 +164,27 @@ namespace DamoOneVision.Camera
 			//MIL_ID MilDisplay = MIL.M_NULL;
 
 			MIL.MdigGrab( MilDigitizer, MilImage );
+			Log.WriteLine($"{CameraName} Grab Complete");
 
 			//MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref MilDisplay );
 			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
 			//MIL.MdispSelect( MilDisplay, MilImage );
 
 
-			SaveImage( ref MilImage , "RAWImage" );
+			//SaveImage( ref MilImage , "RAWImage" );
 
 
 			if (true)
 			{
-				InfraredCameraScaleImage( MilImage );
+				//InfraredCameraScaleImage( MilImage );
 			}
 			//MIL.MdispFree( MilDisplay );
 			return MilImage;
 
+		}
+		public MIL_ID ReciveImage( )
+		{
+			return MilImage;
 		}
 
 
@@ -218,8 +223,8 @@ namespace DamoOneVision.Camera
 			int imageDataType = (int) MIL.MbufInquire(MilImage, MIL.M_TYPE);
 			int nbBands = (int) MIL.MbufInquire(MilImage, MIL.M_SIZE_BAND);
 
-			Debug.WriteLine( "Image DataType: " + imageDataType );
-			Debug.WriteLine( "Number of Bands (NbBands): " + nbBands );
+			Log.WriteLine( "Image DataType: " + imageDataType );
+			Log.WriteLine( "Number of Bands (NbBands): " + nbBands );
 
 
 			SaveImage( ref MilImage , "Image" );

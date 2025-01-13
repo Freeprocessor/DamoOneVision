@@ -33,6 +33,27 @@ namespace DamoOneVision
 		bool PCLifeBit = false;
 		bool PLCLifeBit = false;
 
+		ushort TowerLampREDONAddress = 0x00;
+		ushort TowerLampREDOFFAddress = 0x01;
+		ushort TowerLampYELONAddress = 0x02;
+		ushort TowerLampYELOFFAddress = 0x03;
+		ushort TowerLampGRNONAddress = 0x04;
+		ushort TowerLampGRNOFFAddress = 0x05;
+		ushort MainCVONAddress = 0x10;
+		ushort MainCVOFFAddress = 0x11;
+		ushort EjectONAddress = 0x18;
+		ushort EjectOFFAddress = 0x19;
+		ushort EjectManualONAddress = 0x1a;
+		ushort EjectManualOFFAddress = 0x1b;
+		ushort Vision1LampONAddress = 0x20;
+		ushort Vision1LampOFFAddress = 0x21;
+		ushort Vision2LampONAddress = 0x22;
+		ushort Vision2LampOFFAddress = 0x23;
+		ushort Vision3LampONAddress = 0x24;
+		
+
+
+
 		public ManualWindow()
         {
             InitializeComponent();
@@ -57,7 +78,8 @@ namespace DamoOneVision
 			try
 			{
 				modbus.Connect();
-				Debug.WriteLine( "Connect Success\r\n\r\n" );
+				Data.Log.WriteLine( "Connect Success" );
+
 				MessageBox.Show( $"Modbus 연결 성공" );
 			}
 			catch (Exception ex)
@@ -75,7 +97,7 @@ namespace DamoOneVision
 				Modbus.master.Dispose();
 				lifeBitOFFRequire = true;
 
-				Debug.WriteLine( "Disconnect Success\r\n\r\n" );
+				Data.Log.WriteLine( "Disconnect Success\r\n\r\n" );
 				
 			}
 			catch (Exception ex)
@@ -97,11 +119,15 @@ namespace DamoOneVision
 		private async void TowerLampREDONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
 			await SelfHolding( 0, 0 );
+			TowerLampREDONButton.Background = Brushes.Green;
+			TowerLampREDOFFButton.Background = Brushes.LightGray;
 		}
 
 		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await SelfHolding( 1, 1 );		
+			await SelfHolding( 1, 1 );
+			TowerLampREDONButton.Background = Brushes.LightGray;
+			TowerLampREDOFFButton.Background = Brushes.MediumVioletRed;
 		}
 
 		private async void TowerLampYELONButton_MouseClick( object sender, RoutedEventArgs e )
@@ -164,6 +190,24 @@ namespace DamoOneVision
 			await SelfHolding( 0x25, 0x25 );
 		}
 
+		private async void ReadStatus( ushort StartAddress )
+		{
+			await Task.Run( ( ) =>
+			{
+				bool[] result = modbus.ReadInputs( 0, StartAddress, 1 );
+				if (result[ 0 ])
+				{
+					Data.Log.WriteLine( "ON" );
+				}
+				else
+				{
+					Data.Log.WriteLine( "OFF" );
+				}
+			} );
+
+		}
+
+
 
 
 
@@ -211,6 +255,7 @@ namespace DamoOneVision
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 10000) // 10초 타임아웃
 					{
+						Data.Log.WriteLine( "SelfHolding operation timed out." );
 						throw new TimeoutException( "SelfHolding operation timed out." );
 					}
 					//Thread.Sleep( 10 );
@@ -237,6 +282,7 @@ namespace DamoOneVision
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
 					{
+						Data.Log.WriteLine( "SelfHolding operation timed out." );
 						throw new TimeoutException( "SelfHolding operation timed out." );
 					}
 					//Thread.Sleep( 10 );
@@ -295,6 +341,7 @@ namespace DamoOneVision
 		private static int port=0;
 		private static TcpClient tcpClient;
 		public static IModbusMaster master;
+		public bool isConnected = false;
 
 		public Modbus( )
 		{
@@ -311,29 +358,51 @@ namespace DamoOneVision
 			tcpClient = new TcpClient( ip, port );      // TCP Client 선언
 			var factory = new ModbusFactory();          // ModbusFactory 선언
 			master = factory.CreateMaster( tcpClient ); // IModbusMaster 초기화
+			isConnected = true;
 		}
 
-		public void ConnectionCheck( )
+		public bool ConnectionCheck( )
 		{
 			if (tcpClient.Connected)
 			{
-
+				isConnected = true;
 			}
+			else
+			{
+				isConnected = false;
+				Data.Log.WriteLine( "Connection Fail" );
+			}
+			return isConnected;
 		}
 
 		// Coil Write Multiple
 		public int WriteMultipleCoils( byte station, ushort startAddress, bool[ ] data )
 		{
-			master.WriteMultipleCoils( station, startAddress, data );
-			return 0;
+			if (ConnectionCheck())
+			{
+				master.WriteMultipleCoils( station, startAddress, data );
+				return 0;
+			}
+			else
+			{
+				return -1;
+			}
+
 		}
 
 		// Coil Write Multiple
 		public bool[ ] ReadInputs( byte station, ushort startAddress, ushort num )
 		{
+			if (ConnectionCheck())
+			{
+				bool[] result = master.ReadInputs( station, startAddress, num );
+				return result;
+			}
+			else
+			{
+				return null;
+			}
 
-			bool[] result = master.ReadInputs( station, startAddress, num );
-			return result;
 		}
 
 		public bool[ ] ReadCoils( byte station, ushort startAddress, ushort num )

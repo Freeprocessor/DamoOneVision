@@ -1,5 +1,6 @@
 ﻿using DamoOneVision.Camera;
 using DamoOneVision.ViewModels;
+using DamoOneVision.Data;
 using Matrox.MatroxImagingLibrary;
 using Microsoft.Win32;
 using System;
@@ -85,7 +86,7 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				// 예외 발생 시 로그 출력
-				Debug.WriteLine( $"Exception in Conversion_ImageProcessed: {ex.Message}" );
+				Log.WriteLine( $"Exception in Conversion_ImageProcessed: {ex.Message}" );
 			}
 		}
 
@@ -113,7 +114,7 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				// 예외 발생 시 로그 출력
-				Debug.WriteLine( $"Exception in ConversionImageDisplay: {ex.Message}" );
+				Log.WriteLine( $"Exception in ConversionImageDisplay: {ex.Message}" );
 			}
 			finally
 			{

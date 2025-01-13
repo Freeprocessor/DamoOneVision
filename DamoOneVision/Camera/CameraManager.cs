@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using DamoOneVision.Data;
 
 namespace DamoOneVision.Camera
 {
@@ -23,81 +24,99 @@ namespace DamoOneVision.Camera
 
 		private bool isContinuous = false;
 
-		public void Connect( string Library, string CameraName )
+		public async Task ConnectAsync( string Library, string CameraName )
 		{
-			if (Library == "Matrox")
+			await Task.Run( ( ) =>
 			{
-				camera = new MatroxCamera( CameraName );
-			}
-			else if (Library == "Spinnaker")
-			{
-				//camera = new SpinnakerCamera();
-			}
-			else if (Library == "USB")
-			{
-				//camera = new USBCamera();
-			}
-			else
-			{
-				throw new Exception( "지원되지 않는 카메라 모델입니다." );
-			}
+				if (Library == "Matrox")
+				{
+					camera = new MatroxCamera( CameraName );
+				}
+				else if (Library == "Spinnaker")
+				{
+					//camera = new SpinnakerCamera();
+				}
+				else if (Library == "USB")
+				{
+					//camera = new USBCamera();
+				}
+				else
+				{
+					Log.WriteLine( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
+					throw new Exception( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
+				}
 
-			if (camera.Connect( ))
-			{
-				//cts = new CancellationTokenSource();
-				//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
-				IsConnected = true;
-			}
-			else
-			{
-				throw new Exception( "카메라 연결 실패" );
-			}
+				if (camera.Connect())
+				{
+					//cts = new CancellationTokenSource();
+					//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
+					IsConnected = true;
+
+				}
+				else
+				{
+					Log.WriteLine( "카메라 연결 실패" );
+					throw new Exception( "카메라 연결 실패" );
+				}
+			} );
 		}
 
 		public async Task DisconnectAsync( )
 		{
-			try
+			await Task.Run( ( ) =>
 			{
-				//StopContinuousCapture();
-
-				//if (captureTask != null)
-				//{
-				//	try
-				//	{
-				//		await captureTask;
-				//	}
-				//	catch (OperationCanceledException)
-				//	{
-				//		// 작업이 취소되었음을 무시
-				//	}
-				//	captureTask = null;
-				//}
-
-				if (camera != null)
+				try
 				{
-					camera.Disconnect();
-					camera = null;
-				}
+					//StopContinuousCapture();
 
-				IsConnected = false;
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
-				throw;
-			}
+					//if (captureTask != null)
+					//{
+					//	try
+					//	{
+					//		await captureTask;
+					//	}
+					//	catch (OperationCanceledException)
+					//	{
+					//		// 작업이 취소되었음을 무시
+					//	}
+					//	captureTask = null;
+					//}
+
+					if (camera != null)
+					{
+						camera.Disconnect();
+						camera = null;
+					}
+
+					IsConnected = false;
+				}
+				catch (Exception ex)
+				{
+					Log.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
+				
+					throw;
+				}
+			} );
 		}
 
 
-		public MIL_ID CaptureSingleImage( )
+		public async Task CaptureSingleImageAsync( )
 		{
-			if (camera == null)
-				throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
+			await Task.Run( ( ) => 
+			{
+				if (camera == null)
+					throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
 
-			MilImage = camera.CaptureImage( );
+				MilImage = camera.CaptureImage();
 
+			} );
+
+		}
+
+		public MIL_ID ReciveImage( )
+		{
+			MilImage = camera.ReciveImage();
 			return MilImage;
-
 		}
 
 		public MIL_INT Width( )
