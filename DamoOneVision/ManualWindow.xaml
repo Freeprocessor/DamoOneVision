@@ -7,17 +7,17 @@
         mc:Ignorable="d"
         Title="ManualWindow" Height="525" Width="945">
     <Grid>
-        <TextBox x:Name="ModbusIPTextBox" HorizontalAlignment="Left" Margin="129,51,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="ModbusIPlabel" Content="Modbus IP" HorizontalAlignment="Left" Margin="45,47,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="ModbusPortTextBox" HorizontalAlignment="Left" Margin="129,82,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="ModbusPortlabel" Content="Modbus Port" HorizontalAlignment="Left" Margin="45,78,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="45,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="ConnectButton_Click"/>
-        <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="183,144,0,0" VerticalAlignment="Top" Height="60" Width="66" Click="DisconnectButton_Click"/>
+        <TextBox x:Name="ModbusIPTextBox" HorizontalAlignment="Left" Margin="-185,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="ModbusIPlabel" Content="Modbus IP" HorizontalAlignment="Left" Margin="-269,34,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ModbusPortTextBox" HorizontalAlignment="Left" Margin="-185,69,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="ModbusPortlabel" Content="Modbus Port" HorizontalAlignment="Left" Margin="-269,65,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="-269,131,0,0" VerticalAlignment="Top" Height="60" Width="66" />
+        <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="-131,131,0,0" VerticalAlignment="Top" Height="60" Width="66" />
 
-        <Rectangle x:Name="pcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="90,274,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
-        <Label x:Name="PCLifeBitLabel" Content="PCLifeBit" HorizontalAlignment="Left" Margin="28,269,0,0" VerticalAlignment="Top"/>
-        <Rectangle x:Name="plcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="90,305,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
-        <Label x:Name="PLCLifeBitLabel" Content="PLCLifeBit" HorizontalAlignment="Left" Margin="28,300,0,0" VerticalAlignment="Top"/>
+        <Rectangle x:Name="pcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="-99,278,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
+        <Label x:Name="PCLifeBitLabel" Content="PCLifeBit" HorizontalAlignment="Left" Margin="-161,273,0,0" VerticalAlignment="Top"/>
+        <Rectangle x:Name="plcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="-99,309,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
+        <Label x:Name="PLCLifeBitLabel" Content="PLCLifeBit" HorizontalAlignment="Left" Margin="-161,304,0,0" VerticalAlignment="Top"/>
 
         <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="305,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseClick" Background="LightGray" />
         <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="440,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseClick"/>
