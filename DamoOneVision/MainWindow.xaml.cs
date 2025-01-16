@@ -1,10 +1,6 @@
-﻿
-using System.Windows;
-
-
+﻿using System.Windows;
 using Matrox.MatroxImagingLibrary;
 using System.Windows.Threading;
-
 
 using SpinnakerNET;
 using SpinnakerNET.GenApi;
@@ -25,7 +21,6 @@ using DamoOneVision.Services;
 using static OpenCvSharp.FileStorage;
 using System.Net;
 using System.Windows.Media.Converters;
-
 
 
 namespace DamoOneVision
@@ -57,7 +52,7 @@ namespace DamoOneVision
 		private bool triggerReadingStatus = false;
 
 		bool lifeBitOFFRequire = false;
-		bool lifeBitOFF = false;
+		bool lifeBitStatus = false;
 		bool PCLifeBit = false;
 		bool PLCLifeBit = false;
 
@@ -298,9 +293,10 @@ namespace DamoOneVision
 				Data.Log.WriteLine( $"Modbus Connect Fail: {ex.Message}" );
 				MessageBox.Show( $"Modbus Connect Fail: {ex.Message}" );
 			}
-			lifeBitOFFRequire = true;
+			lifeBitOFFRequire = false;
 			StartLifeBitAsync();
 			TriggerDelayCalculationAsync();
+			ServoCurrentPosition();
 		}
 
 		public void ModbusDisconnect(  )
@@ -320,11 +316,11 @@ namespace DamoOneVision
 			}
 
 			lifeBitOFFRequire = false;
-			while (!lifeBitOFF)
+			while (lifeBitStatus)
 			{
 				System.Threading.Thread.Sleep( 1000 );
 			}
-			lifeBitOFF = false;
+			//lifeBitStatus = false;
 
 		}
 
@@ -521,7 +517,7 @@ namespace DamoOneVision
 			await Task.Run(  ( ) =>
 			{
 				Data.Log.WriteLine( "TriggerDelayCalculationAsync Start" );
-				while (!triggerReadingOFFRequire)
+				while (!lifeBitOFFRequire)
 				{
 					int delay = 0;
 					double distance = 200;
@@ -550,8 +546,9 @@ namespace DamoOneVision
 		{
 			await Task.Run( ( ) =>
 			{
+				lifeBitStatus = true;
 				Data.Log.WriteLine( "LifeBit ON" );
-				while (lifeBitOFFRequire)
+				while (!lifeBitOFFRequire)
 				{
 					Dispatcher.Invoke( ( ) =>
 					{
@@ -582,13 +579,29 @@ namespace DamoOneVision
 					} );
 					System.Threading.Thread.Sleep( 1000 );
 				}
-				lifeBitOFF = true;
+				lifeBitStatus = false;
 				Data.Log.WriteLine( "LifeBit OFF" );
 			} );
 
 		}
 
-
+		private async void ServoCurrentPosition( )
+		{
+			await Task.Run( ( ) =>
+			{
+				Data.Log.WriteLine( "ServoCurrentPosition Start" );
+				while (!lifeBitOFFRequire)
+				{
+					string CurrentPosition = modbus.ReadInputRegisters32(0, 0, 1)[0].ToString();
+					Dispatcher.Invoke( ( ) =>
+					{
+						ServoPosition.Content = CurrentPosition;
+					} );
+					//Thread.Sleep( 1 );
+				}
+				Data.Log.WriteLine( "ServoCurrentPosition Stop" );
+			} );
+		}
 
 		public async Task VisionTrigger()
 		{
@@ -627,7 +640,7 @@ namespace DamoOneVision
 								InfraredCamera.CaptureSingleImageAsync(),
 								SideCamera1.CaptureSingleImageAsync(),
 								SideCamera2.CaptureSingleImageAsync(),
-								//SideCamera3.CaptureSingleImageAsync()
+								SideCamera3.CaptureSingleImageAsync()
 							};
 							await Task.WhenAll( tasks );
 
@@ -1202,11 +1215,14 @@ namespace DamoOneVision
 
 		private void DataReadButton_Click( object sender, RoutedEventArgs e )
 		{
-			ushort[] data = modbus.ReadHoldingRegisters( 0, 0x00, 20 );
-			foreach (var item in data)
-			{
-				Data.Log.WriteLine( $"{item}" );
-			}
+			//ushort[] data = modbus.ReadHoldingRegisters( 0, 0x00, 20 );
+			//foreach (var item in data)
+			//{
+			//	Data.Log.WriteLine( $"{item}" );
+			//}
+			modbus.WriteHoldingRegisters32( 0, 15, 1000000 );
+
+			Log.WriteLine($"{modbus.ReadHoldingRegisters32( 0, 15, 1 )[0]}" );
 
 			//modbus.ReadInputRegisters( 0, 0x00, 10 );
 

@@ -167,6 +167,15 @@ namespace DamoOneVision.Data
 			return 0;
 		}
 
+		public int WriteHoldingRegisters32( byte station, ushort startAddress, int data )
+		{
+			ushort[] registers = new ushort[ 2 ];
+			registers[ 0 ] = (ushort) (data & 0xFFFF);
+			registers[ 1 ] = (ushort) (data >> 16);
+			master.WriteMultipleRegisters( station, startAddress, registers );
+			return 0;
+		}
+
 		public async Task SelfHolding( ushort input, ushort output )
 		{
 			bool[] coil;

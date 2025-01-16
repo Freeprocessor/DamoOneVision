@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DamoOneVision"
         mc:Ignorable="d"
-        Title="ManualWindow" Height="525" Width="945">
+        Title="ManualWindow" Height="525" Width="930">
     <Grid>
         <TextBox x:Name="ModbusIPTextBox" HorizontalAlignment="Left" Margin="-185,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="ModbusIPlabel" Content="Modbus IP" HorizontalAlignment="Left" Margin="-269,34,0,0" VerticalAlignment="Top"/>
@@ -14,27 +14,35 @@
         <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="-269,131,0,0" VerticalAlignment="Top" Height="60" Width="66" />
         <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" Margin="-131,131,0,0" VerticalAlignment="Top" Height="60" Width="66" />
 
-        <Rectangle x:Name="pcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="-99,278,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
-        <Label x:Name="PCLifeBitLabel" Content="PCLifeBit" HorizontalAlignment="Left" Margin="-161,273,0,0" VerticalAlignment="Top"/>
-        <Rectangle x:Name="plcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="-99,309,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
-        <Label x:Name="PLCLifeBitLabel" Content="PLCLifeBit" HorizontalAlignment="Left" Margin="-161,304,0,0" VerticalAlignment="Top"/>
+        <Rectangle x:Name="pcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="899,447,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
+        <Label x:Name="PCLifeBitLabel" Content="PCLifeBit" HorizontalAlignment="Left" Margin="837,442,0,0" VerticalAlignment="Top"/>
+        <Rectangle x:Name="plcLifeBit" HorizontalAlignment="Left" Height="15" Width="15" Margin="899,478,0,0" Stroke="Black" Fill="Green" VerticalAlignment="Top" />
+        <Label x:Name="PLCLifeBitLabel" Content="PLCLifeBit" HorizontalAlignment="Left" Margin="837,473,0,0" VerticalAlignment="Top"/>
 
-        <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="305,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseClick" Background="LightGray" />
-        <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="440,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseClick"/>
-        <Button x:Name="TowerLampYELONButton" Content="Tower Lamp&#xA;YEL ON Button" HorizontalAlignment="Left" Margin="305,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampYELONButton_MouseClick" />
-        <Button x:Name="TowerLampYELOFFButton" Content="Tower Lamp&#xA;YEL OFF Button" HorizontalAlignment="Left" Margin="440,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampYELOFFButton_MouseClick"/>
-        <Button x:Name="TowerLampGENONButton" Content="Tower Lamp&#xA;GRN ON Button" HorizontalAlignment="Left" Margin="305,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampGRNONButton_MouseClick" />
-        <Button x:Name="TowerLampGENOFFButton" Content="Tower Lamp&#xA;GRN OFF Button" HorizontalAlignment="Left" Margin="440,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampGRNOFFButton_MouseClick"/>
-        <Button x:Name="EjectONButton" Content="Eject V/V&#xA;ON Button" HorizontalAlignment="Left" Margin="305,274,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="EjectManualONButton_MouseClick" />
-        <Button x:Name="EjectOFFButton" Content="Eject V/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="440,274,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="EjectManualOFFButton_MouseClick"/>
-        <Button x:Name="MainCVONButton" Content="Main C/V&#xA;ON Button" HorizontalAlignment="Left" Margin="305,364,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="MainCVONButton_MouseClick" />
-        <Button x:Name="MainCVOFFButton" Content="Main C/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="440,364,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="MainCVOFFButton_MouseClick"/>
-        <Button x:Name="Vision1LampONButton" Content="Vision - 1 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="625,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision1LampONButton_MouseClick" />
-        <Button x:Name="Vision1LampOFFButton" Content="Vision - 1 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="760,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision1LampOFFButton_MouseClick"/>
-        <Button x:Name="Vision2LampONButton" Content="Vision - 2 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="625,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision2LampONButton_MouseClick" />
-        <Button x:Name="Vision2LampOFFButton" Content="Vision - 2 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="760,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision2LampOFFButton_MouseClick"/>
-        <Button x:Name="Vision3LampONButton" Content="Vision - 3 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="625,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision3LampONButton_MouseClick" />
-        <Button x:Name="Vision3LampOFFButton" Content="Vision - 3 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="760,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision3LampOFFButton_MouseClick"/>
+        <Button x:Name="TowerLampREDONButton" Content="Tower Lamp&#xA;RED ON Button" HorizontalAlignment="Left" Margin="354,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDONButton_MouseClick" Background="LightGray" />
+        <Button x:Name="TowerLampREDOFFButton" Content="Tower Lamp&#xA;RED OFF Button" HorizontalAlignment="Left" Margin="489,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampREDOFFButton_MouseClick"/>
+        <Button x:Name="TowerLampYELONButton" Content="Tower Lamp&#xA;YEL ON Button" HorizontalAlignment="Left" Margin="354,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampYELONButton_MouseClick" />
+        <Button x:Name="TowerLampYELOFFButton" Content="Tower Lamp&#xA;YEL OFF Button" HorizontalAlignment="Left" Margin="489,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampYELOFFButton_MouseClick"/>
+        <Button x:Name="TowerLampGENONButton" Content="Tower Lamp&#xA;GRN ON Button" HorizontalAlignment="Left" Margin="354,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampGRNONButton_MouseClick" />
+        <Button x:Name="TowerLampGENOFFButton" Content="Tower Lamp&#xA;GRN OFF Button" HorizontalAlignment="Left" Margin="489,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="TowerLampGRNOFFButton_MouseClick"/>
+        <Button x:Name="EjectONButton" Content="Eject V/V&#xA;ON Button" HorizontalAlignment="Left" Margin="354,274,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="EjectManualONButton_MouseClick" />
+        <Button x:Name="EjectOFFButton" Content="Eject V/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="489,274,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="EjectManualOFFButton_MouseClick"/>
+        <Button x:Name="MainCVONButton" Content="Main C/V&#xA;ON Button" HorizontalAlignment="Left" Margin="354,364,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="MainCVONButton_MouseClick" />
+        <Button x:Name="MainCVOFFButton" Content="Main C/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="489,364,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="MainCVOFFButton_MouseClick"/>
+        <Button x:Name="Vision1LampONButton" Content="Vision - 1 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="654,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision1LampONButton_MouseClick" />
+        <Button x:Name="Vision1LampOFFButton" Content="Vision - 1 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="789,31,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision1LampOFFButton_MouseClick"/>
+        <Button x:Name="Vision2LampONButton" Content="Vision - 2 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="654,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision2LampONButton_MouseClick" />
+        <Button x:Name="Vision2LampOFFButton" Content="Vision - 2 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="789,101,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision2LampOFFButton_MouseClick"/>
+        <Button x:Name="Vision3LampONButton" Content="Vision - 3 Lamp&#xA;   ON Button" HorizontalAlignment="Left" Margin="654,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision3LampONButton_MouseClick" />
+        <Button x:Name="Vision3LampOFFButton" Content="Vision - 3 Lamp&#xA;   OFF Button" HorizontalAlignment="Left" Margin="789,174,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="Vision3LampOFFButton_MouseClick"/>
         <Button x:Name="EjectRoutineButton" Content="Eject V/V&#xA;Routine Button" HorizontalAlignment="Left" Margin="625,274,0,0" VerticalAlignment="Top" Height="60" Width="105" Click="EjectRoutineButton_MouseClick" Visibility="Hidden" />
+        <TextBox x:Name="ServoZAxisCurrentPositionTextBox"  HorizontalAlignment="Left" Margin="170,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="ServoZAxisCurrentPositionLabel" Content="Servo Z-Axis Cutrrent" HorizontalAlignment="Left" Margin="39,64,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ServoZAxisPositionTextBox" HorizontalAlignment="Left" Margin="170,95,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120" PreviewTextInput="NumericTextBox_PreviewTextInput" LostFocus="ServoZAxisPositionTextBox_LostFocus"/>
+        <Label x:Name="ServoZAxisPositionLabel" Content="Servo Z-Axis Position" HorizontalAlignment="Left" Margin="39,91,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ServoZAxisSpeedTextBox" HorizontalAlignment="Left" Margin="170,122,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120" PreviewTextInput="NumericTextBox_PreviewTextInput" LostFocus="ServoZAxisSpeedTextBox_LostFocus"/>
+        <Label x:Name="ServoZAxisSpeedLabel" Content="Servo Z-Axis Speed" HorizontalAlignment="Left" Margin="39,118,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ServoMoveButton" Content="Move" HorizontalAlignment="Left" Margin="230,161,0,0" VerticalAlignment="Top" Height="37" Width="55" Click="ServoMoveButton_Click"/>
+
     </Grid>
 </Window>

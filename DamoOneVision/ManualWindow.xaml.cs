@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 
 using DamoOneVision.Data;
 using static OpenCvSharp.FileStorage;
+using System.Text.RegularExpressions;
 
 namespace DamoOneVision
 {
@@ -40,15 +41,15 @@ namespace DamoOneVision
 		private async void TowerLampREDONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
 			await modbus.SelfHolding( 0, 0 );
-			TowerLampREDONButton.Background = Brushes.Green;
-			TowerLampREDOFFButton.Background = Brushes.LightGray;
+			//TowerLampREDONButton.Background = Brushes.Green;
+			//TowerLampREDOFFButton.Background = Brushes.LightGray;
 		}
 
 		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
 			await modbus.SelfHolding( 1, 1 );
-			TowerLampREDONButton.Background = Brushes.LightGray;
-			TowerLampREDOFFButton.Background = Brushes.MediumVioletRed;
+			//TowerLampREDONButton.Background = Brushes.LightGray;
+			//TowerLampREDOFFButton.Background = Brushes.MediumVioletRed;
 		}
 
 		private async void TowerLampYELONButton_MouseClick( object sender, RoutedEventArgs e )
@@ -184,10 +185,123 @@ namespace DamoOneVision
 			} );
 		}
 
+		private async void ServoMoveButton_Click( object sender, RoutedEventArgs e )
+		{
+			await Task.Run( ( ) =>
+			{
+				modbus.WriteSingleCoil( 0, 0x0A, true );
+				Log.WriteLine( "Servo Move Start" );
+				var startTime = DateTime.Now;
+				while (true)
+				{
+					bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
+					if (coil[ 0 ] == true)
+					{
+						modbus.WriteSingleCoil( 0, 0x0A, false );
+						Log.WriteLine( "Servo Moveing..." );
+						break;
+					}
+					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
+					{
+						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						//throw new TimeoutException( "SelfHolding operation timed out." );
+						break;
+					}
+					Thread.Sleep( 10 );
+				}
+				startTime = DateTime.Now;
+				Log.WriteLine( "Servo Move Complete 대기" );
+				modbus.WriteSingleCoil( 0, 0x0B, true );
+				while (true)
+				{
+					bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
+					if (coil[ 0 ] == true)
+					{
+						modbus.WriteSingleCoil( 0, 0x0B, false );
+						Log.WriteLine( "Servo Move Complete" );
+						break;
+					}
+					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
+					{
+						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						//throw new TimeoutException( "SelfHolding operation timed out." );
+						break;
+					}
+					Thread.Sleep( 10 );
+				}
+			} );
+		}
 
+		private void NumericTextBox_PreviewTextInput( object sender, TextCompositionEventArgs e )
+		{
+			// 숫자만 허용
+			Regex regex = new Regex("[^0-9]+");
+			e.Handled = regex.IsMatch( e.Text );
+		}
 
+		private void OnPaste( object sender, DataObjectPastingEventArgs e )
+		{
+			if (e.DataObject.GetDataPresent( typeof( string ) ))
+			{
+				string text = (string)e.DataObject.GetData(typeof(string));
+				if (!IsTextNumeric( text ))
+				{
+					e.CancelCommand();
+				}
+			}
+			else
+			{
+				e.CancelCommand();
+			}
+		}
 
+		private bool IsTextNumeric( string text )
+		{
+			Regex regex = new Regex("^[0-9]+$");
+			return regex.IsMatch( text );
+		}
 
+		private void ServoZAxisPositionTextBox_LostFocus( object sender, RoutedEventArgs e )
+		{
+			if (int.TryParse( ServoZAxisPositionTextBox.Text, out int value ))
+			{
+				if (value < 10 || value > 120000)
+				{
+					MessageBox.Show( "1에서 120000 사이의 숫자만 입력 가능합니다.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
+					ServoZAxisPositionTextBox.Clear();
+				}
+				else
+				{
+					modbus.WriteHoldingRegisters32( 0, 0x00, value );
+				}
+			}
+			else
+			{
+				MessageBox.Show( "유효한 숫자를 입력하세요.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
+				ServoZAxisPositionTextBox.Clear();
+			}
+		}
+
+		private void ServoZAxisSpeedTextBox_LostFocus( object sender, RoutedEventArgs e )
+		{
+			if (int.TryParse( ServoZAxisSpeedTextBox.Text, out int value ))
+			{
+				if (value < 1 || value > 200000)
+				{
+					MessageBox.Show( "1에서 200000 사이의 숫자만 입력 가능합니다.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
+					ServoZAxisSpeedTextBox.Clear();
+				}
+				else
+				{
+					modbus.WriteHoldingRegisters32( 0, 0x02, value );
+				}
+			}
+			else
+			{
+				MessageBox.Show( "유효한 숫자를 입력하세요.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
+				ServoZAxisSpeedTextBox.Clear();
+			}
+		}
 
 	}
 

@@ -57,7 +57,7 @@ namespace DamoOneVision.Camera
 			MIL_INT countNum = 0;
 			
 
-			MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
+			//MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
 
 			MIL.MsysInquire( MilSystem, MIL.M_DISCOVER_DEVICE_COUNT, ref countNum );
 			Log.WriteLine( $"Device Count Number : {countNum}" );
@@ -69,11 +69,13 @@ namespace DamoOneVision.Camera
 				StringBuilder deviceNameBuilder = new StringBuilder(256);
 				MIL.MsysInquire( MilSystem, MIL.M_DISCOVER_DEVICE_USER_NAME + i, deviceNameBuilder );
 				DeviceName[ i ] = deviceNameBuilder.ToString();
+				//Log.WriteLine( $"DEV{i} Device Name : {DeviceName[ i ]}" );
 				if (DeviceName[ i ] == CameraName)
 				{
 					devNum = i;
 					break;
 				}
+				
 			}
 
 			Log.WriteLine($"Camera Name: {CameraName}, Digitizer Num: {(int)devNum}");
@@ -171,8 +173,6 @@ namespace DamoOneVision.Camera
 
 		}
 
-
-
 		public MIL_ID CaptureImage( )
 		{
 
@@ -185,9 +185,7 @@ namespace DamoOneVision.Camera
 			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
 			//MIL.MdispSelect( MilDisplay, MilImage );
 
-
-			SaveImage( MilImage , "RAWImage" );
-
+			SaveImage( MilImage , $"RAW{CameraName}" );
 
 			if (true)
 			{
@@ -198,18 +196,18 @@ namespace DamoOneVision.Camera
 			return MilImage;
 
 		}
+
 		public MIL_ID ReciveImage( )
 		{
 			return MilImage;
 		}
 
-
 		private void InfraredCameraScaleImage( MIL_ID MilImage ) 
 		{
-			MIL_INT SizeByte = 0;
-			MIL_ID MilBayerImage = MIL.M_NULL;
+			//MIL_INT SizeByte = 0;
+			//MIL_ID MilBayerImage = MIL.M_NULL;
 			//버퍼에 쓴 Scale 데이터를 byte로 변환
-			MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
+			//MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
 
 
 
@@ -226,7 +224,7 @@ namespace DamoOneVision.Camera
 					//MIL.MbufPut( MilImage, ushortScaleImageData );
 					MIL.MbufPut( MilImage, ushortScaleImageData );
 				}
-				else if (this.DataType == 8 && this.NbBands == 1)
+				else if (this.DataType == 8 && this.NbBands == 1 && false)
 				{
 					byte [] byteScaleImageData = ByteMilImageShortScale(MilImage);
 					// Scale된 이미지 데이터 Buffer에 전송
@@ -236,14 +234,14 @@ namespace DamoOneVision.Camera
 
 			}
 
-			int imageDataType = (int) MIL.MbufInquire(MilImage, MIL.M_TYPE);
-			int nbBands = (int) MIL.MbufInquire(MilImage, MIL.M_SIZE_BAND);
+			//int imageDataType = (int) MIL.MbufInquire(MilImage, MIL.M_TYPE);
+			//int nbBands = (int) MIL.MbufInquire(MilImage, MIL.M_SIZE_BAND);
 
-			Log.WriteLine( "Image DataType: " + imageDataType );
-			Log.WriteLine( "Number of Bands (NbBands): " + nbBands );
+			//Log.WriteLine( "Image DataType: " + imageDataType );
+			//Log.WriteLine( "Number of Bands (NbBands): " + nbBands );
 
 
-			SaveImage( MilImage , "Image" );
+			SaveImage( MilImage , $"{CameraName}" );
 		}
 
 		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
