@@ -66,7 +66,7 @@ namespace DamoOneVision.Data
 			else
 			{
 				isConnected = false;
-				Data.Log.WriteLine( "Connection Fail" );
+				Logger.WriteLine( "Connection Fail" );
 			}
 			return isConnected;
 		}
@@ -194,7 +194,7 @@ namespace DamoOneVision.Data
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
 					{
-						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						Logger.WriteLine( "SelfHolding operation timed out." );
 						throw new TimeoutException( "SelfHolding operation timed out." );
 					}
 					//Thread.Sleep( 10 );

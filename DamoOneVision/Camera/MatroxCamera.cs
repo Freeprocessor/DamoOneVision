@@ -21,6 +21,7 @@ namespace DamoOneVision.Camera
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
+
 		string appfolder="";
 		string imagesFolder="";
 		string DCFFolder="";
@@ -43,8 +44,25 @@ namespace DamoOneVision.Camera
 			InitImageSave();
 			MilSystem = MILContext.Instance.MilSystem;
 			this.CameraName = CameraName;
-			Log.WriteLine($"{CameraName} is Created" );
+			Logger.WriteLine($"{CameraName} is Created" );
 			//Log.WriteLine( $"System ID : {MilSystem} " );
+		}
+
+		private void InitImageSave( )
+		{
+			// 'Images' 폴더 경로 설정
+			string localappdata = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData);
+			appfolder = System.IO.Path.Combine( localappdata, "DamoOneVision" );
+			imagesFolder = System.IO.Path.Combine( appfolder, "Images" );
+			DCFFolder = System.IO.Path.Combine( appfolder, "DCF" );
+			DCFFilePath = System.IO.Path.Combine( DCFFolder, "SideCamera.dcf" );
+
+			// 폴더가 없으면 생성
+			if (!Directory.Exists( imagesFolder ))
+			{
+				Directory.CreateDirectory( imagesFolder );
+			}
+
 		}
 
 
@@ -60,7 +78,7 @@ namespace DamoOneVision.Camera
 			//MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
 
 			MIL.MsysInquire( MilSystem, MIL.M_DISCOVER_DEVICE_COUNT, ref countNum );
-			Log.WriteLine( $"Device Count Number : {countNum}" );
+			Logger.WriteLine( $"Device Count Number : {countNum}" );
 
 			string[] DeviceName = new string[countNum];
 
@@ -78,8 +96,7 @@ namespace DamoOneVision.Camera
 				
 			}
 
-			Log.WriteLine($"Camera Name: {CameraName}, Digitizer Num: {(int)devNum}");
-
+			Logger.WriteLine($"Camera Name: {CameraName}, Digitizer Num: {(int)devNum}");
 
 			// 디지타이저(카메라) 할당
 			if (CameraName == "InfraredCamera")
@@ -90,6 +107,10 @@ namespace DamoOneVision.Camera
 			{
 				MIL.MdigAlloc( MilSystem, devNum, DCFFilePath, MIL.M_DEFAULT, ref MilDigitizer );
 			}
+
+			///
+			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS );
+			///
 
 
 			if (MilImage == MIL.M_NULL)
@@ -111,7 +132,7 @@ namespace DamoOneVision.Camera
 				this.NbBands = nbBands;
 				this.DataType = dataType;
 
-				Log.WriteLine( $"{CameraName} Spec -> Width: {width}, Height: {height}, NbBands: {nbBands}, DataType: {dataType}"  );
+				Logger.WriteLine( $"{CameraName} Spec -> Width: {width}, Height: {height}, NbBands: {nbBands}, DataType: {dataType}"  );
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
@@ -119,43 +140,25 @@ namespace DamoOneVision.Camera
 				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
 			}
 
-			Log.WriteLine( $"Camera Name: {CameraName} Connect Success" );
+			Logger.WriteLine( $"Camera Name: {CameraName} Connect Success" );
 
 			return MilDigitizer != MIL.M_NULL;
 		}
 
 		public void Disconnect( )
 		{
+			//MIL.MdigGrabWait( MilDigitizer, MIL.M_GRAB_END );
 
 			if (MilDigitizer != MIL.M_NULL) MIL.MdigFree( MilDigitizer );
 			MilDigitizer = MIL.M_NULL;
 
-			Log.WriteLine($"{CameraName} is Disconnect");
+			Logger.WriteLine($"{CameraName} is Disconnect");
 
 			//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
 			//MilImage = MIL.M_NULL;
 
 		}
 
-
-
-
-		private void InitImageSave()
-		{
-			// 'Images' 폴더 경로 설정
-			string localappdata = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData);
-			appfolder = System.IO.Path.Combine( localappdata, "DamoOneVision" );
-			imagesFolder = System.IO.Path.Combine( appfolder, "Images");
-			DCFFolder = System.IO.Path.Combine( appfolder, "DCF" );
-			DCFFilePath = System.IO.Path.Combine( DCFFolder, "SideCamera.dcf" );
-
-			// 폴더가 없으면 생성
-			if (!Directory.Exists( imagesFolder ))
-			{
-				Directory.CreateDirectory( imagesFolder );
-			}
-
-		}
 
 		private async void SaveImage( MIL_ID MilImage, string name )
 		{
@@ -175,11 +178,18 @@ namespace DamoOneVision.Camera
 
 		public MIL_ID CaptureImage( )
 		{
-
+			Stopwatch TectTime = new Stopwatch();
+			TectTime.Start();
 			//MIL_ID MilDisplay = MIL.M_NULL;
-
-			MIL.MdigGrab( MilDigitizer, MilImage );
-			Log.WriteLine($"{CameraName} Grab Complete");
+			for (int i=0;i<2;i++)
+			{
+				MIL.MdigGrab( MilDigitizer, MilImage );
+			}
+			//MIL.MdigGrab( MilDigitizer, MilImage );
+			//MIL.MdigGrabContinuous( MilDigitizer, MilImage );
+			MIL.MdigHalt( MilDigitizer );
+			///
+			Logger.WriteLine($"{CameraName} Grab Complete");
 
 			//MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref MilDisplay );
 			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
@@ -192,7 +202,10 @@ namespace DamoOneVision.Camera
 				InfraredCameraScaleImage( MilImage );
 			}
 			//MIL.MdispFree( MilDisplay );
-			Log.WriteLine( CameraName + " CaptureImage Complete" );
+			Logger.WriteLine( CameraName + " CaptureImage Complete" );
+
+			TectTime.Stop();
+			Logger.WriteLine( $"{CameraName} Grab 시간: {TectTime.ElapsedMilliseconds}ms" );
 			return MilImage;
 
 		}

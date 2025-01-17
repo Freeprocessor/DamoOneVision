@@ -34,7 +34,7 @@ namespace DamoOneVision.Camera
 				}
 				else if (Library == "Spinnaker")
 				{
-					//camera = new SpinnakerCamera();
+					camera = new SpinnakerCamera( CameraName );
 				}
 				else if (Library == "USB")
 				{
@@ -42,7 +42,7 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					Log.WriteLine( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
+					Logger.WriteLine( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
 					throw new Exception( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
 				}
 
@@ -55,7 +55,7 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					Log.WriteLine( "카메라 연결 실패" );
+					Logger.WriteLine( "카메라 연결 실패" );
 					throw new Exception( "카메라 연결 실패" );
 				}
 			} );
@@ -92,7 +92,7 @@ namespace DamoOneVision.Camera
 				}
 				catch (Exception ex)
 				{
-					Log.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
+					Logger.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
 				
 					throw;
 				}

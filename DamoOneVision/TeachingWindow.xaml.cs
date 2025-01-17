@@ -86,7 +86,7 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				// 예외 발생 시 로그 출력
-				Log.WriteLine( $"Exception in Conversion_ImageProcessed: {ex.Message}" );
+				Logger.WriteLine( $"Exception in Conversion_ImageProcessed: {ex.Message}" );
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace DamoOneVision
 			catch (Exception ex)
 			{
 				// 예외 발생 시 로그 출력
-				Log.WriteLine( $"Exception in ConversionImageDisplay: {ex.Message}" );
+				Logger.WriteLine( $"Exception in ConversionImageDisplay: {ex.Message}" );
 			}
 			finally
 			{

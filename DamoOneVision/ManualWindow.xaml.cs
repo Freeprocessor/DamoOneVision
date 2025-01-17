@@ -119,11 +119,11 @@ namespace DamoOneVision
 				bool[] result = modbus.ReadInputs( 0, StartAddress, 1 );
 				if (result[ 0 ])
 				{
-					Data.Log.WriteLine( "ON" );
+					Logger.WriteLine( "ON" );
 				}
 				else
 				{
-					Data.Log.WriteLine( "OFF" );
+					Logger.WriteLine( "OFF" );
 				}
 			} );
 
@@ -177,7 +177,7 @@ namespace DamoOneVision
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 10000) // 10초 타임아웃
 					{
-						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						Logger.WriteLine( "SelfHolding operation timed out." );
 						throw new TimeoutException( "SelfHolding operation timed out." );
 					}
 					//Thread.Sleep( 10 );
@@ -190,7 +190,7 @@ namespace DamoOneVision
 			await Task.Run( ( ) =>
 			{
 				modbus.WriteSingleCoil( 0, 0x0A, true );
-				Log.WriteLine( "Servo Move Start" );
+				Logger.WriteLine( "Servo Move Start" );
 				var startTime = DateTime.Now;
 				while (true)
 				{
@@ -198,19 +198,19 @@ namespace DamoOneVision
 					if (coil[ 0 ] == true)
 					{
 						modbus.WriteSingleCoil( 0, 0x0A, false );
-						Log.WriteLine( "Servo Moveing..." );
+						Logger.WriteLine( "Servo Moveing..." );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
-						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
 					}
 					Thread.Sleep( 10 );
 				}
 				startTime = DateTime.Now;
-				Log.WriteLine( "Servo Move Complete 대기" );
+				Logger.WriteLine( "Servo Move Complete 대기" );
 				modbus.WriteSingleCoil( 0, 0x0B, true );
 				while (true)
 				{
@@ -218,12 +218,12 @@ namespace DamoOneVision
 					if (coil[ 0 ] == true)
 					{
 						modbus.WriteSingleCoil( 0, 0x0B, false );
-						Log.WriteLine( "Servo Move Complete" );
+						Logger.WriteLine( "Servo Move Complete" );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
-						Data.Log.WriteLine( "SelfHolding operation timed out." );
+						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
 					}

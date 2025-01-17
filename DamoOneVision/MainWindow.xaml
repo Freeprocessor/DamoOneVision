@@ -172,7 +172,7 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                     </TabItem>
                     <TabItem Header="Log" Margin="10,0,-10,0" Height="30">
                         <ScrollViewer>
-                            <TextBlock x:Name="LogTextBlock" Margin="10,10,10,10" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontSize="14"/>
+                            <TextBlock x:Name="LogTextBlock" Margin="10,10,10,10" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontSize="14" />
                         </ScrollViewer>
 
                     </TabItem>
@@ -212,23 +212,27 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
+
                         </Grid.RowDefinitions>
 
-                        <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" Margin="0,0,0,96" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+                        <!--<milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" Margin="0,0,0,96" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
                         <milwpf:MILWPFDisplay x:Name="mainInfraredCameraConversionDisplay" Margin="0,96,0,0" Grid.RowSpan="2" Grid.Row="1" Grid.ColumnSpan="2"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera1Display" Grid.Column="2" Margin="0,0,0,0"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera1ConversionDisplay" Grid.Column="3" Margin="0,0,0,0"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera2Display" Grid.Column="2" Grid.Row="1" Margin="0,0,0,0"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera2ConversionDisplay" Grid.Column="3" Grid.Row="1" Margin="0,0,0,0"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera3Display" Grid.Column="2" Grid.Row="2" Margin="0,0,0,0"/>
-                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3ConversionDisplay" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3ConversionDisplay" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0"/>-->
+                        <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera1Display" Grid.Column="1" Margin="0,0,0,0"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera2Display" Margin="0,0,0,0" Grid.Row="1"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3Display" Grid.Column="2" Margin="0,0,0,0" Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1"/>
+
 
                     </Grid>
                 </TabItem>
