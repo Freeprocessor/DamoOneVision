@@ -1,11 +1,12 @@
-﻿using Matrox.MatroxImagingLibrary;
+﻿using DamoOneVision.Camera;
+using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamoOneVision.Camera
+namespace DamoOneVision.ImageProcessing
 {
 	public class TemplateMatcher : IDisposable
 	{
@@ -65,8 +66,8 @@ namespace DamoOneVision.Camera
 
 			if (numOccurrences > 0)
 			{
-				MIL.MpatGetResult( MilPatResult, MIL.M_POSITION_X + MIL.M_TYPE_DOUBLE, 0,ref posX );
-				MIL.MpatGetResult( MilPatResult, MIL.M_POSITION_Y + MIL.M_TYPE_DOUBLE, 0, ref posY);
+				MIL.MpatGetResult( MilPatResult, MIL.M_POSITION_X + MIL.M_TYPE_DOUBLE, 0, ref posX );
+				MIL.MpatGetResult( MilPatResult, MIL.M_POSITION_Y + MIL.M_TYPE_DOUBLE, 0, ref posY );
 				MIL.MpatGetResult( MilPatResult, MIL.M_SCORE + MIL.M_TYPE_DOUBLE, 0, ref score );
 			}
 
@@ -84,7 +85,7 @@ namespace DamoOneVision.Camera
 				MIL.MpatFree( MilPatContext );
 
 			if (MilTemplateImage != MIL.M_NULL) ;
-				//MIL.MbufFree( MilTemplateImage );
+			//MIL.MbufFree( MilTemplateImage );
 
 			//if (MilSystem != MIL.M_NULL)
 			//	MIL.MsysFree( MilSystem );

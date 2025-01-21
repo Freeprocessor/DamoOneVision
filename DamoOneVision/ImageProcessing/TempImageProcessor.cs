@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamoOneVision.Camera
+namespace DamoOneVision.ImageProcessing
 {
-    class TempImageProcessor
-    {
-    }
+	class TempImageProcessor
+	{
+	}
 }

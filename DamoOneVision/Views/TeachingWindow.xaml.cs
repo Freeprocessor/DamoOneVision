@@ -1,6 +1,4 @@
-﻿using DamoOneVision.Camera;
-using DamoOneVision.ViewModels;
-using DamoOneVision.Data;
+﻿using DamoOneVision.ViewModels;
 using Matrox.MatroxImagingLibrary;
 using Microsoft.Win32;
 using System;
@@ -20,6 +18,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using DamoOneVision.ImageProcessing;
+using DamoOneVision.Utilities;
 
 
 namespace DamoOneVision

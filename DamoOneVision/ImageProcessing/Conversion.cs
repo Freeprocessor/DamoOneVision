@@ -1,4 +1,6 @@
-﻿using DamoOneVision.Data;
+﻿using DamoOneVision.Camera;
+using DamoOneVision.Data;
+using DamoOneVision.Utilities;
 using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace DamoOneVision.Camera
+namespace DamoOneVision.ImageProcessing
 {
 
 	internal static class Conversion
@@ -77,7 +79,7 @@ namespace DamoOneVision.Camera
 
 
 
-			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL , SideRight, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT);
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideRight, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT );
 			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideLeft, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT );
 
 			// Control Block for Pat Context
@@ -103,7 +105,7 @@ namespace DamoOneVision.Camera
 			MIL.MpatDraw( MIL.M_DEFAULT, PatResult, MilOverlayImage, MIL.M_DRAW_POSITION + MIL.M_DRAW_BOX, MIL.M_ALL, MIL.M_DEFAULT );
 			MIL.MgraLine( MIL.M_DEFAULT, MilOverlayImage, posx1, posy1, posx2, posy2 );
 
-			
+
 
 			MIL.MpatFree( PatResult );
 			MIL.MpatFree( PatContext );
@@ -120,10 +122,10 @@ namespace DamoOneVision.Camera
 
 
 
-		public static MIL_ID InfraredCameraModel( MIL_ID InfraredCameraImage, ref bool isGood, Data.InfraredCameraModel infraredCameraModels)
+		public static MIL_ID InfraredCameraModel( MIL_ID InfraredCameraImage, ref bool isGood, InfraredCameraModel infraredCameraModels )
 		{
 
-			if(BinarizedImage != MIL.M_NULL)
+			if (BinarizedImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( BinarizedImage );
 				BinarizedImage = MIL.M_NULL;
@@ -167,9 +169,9 @@ namespace DamoOneVision.Camera
 
 			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, CircleMeasMarker, MIL.M_DEFAULT );
 
-			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_RADIUS, ref Radius, IntPtr.Zero );
-			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_POSITION, ref XPos, ref YPos );	
-			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_NUMBER, ref Number, IntPtr.Zero );
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_RADIUS, ref Radius, nint.Zero );
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_POSITION, ref XPos, ref YPos );
+			MIL.MmeasGetResult( CircleMeasMarker, MIL.M_NUMBER, ref Number, nint.Zero );
 
 			Logger.WriteLine( $"Radius: {Radius}, XPos: {XPos}, YPos: {YPos}, Number: {Number}" );
 
@@ -192,23 +194,23 @@ namespace DamoOneVision.Camera
 
 			Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
 
-			for ( MIL_INT i = 0; i < selectedBlobCount; i++ )
+			for (MIL_INT i = 0; i < selectedBlobCount; i++)
 			{
 				MIL_INT blobIndex = 0;
 
 				// M_BLOB_INDEX 속성 가져오기
 				// 블롭 인덱스는 보통 1부터 시작
-				MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_BLOB_INDEX (i), ref blobIndex );
+				MIL.MblobGetResult( BlobContext, BlobResult, MIL.M_BLOB_INDEX( i ), ref blobIndex );
 
 				Logger.WriteLine( "블롭 {i}}의 인덱스: {blobIndex}\n" );
 			}
 
 
 
-			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius*2 - 20 );
+			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius * 2 - 20 );
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_LESS_OR_EQUAL, Radius * 2 + 20 );
 
-			
+
 
 			MIL.MblobDraw( GraphicsContext, BlobResult, BinarizedImage, MIL.M_DRAW_BOX, MIL.M_DEFAULT, MIL.M_DEFAULT );
 

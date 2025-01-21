@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace DamoOneVision.Camera
+namespace DamoOneVision.ImageProcessing
 {
 	public class ImageProcessedEventArgs : EventArgs
 	{

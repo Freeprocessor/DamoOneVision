@@ -1,5 +1,4 @@
-﻿using DamoOneVision.Camera;
-using DamoOneVision.Data;
+﻿using DamoOneVision.Data;
 using DamoOneVision.ViewModels;
 using Matrox.MatroxImagingLibrary;
 using Spinnaker;
@@ -12,6 +11,7 @@ using System.Windows.Media;
 
 using Newtonsoft.Json;
 using System.IO;
+using DamoOneVision.ImageProcessing;
 
 
 namespace DamoOneVision.ViewModels

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace DamoOneVision.Data
+namespace DamoOneVision.Utilities
 {
 	internal static class Logger
 	{

@@ -14,21 +14,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
-using DamoOneVision.Data;
 using static OpenCvSharp.FileStorage;
 using System.Text.RegularExpressions;
+using DamoOneVision.Services;
+using DamoOneVision.Utilities;
 
 namespace DamoOneVision
 {
-    /// <summary>
-    /// ManualWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class ManualWindow : Window
+	/// <summary>
+	/// ManualWindow.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class ManualWindow : Window
     {
-		private Modbus modbus;
+		private ModbusService modbus;
 
-		public ManualWindow( Modbus modbus )
+		public ManualWindow( ModbusService modbus )
         {
 			this.modbus = modbus;
 			InitializeComponent();

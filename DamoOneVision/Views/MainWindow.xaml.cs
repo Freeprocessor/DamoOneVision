@@ -22,6 +22,8 @@ using static OpenCvSharp.FileStorage;
 using System.Net;
 using System.Windows.Media.Converters;
 using Newtonsoft.Json.Linq;
+using DamoOneVision.ImageProcessing;
+using DamoOneVision.Utilities;
 
 
 namespace DamoOneVision
@@ -46,7 +48,7 @@ namespace DamoOneVision
 		private string modelfolder = "";
 		private string modelfile = "";
 
-		Modbus modbus = new Modbus();
+		ModbusService modbus = new ModbusService();
 
 		//private bool isTriggered = false;
 		private bool triggerReadingOFFRequire = false;
@@ -349,7 +351,7 @@ namespace DamoOneVision
 		{
 			try
 			{
-				Modbus.master.Dispose();
+				ModbusService.master.Dispose();
 				lifeBitOFFRequire = true;
 
 				Logger.WriteLine( "Modbus Disconnect Success" );
