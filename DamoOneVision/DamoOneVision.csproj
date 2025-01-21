@@ -28,6 +28,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Advantech.Adam">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Advantech\AdamApax.NET Class Library\Class Library\Win32\Advantech.Adam.DLL</HintPath>
+    </Reference>
+    <Reference Include="Advantech.Common">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Advantech\AdamApax.NET Class Library\Class Library\Win32\Advantech.Common.DLL</HintPath>
+    </Reference>
+    <Reference Include="Advantech.Graph">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Advantech\AdamApax.NET Class Library\Class Library\Win32\Advantech.Graph.dll</HintPath>
+    </Reference>
+    <Reference Include="Advantech.Protocol">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Advantech\AdamApax.NET Class Library\Class Library\Win32\Advantech.Protocol.DLL</HintPath>
+    </Reference>
     <Reference Include="Matrox.MatroxImagingLibrary">
       <HintPath>..\..\..\..\..\..\..\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.dll</HintPath>
     </Reference>

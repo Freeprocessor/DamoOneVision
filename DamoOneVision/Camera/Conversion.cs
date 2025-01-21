@@ -34,6 +34,90 @@ namespace DamoOneVision.Camera
 		}
 
 
+		public static async Task SideCameraModel( MIL_ID SideCameraImage, MIL_ID SideCameraDisplay )
+		{
+
+			string appFolder = string.Empty;
+			string SideRightImage = string.Empty;
+			string SideLeftImage = string.Empty;
+			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
+			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
+			SideRightImage = System.IO.Path.Combine( appFolder, "SideRight.mim" );
+			SideLeftImage = System.IO.Path.Combine( appFolder, "SideLeft.mim" );
+
+			MIL_ID PatContext = MIL.M_NULL;
+			MIL_ID PatResult = MIL.M_NULL;
+			MIL_ID MilOverlayImage = MIL.M_NULL;
+
+
+			MIL.MdispInquire( SideCameraDisplay, MIL.M_OVERLAY_ID, ref MilOverlayImage );
+			MIL.MdispControl( SideCameraDisplay, MIL.M_OVERLAY_CLEAR, MIL.M_DEFAULT );
+
+			//MIL.MbufClear( MilOverlayImage, 0 );
+
+			double posx1 = 0;
+			double posy1 = 0;
+			double posx2 = 0;
+			double posy2 = 0;
+
+			if (BinarizedImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( BinarizedImage );
+				BinarizedImage = MIL.M_NULL;
+			}
+
+			MIL_ID SideRight = MIL.M_NULL;
+			MIL_ID SideLeft = MIL.M_NULL;
+
+			MIL.MbufImport( SideRightImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideRight );
+			MIL.MbufImport( SideLeftImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideLeft );
+
+			MIL.MpatAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref PatContext );
+			MIL.MpatAllocResult( MilSystem, MIL.M_DEFAULT, ref PatResult );
+
+
+
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL , SideRight, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT);
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideLeft, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT );
+
+			// Control Block for Pat Context
+			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_X, 6.984375 );
+			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_Y, 13.1875 );
+			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_X, 22.875 );
+			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_Y, 14.96875 );
+
+
+			MIL.MpatPreprocess( PatContext, MIL.M_DEFAULT, MIL.M_NULL );
+			MIL.MpatFind( PatContext, SideCameraImage, PatResult );
+
+			MIL.MpatGetResult( PatResult, 0, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref posx1 );
+			MIL.MpatGetResult( PatResult, 0, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy1 );
+			MIL.MpatGetResult( PatResult, 1, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref posx2 );
+			MIL.MpatGetResult( PatResult, 1, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy2 );
+
+			///예외처리 필요
+
+			Logger.WriteLine( $"posx1:{posx1}, posy1:{posy1}, posx2:{posx2}, posy2:{posy2}" );
+
+			MIL.MgraColor( MIL.M_DEFAULT, MIL.M_COLOR_GREEN );
+			MIL.MpatDraw( MIL.M_DEFAULT, PatResult, MilOverlayImage, MIL.M_DRAW_POSITION + MIL.M_DRAW_BOX, MIL.M_ALL, MIL.M_DEFAULT );
+			MIL.MgraLine( MIL.M_DEFAULT, MilOverlayImage, posx1, posy1, posx2, posy2 );
+
+			
+
+			MIL.MpatFree( PatResult );
+			MIL.MpatFree( PatContext );
+
+			MIL.MbufFree( SideRight );
+			MIL.MbufFree( SideLeft );
+
+			//MIL.MbufFree( MilOverlayImage );
+
+
+
+			//return SideCameraImage;
+		}
+
 
 
 		public static MIL_ID InfraredCameraModel( MIL_ID InfraredCameraImage, ref bool isGood, Data.InfraredCameraModel infraredCameraModels)

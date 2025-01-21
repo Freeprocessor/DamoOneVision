@@ -75,7 +75,7 @@ namespace DamoOneVision.Camera
 			MIL_INT countNum = 0;
 			
 
-			//MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
+			MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
 
 			MIL.MsysInquire( MilSystem, MIL.M_DISCOVER_DEVICE_COUNT, ref countNum );
 			Logger.WriteLine( $"Device Count Number : {countNum}" );

@@ -49,6 +49,7 @@ namespace DamoOneVision.Camera
 			if (MilApplication != MIL.M_NULL)
 			{
 				//MIL.MsysAlloc( MIL.M_SYSTEM_USB3_VISION, MIL.M_NULL, MIL.M_DEFAULT, ref MilSystem );
+
 				MIL.MsysAlloc( MIL.M_SYSTEM_GIGE_VISION, MIL.M_NULL, MIL.M_DEFAULT, ref MilSystem );
 			}
 			else

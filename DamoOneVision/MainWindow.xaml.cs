@@ -108,6 +108,8 @@ namespace DamoOneVision
 		// Setting
 		SettingManager settingManager;
 
+		AdvantechCard advantechCard = new AdvantechCard();
+
 		public MainWindow( )
 		{
 			InitializeComponent();
@@ -129,6 +131,9 @@ namespace DamoOneVision
 			SideCamera1 = new CameraManager();
 			SideCamera2 = new CameraManager();
 			SideCamera3 = new CameraManager();
+
+			advantechCard.Connect();
+			advantechCard.ReadBitAsync();
 
 			ModbusInit( );
 			ModbusConntect( );
@@ -306,7 +311,6 @@ namespace DamoOneVision
 
 		private void ModbusInit()
 		{
-			InitializeComponent();
 
 			modbus.Ip = "192.168.2.11";
 			modbus.Port = 502;
@@ -532,22 +536,22 @@ namespace DamoOneVision
 			triggerReadingOFFRequire = false;
 			await Task.Run( async ( ) =>
 			{
-				modbus.WriteSingleCoil( 0, 0x2A, true );
+				//modbus.WriteSingleCoil( 0, 0x2A, true );
 				Logger.WriteLine( "TriggerReadingAsync Start" );
 
 				while (!triggerReadingOFFRequire)
 				{
 					/// Trigger-1 ON
-					if (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ])
+					if (advantechCard.ReadCoil[0] == true)
 					{
-						modbus.WriteSingleCoil( 0, 0x06, true );
+						await Task.Delay( 1400 );
 						await VisionTrigger();
-						modbus.WriteSingleCoil( 0, 0x06, false );
-						while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
+						//modbus.WriteSingleCoil( 0, 0x06, false );
+						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
 					}
 
 				}
-				modbus.WriteSingleCoil( 0, 0x2A, false );
+				//modbus.WriteSingleCoil( 0, 0x2A, false );
 				Logger.WriteLine( "TriggerReadingAsync Stop" );
 
 				triggerReadingStatus = false;
@@ -732,7 +736,7 @@ namespace DamoOneVision
 
 					try
 					{
-						if (InfraredCameraImage != MIL.M_NULL && SideCamera1Image != MIL.M_NULL && SideCamera2Image != MIL.M_NULL && SideCamera3Image != MIL.M_NULL && false)
+						if (InfraredCameraImage != MIL.M_NULL && SideCamera1Image != MIL.M_NULL && SideCamera2Image != MIL.M_NULL && SideCamera3Image != MIL.M_NULL)
 						{
 							// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 							// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
@@ -749,10 +753,20 @@ namespace DamoOneVision
 							SideCamera3ConversionImage = MIL.M_NULL;
 
 
-							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
-							MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
 
-							GoodLamp( isGood );
+							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
+							await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
+
+							var tasks = new[]
+							{
+								Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ),
+								Conversion.SideCameraModel( SideCamera2Image, MainSideCamera2Display ),
+								Conversion.SideCameraModel( SideCamera3Image, MainSideCamera3Display )
+							};
+							await Task.WhenAll( tasks );
+							//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
+
+							//GoodLamp( isGood );
 
 							Logger.WriteLine( "InfraredCameraConversionImage 완료" );
 							//DisplayConversionImage( ConversionpixelData );
@@ -808,6 +822,7 @@ namespace DamoOneVision
 			MessageBox.Show( "버튼이 클릭되었습니다." );
 			Logger.WriteLine( "버튼이 클릭되었습니다." );
 		}
+		
 		private async void StartButton_Click( object sender, RoutedEventArgs e )
 		{
 			await modbus.SelfHolding( 1, 1 );
@@ -870,6 +885,7 @@ namespace DamoOneVision
 
 			Logger.WriteLine( "Trigger Reading Start." );
 			TriggerReadingAsync();
+			Logger.WriteLine( "Machine Start." );
 		}
 
 		private async void StopButton_Click( object sender, RoutedEventArgs e )
@@ -892,6 +908,7 @@ namespace DamoOneVision
 
 			await modbus.SelfHolding( 5, 5 );
 			await modbus.SelfHolding( 0, 0 );
+			Logger.WriteLine( "Machine Stop." );
 		}
 
 
