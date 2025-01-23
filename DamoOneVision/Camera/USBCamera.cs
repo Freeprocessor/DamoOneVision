@@ -10,7 +10,7 @@ using OpenCvSharp.WpfExtensions;
 using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
 using System.Diagnostics;
-using DamoOneVision.Utilities;
+using DamoOneVision.Services;
 
 namespace DamoOneVision.Camera
 {

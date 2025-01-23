@@ -17,7 +17,6 @@ using System.Windows.Shapes;
 using static OpenCvSharp.FileStorage;
 using System.Text.RegularExpressions;
 using DamoOneVision.Services;
-using DamoOneVision.Utilities;
 
 namespace DamoOneVision
 {
@@ -189,20 +188,23 @@ namespace DamoOneVision
 		{
 			await Task.Run( ( ) =>
 			{
-				modbus.WriteSingleCoil( 0, 0x0A, true );
+				//modbus.WriteSingleCoil( 0, 0x0A, true );
+				modbus.OutputCoil[ 0x0A ] = true;
 				Logger.WriteLine( "Servo Move Start" );
 				var startTime = DateTime.Now;
 				while (true)
 				{
-					bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
-					if (coil[ 0 ] == true)
+					//bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
+					if (modbus.InputCoil[ 0x0A ])
 					{
-						modbus.WriteSingleCoil( 0, 0x0A, false );
+						//modbus.WriteSingleCoil( 0, 0x0A, false );
+						modbus.OutputCoil[ 0x0A ] = false;
 						Logger.WriteLine( "Servo Moveing..." );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
+						modbus.OutputCoil[ 0x0A ] = false;
 						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
@@ -211,18 +213,23 @@ namespace DamoOneVision
 				}
 				startTime = DateTime.Now;
 				Logger.WriteLine( "Servo Move Complete 대기" );
-				modbus.WriteSingleCoil( 0, 0x0B, true );
+
+				//modbus.WriteSingleCoil( 0, 0x0B, true );
+				modbus.OutputCoil[ 0x0B ] = true;
 				while (true)
 				{
-					bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
-					if (coil[ 0 ] == true)
+					//bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
+					//modbus.OutputCoil[ 0x0B ] = false;
+					if (modbus.InputCoil[ 0x0B ])
 					{
-						modbus.WriteSingleCoil( 0, 0x0B, false );
+						//modbus.WriteSingleCoil( 0, 0x0B, false );
+						modbus.OutputCoil[ 0x0B ] = false;
 						Logger.WriteLine( "Servo Move Complete" );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
+						modbus.OutputCoil[ 0x0B ] = false;
 						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
@@ -265,14 +272,14 @@ namespace DamoOneVision
 		{
 			if (int.TryParse( ServoZAxisPositionTextBox.Text, out int value ))
 			{
-				if (value < 10 || value > 120000)
+				if (value < 0 || value > 120000)
 				{
 					MessageBox.Show( "1에서 120000 사이의 숫자만 입력 가능합니다.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
 					ServoZAxisPositionTextBox.Clear();
 				}
 				else
 				{
-					modbus.WriteHoldingRegisters32( 0, 0x00, value );
+					modbus.HoldingRegister32[ 0x00 ] = value;
 				}
 			}
 			else
@@ -286,14 +293,15 @@ namespace DamoOneVision
 		{
 			if (int.TryParse( ServoZAxisSpeedTextBox.Text, out int value ))
 			{
-				if (value < 1 || value > 200000)
+				if (value < 0 || value > 200000)
 				{
 					MessageBox.Show( "1에서 200000 사이의 숫자만 입력 가능합니다.", "입력 오류", MessageBoxButton.OK, MessageBoxImage.Error );
 					ServoZAxisSpeedTextBox.Clear();
 				}
 				else
 				{
-					modbus.WriteHoldingRegisters32( 0, 0x02, value );
+					//modbus.WriteHoldingRegisters32( 0, 0x02, value );
+					modbus.HoldingRegister32[ 0x01 ] = value;
 				}
 			}
 			else

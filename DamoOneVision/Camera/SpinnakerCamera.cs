@@ -1,4 +1,4 @@
-﻿using DamoOneVision.Utilities;
+﻿using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
 using SpinnakerNET;
 using System;

@@ -23,7 +23,6 @@ using System.Net;
 using System.Windows.Media.Converters;
 using Newtonsoft.Json.Linq;
 using DamoOneVision.ImageProcessing;
-using DamoOneVision.Utilities;
 
 
 namespace DamoOneVision
@@ -48,17 +47,11 @@ namespace DamoOneVision
 		private string modelfolder = "";
 		private string modelfile = "";
 
-		ModbusService modbus = new ModbusService();
+		ModbusService modbus = new ModbusService( "192.168.2.11", 502 );
 
 		//private bool isTriggered = false;
 		private bool triggerReadingOFFRequire = false;
 		private bool triggerReadingStatus = false;
-
-		bool lifeBitOFFRequire = false;
-		bool lifeBitStatus = false;
-		bool PCLifeBit = false;
-		bool PLCLifeBit = false;
-
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
@@ -93,11 +86,6 @@ namespace DamoOneVision
 
 		private MIL_ID SideCamera3Image;
 		private MIL_ID SideCamera3ConversionImage;
-
-
-		private int frameCount = 0;
-		private DateTime fpsStartTime = DateTime.Now;
-		private double currentFps = 0;
 
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
@@ -137,8 +125,6 @@ namespace DamoOneVision
 			advantechCard.Connect();
 			advantechCard.ReadBitAsync();
 
-			ModbusInit( );
-			ModbusConntect( );
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
@@ -280,8 +266,8 @@ namespace DamoOneVision
 
 
 			/// 컬러맵 설정은 필요에 따라 변경 가능
-			MIL.MdispLut( InfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
-			MIL.MdispLut(MainInfraredCameraDisplay, MIL.M_COLORMAP_GRAYSCALE );
+			MIL.MdispLut( InfraredCameraDisplay, MIL.M_COLORMAP_JET );
+			MIL.MdispLut( MainInfraredCameraDisplay, MIL.M_COLORMAP_JET );
 
 
 			infraredCameraDisplay.DisplayId = InfraredCameraDisplay;
@@ -307,68 +293,6 @@ namespace DamoOneVision
 
 			mainSideCamera3Display.DisplayId = MainSideCamera3Display;
 			//mainSideCamera3ConversionDisplay.DisplayId = MainSideCamera3ConversionDisplay;
-
-
-		}
-
-		private void ModbusInit()
-		{
-
-			modbus.Ip = "192.168.2.11";
-			modbus.Port = 502;
-
-		}
-
-		public void ModbusConntect(  )
-		{
-			//IPAddress sip;
-			//int port;
-			//var ipaddress = ModbusIPTextBox.Text;
-			//bool ValidIp = IPAddress.TryParse( ipaddress, out sip );
-
-			//modbus.Ip = sip.ToString();
-			//int.TryParse( ModbusPortTextBox.Text, out port );
-			//modbus.Port = port;
-			try
-			{
-				modbus.Connect();
-				Logger.WriteLine( "Modbus Connect Success" );
-
-				MessageBox.Show( $"Modbus 연결 성공" );
-			}
-			catch (Exception ex)
-			{
-				Logger.WriteLine( $"Modbus Connect Fail: {ex.Message}" );
-				MessageBox.Show( $"Modbus Connect Fail: {ex.Message}" );
-			}
-			lifeBitOFFRequire = false;
-			StartLifeBitAsync();
-			TriggerDelayCalculationAsync();
-			ServoCurrentPosition();
-		}
-
-		public void ModbusDisconnect(  )
-		{
-			try
-			{
-				ModbusService.master.Dispose();
-				lifeBitOFFRequire = true;
-
-				Logger.WriteLine( "Modbus Disconnect Success" );
-
-			}
-			catch (Exception ex)
-			{
-				Logger.WriteLine( $"Modbus Disconnect Fail: {ex.Message}" );
-				MessageBox.Show( $"Modbus Disconnect Fail: {ex.Message}" );
-			}
-
-			lifeBitOFFRequire = false;
-			while (lifeBitStatus)
-			{
-				System.Threading.Thread.Sleep( 1000 );
-			}
-			//lifeBitStatus = false;
 
 		}
 
@@ -546,7 +470,7 @@ namespace DamoOneVision
 					/// Trigger-1 ON
 					if (advantechCard.ReadCoil[0] == true)
 					{
-						await Task.Delay( 1400 );
+						await Task.Delay( 1450 );
 						await VisionTrigger();
 						//modbus.WriteSingleCoil( 0, 0x06, false );
 						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
@@ -560,96 +484,7 @@ namespace DamoOneVision
 			} );
 		}
 
-		private async void TriggerDelayCalculationAsync( )
-		{
-			await Task.Run(  ( ) =>
-			{
-				Logger.WriteLine( "TriggerDelayCalculationAsync Start" );
-				while (!lifeBitOFFRequire)
-				{
-					int delay = 0;
-					double distance = 200;
-					double speed = 0;
-					double time = 0;
-					delay = modbus.ReadInputRegisters( 0, 0x04, 1 )[0];
-					if(delay == 0)
-					{
-						Logger.WriteLine( "Trigger Delay Devide 0" );
-						System.Threading.Thread.Sleep( 1000 );
-						continue;
-					}
-					speed = 40.0 / (double)delay;
-					time = distance / speed;
-
-					//Log.WriteLine( $"Speed: {speed}, Time: {time}" );
-
-					modbus.WriteSingleRegister( 0, 0x04, (ushort) time );
-					
-				}
-				Logger.WriteLine( "TriggerDelayCalculationAsync Stop" );
-			} );
-		}
-
-		private async void StartLifeBitAsync( )
-		{
-			await Task.Run( ( ) =>
-			{
-				lifeBitStatus = true;
-				Logger.WriteLine( "LifeBit ON" );
-				while (!lifeBitOFFRequire)
-				{
-					Dispatcher.Invoke( ( ) =>
-					{
-						if (PCLifeBit)
-						{
-							modbus.WriteSingleCoil( 0, 0x2f, false );
-							PCLifeBit = false;
-							pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
-						}
-						else
-						{
-							modbus.WriteSingleCoil( 0, 0x2f, true );
-							PCLifeBit = true;
-							pcLifeBit.Fill = System.Windows.Media.Brushes.White;
-						}
-
-						PLCLifeBit = modbus.ReadInputs( 0, 0x2f, 1 )[ 0 ];
-
-						if (PLCLifeBit)
-						{
-							plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
-						}
-						else
-						{
-							plcLifeBit.Fill = System.Windows.Media.Brushes.White;
-						}
-
-					} );
-					System.Threading.Thread.Sleep( 1000 );
-				}
-				lifeBitStatus = false;
-				Logger.WriteLine( "LifeBit OFF" );
-			} );
-
-		}
-
-		private async void ServoCurrentPosition( )
-		{
-			await Task.Run( ( ) =>
-			{
-				Logger.WriteLine( "ServoCurrentPosition Start" );
-				while (!lifeBitOFFRequire)
-				{
-					string CurrentPosition = modbus.ReadInputRegisters32(0, 0, 1)[0].ToString();
-					Dispatcher.Invoke( ( ) =>
-					{
-						ServoPosition.Content = CurrentPosition;
-					} );
-					//Thread.Sleep( 1 );
-				}
-				Logger.WriteLine( "ServoCurrentPosition Stop" );
-			} );
-		}
+		
 
 		public async Task VisionTrigger()
 		{
@@ -834,53 +669,66 @@ namespace DamoOneVision
 			await modbus.SelfHolding( 0x22, 0x22 );
 			await modbus.SelfHolding( 0x24, 0x24 );
 
-			modbus.WriteHoldingRegisters32( 0, 0x00, 20000 );
+			//modbus.WriteHoldingRegisters32( 0, 0x00, 20000 );
+			int pos = 85000;
+			int speed = 20000;
+			modbus.HoldingRegister32[ 0x00 ] = pos;
+			modbus.HoldingRegister32[ 0x01 ] = speed;
 
-			modbus.WriteHoldingRegisters32( 0, 0x02, 10000 );
+			await Task.Delay( 100 );
 
-			await Task.Run( ( ) =>
+			if (modbus.InputRegister32[ 0x00 ] != pos)
 			{
-				modbus.WriteSingleCoil( 0, 0x0A, true );
-				Logger.WriteLine( "Servo Move Start" );
-				var startTime = DateTime.Now;
-				while (true)
+				await Task.Run( ( ) =>
 				{
-					bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
-					if (coil[ 0 ] == true)
+					//modbus.WriteSingleCoil( 0, 0x0A, true );
+					modbus.OutputCoil[ 0x0A ] = true;
+					Logger.WriteLine( "Servo Move Start" );
+					var startTime = DateTime.Now;
+					while (true)
 					{
-						modbus.WriteSingleCoil( 0, 0x0A, false );
-						Logger.WriteLine( "Servo Moveing..." );
-						break;
+						//bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
+						if (modbus.InputCoil[ 0x0A ])
+						{
+							//modbus.WriteSingleCoil( 0, 0x0A, false );
+							modbus.OutputCoil[ 0x0A ] = false;
+							Logger.WriteLine( "Servo Moveing..." );
+							break;
+						}
+						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
+						{
+							modbus.OutputCoil[ 0x0A ] = false;
+							Logger.WriteLine( "SelfHolding operation timed out." );
+							//throw new TimeoutException( "SelfHolding operation timed out." );
+							break;
+						}
+						Thread.Sleep( 10 );
 					}
-					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
+					startTime = DateTime.Now;
+					Logger.WriteLine( "Servo Move Complete 대기" );
+					//modbus.WriteSingleCoil( 0, 0x0B, true );
+					modbus.OutputCoil[ 0x0B ] = false;
+					while (true)
 					{
-						Logger.WriteLine( "SelfHolding operation timed out." );
-						//throw new TimeoutException( "SelfHolding operation timed out." );
-						break;
+						//bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
+						if (modbus.InputCoil[ 0x0B ])
+						{
+							//modbus.WriteSingleCoil( 0, 0x0B, false );
+							modbus.OutputCoil[ 0x0B ] = false;
+							Logger.WriteLine( "Servo Move Complete" );
+							break;
+						}
+						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
+						{
+							modbus.OutputCoil[ 0x0B ] = false;
+							Logger.WriteLine( "SelfHolding operation timed out." );
+							//throw new TimeoutException( "SelfHolding operation timed out." );
+							break;
+						}
+						Thread.Sleep( 10 );
 					}
-					Thread.Sleep( 10 );
-				}
-				startTime = DateTime.Now;
-				Logger.WriteLine( "Servo Move Complete 대기" );
-				modbus.WriteSingleCoil( 0, 0x0B, true );
-				while (true)
-				{
-					bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
-					if (coil[ 0 ] == true)
-					{
-						modbus.WriteSingleCoil( 0, 0x0B, false );
-						Logger.WriteLine( "Servo Move Complete" );
-						break;
-					}
-					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
-					{
-						Logger.WriteLine( "SelfHolding operation timed out." );
-						//throw new TimeoutException( "SelfHolding operation timed out." );
-						break;
-					}
-					Thread.Sleep( 10 );
-				}
-			} );
+				} );
+			}
 
 			await modbus.SelfHolding( 0x10, 0x10 );
 
@@ -892,18 +740,19 @@ namespace DamoOneVision
 
 		private async void StopButton_Click( object sender, RoutedEventArgs e )
 		{
-			Logger.WriteLine( "Trigger Reading Stop." );
+
 			triggerReadingOFFRequire = true;
 			await Task.Run( ( ) =>
 			{
-				while (!triggerReadingStatus)
+				while (triggerReadingStatus)
 				{
 					System.Threading.Thread.Sleep( 1000 );
 				}
 			} );
 
+			Logger.WriteLine( "Trigger Reading Stop." );
 			await modbus.SelfHolding( 0x11, 0x11 );
-
+			Logger.WriteLine( "C/V OFF" );
 			await modbus.SelfHolding( 0x21, 0x21 );
 			await modbus.SelfHolding( 0x23, 0x23 );
 			await modbus.SelfHolding( 0x25, 0x25 );

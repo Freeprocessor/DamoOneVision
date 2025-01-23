@@ -1,4 +1,4 @@
-﻿using DamoOneVision.Utilities;
+﻿using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
@@ -22,10 +22,13 @@ namespace DamoOneVision.Camera
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
 
+		private int[] _infraredImageFilter;
+
 		string appfolder="";
 		string imagesFolder="";
+		string cameraImageFolder = "";
 		string DCFFolder="";
-		string DCFFilePath = "";
+		string DCFPath = "";
 
 		public MIL_INT Width { get; set; }
 
@@ -41,10 +44,11 @@ namespace DamoOneVision.Camera
 
 		public MatroxCamera( string CameraName )
 		{
+			this.CameraName = CameraName;
+			Logger.WriteLine( $"{CameraName} is Created" );
+
 			InitImageSave();
 			MilSystem = MILContext.Instance.MilSystem;
-			this.CameraName = CameraName;
-			Logger.WriteLine($"{CameraName} is Created" );
 			//Log.WriteLine( $"System ID : {MilSystem} " );
 		}
 
@@ -54,8 +58,9 @@ namespace DamoOneVision.Camera
 			string localappdata = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData);
 			appfolder = System.IO.Path.Combine( localappdata, "DamoOneVision" );
 			imagesFolder = System.IO.Path.Combine( appfolder, "Images" );
+			cameraImageFolder = System.IO.Path.Combine( imagesFolder, CameraName );
 			DCFFolder = System.IO.Path.Combine( appfolder, "DCF" );
-			DCFFilePath = System.IO.Path.Combine( DCFFolder, "SideCamera.dcf" );
+			DCFPath = System.IO.Path.Combine( DCFFolder, $"{CameraName}.dcf" );
 
 			// 폴더가 없으면 생성
 			if (!Directory.Exists( imagesFolder ))
@@ -63,11 +68,17 @@ namespace DamoOneVision.Camera
 				Directory.CreateDirectory( imagesFolder );
 			}
 
+			if(!Directory.Exists( cameraImageFolder ))
+			{
+				Directory.CreateDirectory( cameraImageFolder );
+			}
+
 		}
 
 
 		public bool Connect(  )
 		{
+
 			// MILContext에서 MilSystem 가져오기
 			//MilSystem = MILContext.Instance.MilSystem;
 			//string selectionString = $" M_GC_DEVICE_NAME={CameraName}";
@@ -99,18 +110,7 @@ namespace DamoOneVision.Camera
 			Logger.WriteLine($"Camera Name: {CameraName}, Digitizer Num: {(int)devNum}");
 
 			// 디지타이저(카메라) 할당
-			if (CameraName == "InfraredCamera")
-			{
-				MIL.MdigAlloc( MilSystem, devNum, "M_DEFAULT", MIL.M_DEFAULT, ref MilDigitizer );
-			}
-			else
-			{
-				MIL.MdigAlloc( MilSystem, devNum, DCFFilePath, MIL.M_DEFAULT, ref MilDigitizer );
-			}
-
-			///
-			//MIL.MdigControl( MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS );
-			///
+			MIL.MdigAlloc( MilSystem, devNum, DCFPath, MIL.M_DEFAULT, ref MilDigitizer );
 
 
 			if (MilImage == MIL.M_NULL)
@@ -140,6 +140,11 @@ namespace DamoOneVision.Camera
 				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
 			}
 
+			if (CameraName == "InfraredCamera")
+			{
+				InfraredCameraNoiseFilter( System.IO.Path.Combine( appfolder, "InfraredCameraNoiseFilter.bmp" ) );
+			}
+
 			Logger.WriteLine( $"Camera Name: {CameraName} Connect Success" );
 
 			return MilDigitizer != MIL.M_NULL;
@@ -164,12 +169,28 @@ namespace DamoOneVision.Camera
 		{
 			await Task.Run( ( ) =>
 			{
+
 				// 현재 시간과 날짜 가져오기
 				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 				// 파일 이름 생성
 				string fileName = $"{name}_{timeStamp}.bmp";
+
+				string folderClassPath = System.IO.Path.Combine( cameraImageFolder, $"{name}" );
+
+				if (!Directory.Exists( folderClassPath ))
+				{
+					Directory.CreateDirectory( folderClassPath );
+				}
+
+				string folderClassDatePath = System.IO.Path.Combine( folderClassPath, $"{DateTime.Today:yyyy-MM-d}" );
+
+				if (!Directory.Exists( folderClassDatePath ))
+				{
+					Directory.CreateDirectory( folderClassDatePath );
+				}
+
 				// 전체 파일 경로
-				string filePath = System.IO.Path.Combine( imagesFolder, fileName );
+				string filePath = System.IO.Path.Combine( folderClassDatePath, fileName );
 				//SaveImage( imageData, filePath );
 				MIL.MbufSave( filePath, MilImage );
 			} );
@@ -178,6 +199,7 @@ namespace DamoOneVision.Camera
 
 		public MIL_ID CaptureImage( )
 		{
+
 			Stopwatch TectTime = new Stopwatch();
 			TectTime.Start();
 			//MIL_ID MilDisplay = MIL.M_NULL;
@@ -185,11 +207,12 @@ namespace DamoOneVision.Camera
 			{
 				MIL.MdigGrab( MilDigitizer, MilImage );
 			}
+
 			//MIL.MdigGrab( MilDigitizer, MilImage );
 			//MIL.MdigGrabContinuous( MilDigitizer, MilImage );
 			MIL.MdigHalt( MilDigitizer );
 			///
-			Logger.WriteLine($"{CameraName} Grab Complete");
+			//Logger.WriteLine($"{CameraName} Grab Complete");
 
 			//MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref MilDisplay );
 			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
@@ -197,12 +220,17 @@ namespace DamoOneVision.Camera
 
 			SaveImage( MilImage , $"RAW{CameraName}" );
 
+			if (CameraName == "InfraredCamera" && _infraredImageFilter != null)
+			{
+
+			}
+
 			if (true)
 			{
 				InfraredCameraScaleImage( MilImage );
 			}
 			//MIL.MdispFree( MilDisplay );
-			Logger.WriteLine( CameraName + " CaptureImage Complete" );
+			//Logger.WriteLine( CameraName + " CaptureImage Complete" );
 
 			TectTime.Stop();
 			Logger.WriteLine( $"{CameraName} Grab 시간: {TectTime.ElapsedMilliseconds}ms" );
@@ -213,6 +241,73 @@ namespace DamoOneVision.Camera
 		public MIL_ID ReciveImage( )
 		{
 			return MilImage;
+		}
+
+		private void InfraredCameraNoiseFilter( string filePath )
+		{
+			if (_infraredImageFilter == null)
+			{
+				MIL_ID MilImage = MIL.M_NULL;
+
+				if (File.Exists( filePath ))
+				{
+
+					MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref MilImage );
+
+					// 이미지 속성 가져오기
+					MIL_INT width = 0;
+					MIL_INT height = 0;
+					MIL_INT nbBands = 0;
+					MIL_INT dataType = 0;
+
+					MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref width );
+					MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref height );
+					MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref nbBands );
+					MIL.MbufInquire( MilImage, MIL.M_TYPE, ref dataType );
+
+					this.Width = width;
+					this.Height = height;
+					this.NbBands = nbBands;
+					this.DataType = dataType;
+
+				}
+				else
+				{
+					return;
+				}
+				// 이미지 데이터 가져오기
+				ushort [] ImageData = new ushort[ this.Width * this.Height ];
+				MIL.MbufGet( MilImage, ImageData );
+
+				MIL.MbufFree( MilImage );
+
+				// 중앙값 필터링
+				ushort[] sorted = (ushort[])ImageData.Clone();
+				Array.Sort( sorted );
+
+				int i = sorted.Length;
+				int median = 0;
+				if (i % 2 == 1) median = sorted[ i / 2 ];
+				else median = (ushort) ((sorted[ i / 2 - 1 ] + sorted[ i / 2 ]) / 2);
+
+				// 중앙값 필터링 결과
+				_infraredImageFilter = ImageData.Select( x => (int) x - median ).ToArray();
+			}
+		}
+
+		private void InfraredNoiseFiltering( ushort[] ImageData )
+		{
+			for (int i = 0; i < ImageData.Length; i++)
+			{
+				// ushort -> int 변환 후 _infraredImageFilter[i] 빼기
+				int diff = (int)ImageData[i] - _infraredImageFilter[i];
+
+				// 음수나 65535를 초과하지 않는 것이 보장된다면 바로 캐스팅 가능
+				if (diff < 0) diff = 0;
+				else if (diff > ushort.MaxValue) diff = ushort.MaxValue;
+
+				ImageData[ i ] = (ushort) diff;
+			}
 		}
 
 		private void InfraredCameraScaleImage( MIL_ID MilImage ) 
@@ -263,25 +358,27 @@ namespace DamoOneVision.Camera
 
 			MIL.MbufGet( MilImage, ImageData );
 
+			//이미지 데이터 레밸링
+			InfraredNoiseFiltering( ImageData );
 
 			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
 			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
-			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
-			//if (distinctNumbersDesc.Length > 1 )
-			//{
-			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
-			//}
+			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			if (distinctNumbersDesc.Length > 1)
+			{
+				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			}
 
 			ushort MinPixelValue = ImageData.Min();
 			ushort MaxPixelValue = ImageData.Max();
 
 
 			// 30~50도 범위로 Scale
-			double dMinPixelValue = (30.0 / 190.0) * 65535.0;
-			double dMaxPixelValue = (50.0 / 190.0) * 65535.0;
+			//double dMinPixelValue = (30.0 / 190.0) * 65535.0;
+			//double dMaxPixelValue = (50.0 / 190.0) * 65535.0;
 
-			MinPixelValue = (ushort) dMinPixelValue;
-			MaxPixelValue = (ushort) dMaxPixelValue;
+			//MinPixelValue = (ushort) dMinPixelValue;
+			//MaxPixelValue = (ushort) dMaxPixelValue;
 
 
 			for (int i = 0; i < ImageData.Length; i++)

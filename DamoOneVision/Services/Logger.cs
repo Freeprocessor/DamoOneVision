@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace DamoOneVision.Utilities
+namespace DamoOneVision.Services
 {
 	internal static class Logger
 	{
@@ -65,6 +65,7 @@ namespace DamoOneVision.Utilities
 						if (Application.Current.MainWindow is MainWindow mainWindow)
 						{
 							mainWindow.LogTextBlock.Text += message + Environment.NewLine;
+							mainWindow.LogScroll.ScrollToEnd();
 						}
 					} ) );
 				}

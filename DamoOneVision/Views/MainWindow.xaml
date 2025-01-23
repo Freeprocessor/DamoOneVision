@@ -171,7 +171,7 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                         </Grid>
                     </TabItem>
                     <TabItem Header="Log" Margin="10,0,-10,0" Height="30">
-                        <ScrollViewer>
+                        <ScrollViewer x:Name="LogScroll">
                             <TextBlock x:Name="LogTextBlock" Margin="10,10,10,10" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontSize="14" />
                         </ScrollViewer>
 

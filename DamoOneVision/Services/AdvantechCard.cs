@@ -11,9 +11,8 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 
 using System.Diagnostics;
-using DamoOneVision.Utilities;
 
-namespace DamoOneVision.Data
+namespace DamoOneVision.Services
 {
 	internal class AdvantechCard
 	{
@@ -42,11 +41,11 @@ namespace DamoOneVision.Data
 
 			if (isConnected)
 			{
-				Logger.WriteLine( "Connected" );
+				Logger.WriteLine( "Adventech Connected" );
 			}
 			else
 			{
-				Logger.WriteLine( "Not Connected" );
+				Logger.WriteLine( "Advantech Not Connected" );
 			}
 		}
 

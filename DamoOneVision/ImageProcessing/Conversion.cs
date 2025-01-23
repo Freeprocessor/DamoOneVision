@@ -1,6 +1,6 @@
 ﻿using DamoOneVision.Camera;
 using DamoOneVision.Data;
-using DamoOneVision.Utilities;
+using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
@@ -99,7 +99,7 @@ namespace DamoOneVision.ImageProcessing
 
 			///예외처리 필요
 
-			Logger.WriteLine( $"posx1:{posx1}, posy1:{posy1}, posx2:{posx2}, posy2:{posy2}" );
+			//Logger.WriteLine( $"posx1:{posx1}, posy1:{posy1}, posx2:{posx2}, posy2:{posy2}" );
 
 			MIL.MgraColor( MIL.M_DEFAULT, MIL.M_COLOR_GREEN );
 			MIL.MpatDraw( MIL.M_DEFAULT, PatResult, MilOverlayImage, MIL.M_DRAW_POSITION + MIL.M_DRAW_BOX, MIL.M_ALL, MIL.M_DEFAULT );

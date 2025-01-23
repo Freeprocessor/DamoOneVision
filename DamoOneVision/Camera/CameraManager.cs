@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using DamoOneVision.Utilities;
+using DamoOneVision.Services;
 
 namespace DamoOneVision.Camera
 {
