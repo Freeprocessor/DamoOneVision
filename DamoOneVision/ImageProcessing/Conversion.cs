@@ -36,16 +36,20 @@ namespace DamoOneVision.ImageProcessing
 		}
 
 
-		public static async Task SideCameraModel( MIL_ID SideCameraImage, MIL_ID SideCameraDisplay )
+		public static async Task<bool> SideCameraModel( MIL_ID SideCameraImage, MIL_ID SideCameraDisplay )
 		{
 
 			string appFolder = string.Empty;
-			string SideRightImage = string.Empty;
-			string SideLeftImage = string.Empty;
+			string SideRightTopImage = string.Empty;
+			string SideLeftTopImage = string.Empty;
+			string SideRightBottomImage = string.Empty;
+			string SideLeftBottomImage = string.Empty;
 			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
-			SideRightImage = System.IO.Path.Combine( appFolder, "SideRight.mim" );
-			SideLeftImage = System.IO.Path.Combine( appFolder, "SideLeft.mim" );
+			SideRightTopImage = System.IO.Path.Combine( appFolder, "SideRightTop.mim" );
+			SideLeftTopImage = System.IO.Path.Combine( appFolder, "SideLeftTop.mim" );
+			SideRightBottomImage = System.IO.Path.Combine( appFolder, "SideRightBottom.mim" );
+			SideLeftBottomImage = System.IO.Path.Combine( appFolder, "SideLeftBottom.mim" );
 
 			MIL_ID PatContext = MIL.M_NULL;
 			MIL_ID PatResult = MIL.M_NULL;
@@ -61,6 +65,10 @@ namespace DamoOneVision.ImageProcessing
 			double posy1 = 0;
 			double posx2 = 0;
 			double posy2 = 0;
+			double posx3 = 0;
+			double posy3 = 0;
+			double posx4 = 0;
+			double posy4 = 0;
 
 			if (BinarizedImage != MIL.M_NULL)
 			{
@@ -68,25 +76,35 @@ namespace DamoOneVision.ImageProcessing
 				BinarizedImage = MIL.M_NULL;
 			}
 
-			MIL_ID SideRight = MIL.M_NULL;
-			MIL_ID SideLeft = MIL.M_NULL;
+			MIL_ID SideRightTop = MIL.M_NULL;
+			MIL_ID SideLeftTop = MIL.M_NULL;
+			MIL_ID SideRightBottom = MIL.M_NULL;
+			MIL_ID SideLeftBottom = MIL.M_NULL;
 
-			MIL.MbufImport( SideRightImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideRight );
-			MIL.MbufImport( SideLeftImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideLeft );
+
+			MIL.MbufImport( SideRightTopImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideRightTop );
+			MIL.MbufImport( SideLeftTopImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideLeftTop );
+			MIL.MbufImport( SideRightBottomImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideRightBottom );
+			MIL.MbufImport( SideLeftBottomImage, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref SideLeftBottom );
 
 			MIL.MpatAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref PatContext );
 			MIL.MpatAllocResult( MilSystem, MIL.M_DEFAULT, ref PatResult );
 
-
-
-			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideRight, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT );
-			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideLeft, 0.0, 0.0, 30.0, 20.0, MIL.M_DEFAULT );
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideLeftTop, 0.0, 0.0, 65.0, 45.0, MIL.M_DEFAULT );
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideRightTop, 0.0, 0.0, 65.0, 45.0, MIL.M_DEFAULT );
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideLeftBottom, 0.0, 0.0, 65.0, 45.0, MIL.M_DEFAULT );
+			MIL.MpatDefine( PatContext, MIL.M_REGULAR_MODEL, SideRightBottom, 0.0, 0.0, 65.0, 45.0, MIL.M_DEFAULT );
 
 			// Control Block for Pat Context
-			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_X, 6.984375 );
-			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_Y, 13.1875 );
-			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_X, 22.875 );
-			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_Y, 14.96875 );
+			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_X, 12.0 );
+			MIL.MpatControl( PatContext, 0, MIL.M_REFERENCE_Y, 23.8125 );
+			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_X, 51.03125 );
+			MIL.MpatControl( PatContext, 1, MIL.M_REFERENCE_Y, 22.9375 );
+			MIL.MpatControl( PatContext, 2, MIL.M_REFERENCE_X, 35.875 );
+			MIL.MpatControl( PatContext, 2, MIL.M_REFERENCE_Y, 18.125 );
+			MIL.MpatControl( PatContext, 3, MIL.M_REFERENCE_X, 29.0625 );
+			MIL.MpatControl( PatContext, 3, MIL.M_REFERENCE_Y, 21.5 );
+
 
 
 			MIL.MpatPreprocess( PatContext, MIL.M_DEFAULT, MIL.M_NULL );
@@ -96,22 +114,40 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MpatGetResult( PatResult, 0, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy1 );
 			MIL.MpatGetResult( PatResult, 1, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref posx2 );
 			MIL.MpatGetResult( PatResult, 1, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy2 );
+			MIL.MpatGetResult( PatResult, 2, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref posx3 );
+			MIL.MpatGetResult( PatResult, 2, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy3 );
+			MIL.MpatGetResult( PatResult, 3, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref posx4 );
+			MIL.MpatGetResult( PatResult, 3, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref posy4 );
+
 
 			///예외처리 필요
 
 			//Logger.WriteLine( $"posx1:{posx1}, posy1:{posy1}, posx2:{posx2}, posy2:{posy2}" );
 
 			MIL.MgraColor( MIL.M_DEFAULT, MIL.M_COLOR_GREEN );
+
 			MIL.MpatDraw( MIL.M_DEFAULT, PatResult, MilOverlayImage, MIL.M_DRAW_POSITION + MIL.M_DRAW_BOX, MIL.M_ALL, MIL.M_DEFAULT );
 			MIL.MgraLine( MIL.M_DEFAULT, MilOverlayImage, posx1, posy1, posx2, posy2 );
-
+			MIL.MgraLine( MIL.M_DEFAULT, MilOverlayImage, posx3, posy3, posx4, posy4 );
+			//MIL.MgraControl( MIL.M_DEFAULT, MIL.M_LINE_THICKNESS, 2 );
 
 
 			MIL.MpatFree( PatResult );
 			MIL.MpatFree( PatContext );
 
-			MIL.MbufFree( SideRight );
-			MIL.MbufFree( SideLeft );
+			MIL.MbufFree( SideRightTop );
+			MIL.MbufFree( SideLeftTop );
+			MIL.MbufFree( SideRightBottom );
+			MIL.MbufFree( SideLeftBottom );
+
+			if((Math.Abs(posy1 - posy2) - Math.Abs( posy3 - posy4 )) > 15)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 
 			//MIL.MbufFree( MilOverlayImage );
 

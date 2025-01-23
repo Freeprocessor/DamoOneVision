@@ -117,10 +117,10 @@ namespace DamoOneVision
 			// 윈도우 종료 이벤트 핸들러 추가
 			this.Closing += Window_Closing;
 
-			InfraredCamera = new CameraManager();
-			SideCamera1 = new CameraManager();
-			SideCamera2 = new CameraManager();
-			SideCamera3 = new CameraManager();
+			InfraredCamera = new CameraManager( "Matrox", "InfraredCamera" );
+			SideCamera1 = new CameraManager( "Matrox", "SideCamera1" );
+			SideCamera2 = new CameraManager( "Matrox", "SideCamera2" );
+			SideCamera3 = new CameraManager( "Matrox", "SideCamera3" );
 
 			advantechCard.Connect();
 			advantechCard.ReadBitAsync();
@@ -305,10 +305,10 @@ namespace DamoOneVision
 			{
 				var tasks = new[]
 				{
-					InfraredCamera.ConnectAsync( "Matrox", "InfraredCamera" ),
-					SideCamera1.ConnectAsync( "Matrox", "SideCamera1" ),
-					SideCamera2.ConnectAsync( "Matrox", "SideCamera2" ),
-					SideCamera3.ConnectAsync( "Matrox", "SideCamera3" )
+					InfraredCamera.ConnectAsync( ),
+					SideCamera1.ConnectAsync( ),
+					SideCamera2.ConnectAsync( ),
+					SideCamera3.ConnectAsync( )
 				};
 
 				await Task.WhenAll( tasks );
@@ -592,7 +592,7 @@ namespace DamoOneVision
 
 
 							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
-							await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
+							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
 
 							var tasks = new[]
 							{
@@ -600,12 +600,20 @@ namespace DamoOneVision
 								Conversion.SideCameraModel( SideCamera2Image, MainSideCamera2Display ),
 								Conversion.SideCameraModel( SideCamera3Image, MainSideCamera3Display )
 							};
-							await Task.WhenAll( tasks );
+							bool[] result = await Task.WhenAll( tasks );
+
+							isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
 							//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
+							Logger.WriteLine( "이미지 처리 완료" );
 
-							//GoodLamp( isGood );
+							if (!Dispatcher.CheckAccess())
+							{
+								// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
+								Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
+								return;
+							}
 
-							Logger.WriteLine( "InfraredCameraConversionImage 완료" );
+
 							//DisplayConversionImage( ConversionpixelData );
 						}
 					}
@@ -626,7 +634,7 @@ namespace DamoOneVision
 			} );
 			TectTime.Stop();
 			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
-			Logger.WriteLine( "이미지 처리 완료" );
+
 
 		}
 
@@ -816,11 +824,14 @@ namespace DamoOneVision
 		{
 			if (!isGood)
 			{
+				Logger.WriteLine( "Reject" );
+
 				GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
 				GoodRejectText.Content = "Reject";
 			}
 			else
 			{
+				Logger.WriteLine( "Good" );
 				GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
 				GoodRejectText.Content = "Good";
 			}

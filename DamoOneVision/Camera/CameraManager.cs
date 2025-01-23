@@ -24,26 +24,36 @@ namespace DamoOneVision.Camera
 
 		private bool isContinuous = false;
 
-		public async Task ConnectAsync( string Library, string CameraName )
+		private string _cameraName = "";
+		private string _library = "";
+
+		public CameraManager( string Library, string CameraName )
 		{
+			this._cameraName = CameraName;
+			this._library = Library;
+		}
+
+		public async Task ConnectAsync( )
+		{
+			
 			await Task.Run( ( ) =>
 			{
-				if (Library == "Matrox")
+				if (_library == "Matrox")
 				{
-					camera = new MatroxCamera( CameraName );
+					camera = new MatroxCamera( _cameraName );
 				}
-				else if (Library == "Spinnaker")
+				else if (_library == "Spinnaker")
 				{
-					camera = new SpinnakerCamera( CameraName );
+					camera = new SpinnakerCamera( _cameraName );
 				}
-				else if (Library == "USB")
+				else if (_library == "USB")
 				{
 					//camera = new USBCamera();
 				}
 				else
 				{
-					Logger.WriteLine( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
-					throw new Exception( $"{CameraName}은/는 지원되지 않는 카메라 모델입니다." );
+					Logger.WriteLine( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
+					throw new Exception( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
 				}
 
 				if (camera.Connect())
@@ -63,6 +73,7 @@ namespace DamoOneVision.Camera
 
 		public async Task DisconnectAsync( )
 		{
+			Logger.WriteLine( $"{_cameraName} 연결 해제" );
 			await Task.Run( ( ) =>
 			{
 				try
@@ -115,8 +126,13 @@ namespace DamoOneVision.Camera
 
 		public MIL_ID ReciveImage( )
 		{
-			MilImage = camera.ReciveImage();
-			return MilImage;
+			if(camera != null)
+			{
+				MilImage = camera.ReciveImage();
+				return MilImage;
+			}
+			return MIL.M_NULL;
+
 		}
 
 		public MIL_INT Width( )
