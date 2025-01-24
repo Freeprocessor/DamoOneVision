@@ -25,6 +25,8 @@ namespace DamoOneVision.Services
 
 		public bool[ ] ReadCoil = new bool[8];
 
+		public bool WriteCoil = false;
+
 		public AdvantechCard( )
 		{
 
@@ -79,6 +81,8 @@ namespace DamoOneVision.Services
 					adamSocket.Modbus().ReadCoilStatus( 1, 8, out value );
 
 					ReadCoil = value;
+
+					adamSocket.DigitalOutput().SetValue( 0, WriteCoil );
 				}
 				else
 				{

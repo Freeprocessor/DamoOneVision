@@ -89,6 +89,7 @@ namespace DamoOneVision
 
 		private bool isContinuous = false; // Continuous 모드 상태
 		private bool isCapturing = false;  // 이미지 캡처 중인지 여부
+		private bool isConnected = false;
 
 		private readonly JsonHandler _jsonHandler;
 		public ObservableCollection<InfraredCameraModel> InfraredCameraModels { get; set; }
@@ -299,6 +300,16 @@ namespace DamoOneVision
 
 		private async void ConnectButton_Click( object sender, RoutedEventArgs e )
 		{
+			await ConnectAction();
+		}
+
+		private async Task ConnectAction( )
+		{
+			if (isConnected)
+			{
+				Logger.WriteLine( "이미 카메라가 연결되어 있습니다." );
+				return;
+			}
 			ConnectButton.IsEnabled = false;
 			DisconnectButton.IsEnabled = false;
 			try
@@ -315,6 +326,7 @@ namespace DamoOneVision
 
 				ConnectButton.IsEnabled = false;
 				DisconnectButton.IsEnabled = true;
+				isConnected = true;
 
 			}
 			catch (Exception ex)
@@ -336,6 +348,11 @@ namespace DamoOneVision
 
 		private async void DisconnectButton_Click( object sender, RoutedEventArgs e )
 		{
+			if (!isConnected)
+			{
+				Logger.WriteLine( "카메라가 연결되어 있지 않습니다." );
+				return;
+			}
 			ConnectButton.IsEnabled = false;
 			DisconnectButton.IsEnabled = false;
 
@@ -412,6 +429,7 @@ namespace DamoOneVision
 
 			ConnectButton.IsEnabled = true;
 			DisconnectButton.IsEnabled = false;
+			isConnected = false;
 		}
 
 		// 모델 수정 버튼 클릭 이벤트 핸들러
@@ -610,9 +628,8 @@ namespace DamoOneVision
 							{
 								// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
 								Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
-								return;
 							}
-
+							if (!isGood) EjectAction();
 
 							//DisplayConversionImage( ConversionpixelData );
 						}
@@ -636,6 +653,17 @@ namespace DamoOneVision
 			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
 
 
+		}
+
+		private async void EjectAction()
+		{
+			await Task.Run( async ( ) =>
+			{
+				await Task.Delay( 3000 );
+				advantechCard.WriteCoil = true ;
+				await Task.Delay( 500 );
+				advantechCard.WriteCoil = false;
+			} );
 		}
 
 		private void TeachingButton_Click( object sender, RoutedEventArgs e )
@@ -670,6 +698,9 @@ namespace DamoOneVision
 		
 		private async void StartButton_Click( object sender, RoutedEventArgs e )
 		{
+
+			await ConnectAction();
+
 			await modbus.SelfHolding( 1, 1 );
 			await modbus.SelfHolding( 4, 4 );
 
@@ -748,7 +779,11 @@ namespace DamoOneVision
 
 		private async void StopButton_Click( object sender, RoutedEventArgs e )
 		{
+			await StopAction();
+		}
 
+		private async Task StopAction( )
+		{
 			triggerReadingOFFRequire = true;
 			await Task.Run( ( ) =>
 			{
@@ -930,7 +965,7 @@ namespace DamoOneVision
 
 		private async void ExitProgram( object sender, EventArgs e )
 		{
-
+			await StopAction();
 
 
 			if (InfraredCamera.IsConnected) InfraredCameraImage = InfraredCamera.ReciveImage();
