@@ -12,14 +12,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using DamoOneVision.Data;
+using DamoOneVision.Models;
 
 namespace DamoOneVision
 {
-    /// <summary>
-    /// SettingWindow.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class SettingWindow : Window
+	/// <summary>
+	/// SettingWindow.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class SettingWindow : Window
     {
 		//string InfraredCameraModelName;
 		//double CircleCenterX;

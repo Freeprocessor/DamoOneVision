@@ -23,6 +23,7 @@ using System.Net;
 using System.Windows.Media.Converters;
 using Newtonsoft.Json.Linq;
 using DamoOneVision.ImageProcessing;
+using DamoOneVision.Models;
 
 
 namespace DamoOneVision

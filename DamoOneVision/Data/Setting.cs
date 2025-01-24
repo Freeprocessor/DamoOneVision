@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 
 using System.Text.Json;
+using DamoOneVision.Models;
 
 namespace DamoOneVision.Data
 {

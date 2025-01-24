@@ -1,5 +1,5 @@
 ﻿using DamoOneVision.Camera;
-using DamoOneVision.Data;
+using DamoOneVision.Models;
 using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
 using System;
