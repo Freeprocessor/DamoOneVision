@@ -38,12 +38,11 @@ namespace DamoOneVision.Services
 			_ip = ip;
 			_port = port;
 			ConnectAsync();
-			
 		}
 
 		public bool IsConnected => _connected && _tcpClient?.Connected == true;
 
-		public async Task ConnectAsync( )
+		public async void ConnectAsync( )
 		{
 			if(_connected) return;
 
@@ -69,11 +68,14 @@ namespace DamoOneVision.Services
 
 		public async Task DisconnectAsync( )
 		{
-			if (!_connected) return;
-			_tcpClient.Close();
-			_tcpClient = null;
-			_connected = false;
-			// _master = null;
+			await Task.Run( ( ) =>
+			{
+				if (!_connected) return;
+				_tcpClient.Close();
+				_tcpClient = null;
+				_connected = false;
+				// _master = null;
+			} );
 		}
 
 		private async void _modbusPollingAsync( )
@@ -330,77 +332,104 @@ namespace DamoOneVision.Services
 
 		public async Task SelfHolding( ushort input, ushort output )
 		{
-			await Task.Run( ( ) =>
+			try
 			{
-				//WriteSingleCoil( 0, output, true );
-				OutputCoil[ output ] = true;
-				var startTime = DateTime.Now;
-				while (true)
+				if (!IsConnected) throw new Exception( "Modbus is not connected." );
+				await Task.Run( ( ) =>
 				{
-					if (InputCoil[input])
+					//WriteSingleCoil( 0, output, true );
+					OutputCoil[ output ] = true;
+					var startTime = DateTime.Now;
+					while (true)
 					{
-						//WriteSingleCoil( 0, output, false );
-						OutputCoil[ output ] = false;
-						break;
+						if (InputCoil[ input ])
+						{
+							//WriteSingleCoil( 0, output, false );
+							OutputCoil[ output ] = false;
+							break;
+						}
+						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
+						{
+							Logger.WriteLine( "SelfHolding operation timed out." );
+							throw new TimeoutException( "SelfHolding operation timed out." );
+						}
+						//Thread.Sleep( 10 );
 					}
-					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
-					{
-						Logger.WriteLine( "SelfHolding operation timed out." );
-						throw new TimeoutException( "SelfHolding operation timed out." );
-					}
-					//Thread.Sleep( 10 );
-				}
-			} );
+				} );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( ex.Message );
+			}
+
 		}
 
 		public async Task SelfHoldingRegister( ushort input, ushort output )
 		{
-			await Task.Run( ( ) =>
+			try
 			{
-				//WriteSingleRegister( 0, output, 1 );
-				HoldingRegister[ output ] = 1;
-				var startTime = DateTime.Now;
-				while (true)
+				if (!IsConnected) throw new Exception( "Modbus is not connected." );
+				await Task.Run( ( ) =>
 				{
-					if (InputCoil[ input ])
+					//WriteSingleRegister( 0, output, 1 );
+					HoldingRegister[ output ] = 1;
+					var startTime = DateTime.Now;
+					while (true)
 					{
-						//WriteSingleRegister( 0, output, 0 );
-						HoldingRegister[ output ] = 0;
-						break;
+						if (InputCoil[ input ])
+						{
+							//WriteSingleRegister( 0, output, 0 );
+							HoldingRegister[ output ] = 0;
+							break;
+						}
+						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
+						{
+							Logger.WriteLine( "SelfHolding operation timed out." );
+							throw new TimeoutException( "SelfHolding operation timed out." );
+						}
+						//Thread.Sleep( 10 );
 					}
-					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
-					{
-						Logger.WriteLine( "SelfHolding operation timed out." );
-						throw new TimeoutException( "SelfHolding operation timed out." );
-					}
-					//Thread.Sleep( 10 );
-				}
-			} );
+				} );
+			}
+			catch(Exception ex)
+			{
+				Logger.WriteLine( ex.Message );
+			}
+
 		}
 
 		public async Task SelfHoldingRegister32( ushort input, ushort output )
 		{
-			await Task.Run( ( ) =>
+			try
 			{
-				//WriteSingleRegister( 0, output, 1 );
-				HoldingRegister32[ output ] = 1;
-				var startTime = DateTime.Now;
-				while (true)
+				if (!IsConnected) throw new Exception( "Modbus is not connected." );
+				await Task.Run( ( ) =>
 				{
-					if (InputCoil[ input ])
+					//WriteSingleRegister( 0, output, 1 );
+					HoldingRegister32[ output ] = 1;
+					var startTime = DateTime.Now;
+					while (true)
 					{
-						//WriteSingleRegister( 0, output, 0 );
-						HoldingRegister32[ output ] = 0;
-						break;
+						if (InputCoil[ input ])
+						{
+							//WriteSingleRegister( 0, output, 0 );
+							HoldingRegister32[ output ] = 0;
+							break;
+						}
+						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
+						{
+							Logger.WriteLine( "SelfHolding operation timed out." );
+							throw new TimeoutException( "SelfHolding operation timed out." );
+						}
+						//Thread.Sleep( 10 );
 					}
-					if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
-					{
-						Logger.WriteLine( "SelfHolding operation timed out." );
-						throw new TimeoutException( "SelfHolding operation timed out." );
-					}
-					//Thread.Sleep( 10 );
-				}
-			} );
+				} );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( ex.Message );
+			}
+
 		}
 
 		//private async void TriggerDelayCalculationAsync( )
@@ -437,66 +466,84 @@ namespace DamoOneVision.Services
 
 		private async void StartLifeBitAsync( )
 		{
-			await Task.Run( ( ) =>
+			try
 			{
-				_lifeBitStatus = true;
-				Logger.WriteLine( "LifeBit ON" );
-				while (_connected)
+				if (!IsConnected) throw new Exception( "Modbus is not connected." );
+				await Task.Run( ( ) =>
 				{
-					if (InputCoil[0x2F])
+					_lifeBitStatus = true;
+					Logger.WriteLine( "LifeBit ON" );
+					while (_connected)
 					{
-						OutputCoil[0x2F] = false;
-
-						Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+						if (InputCoil[ 0x2F ])
 						{
-							if (Application.Current.MainWindow is MainWindow mainWindow)
+							OutputCoil[ 0x2F ] = false;
+
+							Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
 							{
-								mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.White;
-								mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
-							}
-						} ) );
-					}
-					else
-					{
-						OutputCoil[ 0x2F ] = true;
-						Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+								if (Application.Current.MainWindow is MainWindow mainWindow)
+								{
+									mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.White;
+									mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+								}
+							} ) );
+						}
+						else
 						{
-							if (Application.Current.MainWindow is MainWindow mainWindow)
+							OutputCoil[ 0x2F ] = true;
+							Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
 							{
-								mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
-								mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.White;
-							}
-						} ) );
+								if (Application.Current.MainWindow is MainWindow mainWindow)
+								{
+									mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+									mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.White;
+								}
+							} ) );
+						}
+
+
+						System.Threading.Thread.Sleep( 1000 );
 					}
+					_lifeBitStatus = false;
+					Logger.WriteLine( "LifeBit OFF" );
+				} );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( ex.Message );
+			}
 
-
-					System.Threading.Thread.Sleep( 1000 );
-				}
-				_lifeBitStatus = false;
-				Logger.WriteLine( "LifeBit OFF" );
-			} );
 
 		}
 
 		private async void ServoCurrentPositionAsync( )
 		{
-			await Task.Run( ( ) =>
+			try
 			{
-				Logger.WriteLine( "ServoCurrentPosition Start" );
-				while (_connected)
+				if (!IsConnected) throw new Exception( "Modbus is not connected." );
+				await Task.Run( ( ) =>
 				{
-					string CurrentPosition = InputRegister32[0].ToString();
-					Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+					Logger.WriteLine( "ServoCurrentPosition Start" );
+					while (_connected)
 					{
-						if (Application.Current.MainWindow is MainWindow mainWindow)
+						string CurrentPosition = InputRegister32[0].ToString();
+						Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
 						{
-							mainWindow.ServoPosition.Content = CurrentPosition;
-						}
-					} ) );
-					Thread.Sleep( 100 );
-				}
-				Logger.WriteLine( "ServoCurrentPosition Stop" );
-			} );
+							if (Application.Current.MainWindow is MainWindow mainWindow)
+							{
+								mainWindow.ServoPosition.Content = CurrentPosition;
+							}
+						} ) );
+						Thread.Sleep( 100 );
+					}
+					Logger.WriteLine( "ServoCurrentPosition Stop" );
+				} );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( ex.Message );
+			}
+
 		}
 
 

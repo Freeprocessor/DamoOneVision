@@ -25,11 +25,11 @@ namespace DamoOneVision
 	/// </summary>
 	public partial class ManualWindow : Window
     {
-		private ModbusService modbus;
+		private readonly ModbusService _modbus;
 
 		public ManualWindow( ModbusService modbus )
         {
-			this.modbus = modbus;
+			this._modbus = modbus;
 			InitializeComponent();
 
 		}
@@ -39,83 +39,83 @@ namespace DamoOneVision
 
 		private async void TowerLampREDONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0, 0 );
+			await _modbus.SelfHolding( 0, 0 );
 			//TowerLampREDONButton.Background = Brushes.Green;
 			//TowerLampREDOFFButton.Background = Brushes.LightGray;
 		}
 
 		private async void TowerLampREDOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 1, 1 );
+			await _modbus.SelfHolding( 1, 1 );
 			//TowerLampREDONButton.Background = Brushes.LightGray;
 			//TowerLampREDOFFButton.Background = Brushes.MediumVioletRed;
 		}
 
 		private async void TowerLampYELONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 2, 2 );
+			await _modbus.SelfHolding( 2, 2 );
 		}
 
 		private async void TowerLampYELOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 3, 3 );
+			await _modbus.SelfHolding( 3, 3 );
 		}
 
 		private async void TowerLampGRNONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 4, 4 );
+			await _modbus.SelfHolding( 4, 4 );
 		}
 
 		private async void TowerLampGRNOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 5, 5 );
+			await _modbus.SelfHolding( 5, 5 );
 		}
 
 		private async void MainCVONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x10, 0x10 );
+			await _modbus.SelfHolding( 0x10, 0x10 );
 		}
 
 		private async void MainCVOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x11, 0x11 );
+			await _modbus.SelfHolding( 0x11, 0x11 );
 		}
 
 		private async void Vision1LampONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x20, 0x20 );
+			await _modbus.SelfHolding( 0x20, 0x20 );
 		}
 
 		private async void Vision1LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x21, 0x21 );
+			await _modbus.SelfHolding( 0x21, 0x21 );
 		}
 
 		private async void Vision2LampONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x22, 0x22 );
+			await _modbus.SelfHolding( 0x22, 0x22 );
 		}
 
 		private async void Vision2LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x23, 0x23 );
+			await _modbus.SelfHolding( 0x23, 0x23 );
 		}
 
 		private async void Vision3LampONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x24, 0x24 );
+			await _modbus.SelfHolding( 0x24, 0x24 );
 		}
 
 		private async void Vision3LampOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x25, 0x25 );
+			await _modbus.SelfHolding( 0x25, 0x25 );
 		}
 
 		private async void ReadStatus( ushort StartAddress )
 		{
 			await Task.Run( ( ) =>
 			{
-				bool[] result = modbus.ReadInputs( 0, StartAddress, 1 );
+				bool[] result = _modbus.ReadInputs( 0, StartAddress, 1 );
 				if (result[ 0 ])
 				{
 					Logger.WriteLine( "ON" );
@@ -144,11 +144,11 @@ namespace DamoOneVision
 
 		private async void EjectManualONButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x1a, 0x1a );
+			await _modbus.SelfHolding( 0x1a, 0x1a );
 		}
 		private async void EjectManualOFFButton_MouseClick( object sender, RoutedEventArgs e )
 		{
-			await modbus.SelfHolding( 0x1b, 0x1b );
+			await _modbus.SelfHolding( 0x1b, 0x1b );
 		}
 		private async void EjectRoutineButton_MouseClick( object sender, RoutedEventArgs e )
 		{
@@ -156,17 +156,17 @@ namespace DamoOneVision
 
 			await Task.Run( ( ) =>
 			{
-				modbus.WriteSingleCoil( 0, 0x18, true );
+				_modbus.WriteSingleCoil( 0, 0x18, true );
 				var startTime = DateTime.Now;
 				while (true)
 				{
-					coil = modbus.ReadInputs( 0, 0x18, 1 );
+					coil = _modbus.ReadInputs( 0, 0x18, 1 );
 					if (coil[ 0 ] == true)
 					{
-						modbus.WriteSingleCoil( 0, 0x19, true );
+						_modbus.WriteSingleCoil( 0, 0x19, true );
 						while (true)
 						{
-							coil = modbus.ReadInputs( 0, 0x19, 1 );
+							coil = _modbus.ReadInputs( 0, 0x19, 1 );
 							if (coil[ 0 ] == false)
 							{
 								break;
@@ -189,22 +189,22 @@ namespace DamoOneVision
 			await Task.Run( ( ) =>
 			{
 				//modbus.WriteSingleCoil( 0, 0x0A, true );
-				modbus.OutputCoil[ 0x0A ] = true;
+				_modbus.OutputCoil[ 0x0A ] = true;
 				Logger.WriteLine( "Servo Move Start" );
 				var startTime = DateTime.Now;
 				while (true)
 				{
 					//bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
-					if (modbus.InputCoil[ 0x0A ])
+					if (_modbus.InputCoil[ 0x0A ])
 					{
 						//modbus.WriteSingleCoil( 0, 0x0A, false );
-						modbus.OutputCoil[ 0x0A ] = false;
+						_modbus.OutputCoil[ 0x0A ] = false;
 						Logger.WriteLine( "Servo Moveing..." );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
-						modbus.OutputCoil[ 0x0A ] = false;
+						_modbus.OutputCoil[ 0x0A ] = false;
 						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
@@ -215,21 +215,21 @@ namespace DamoOneVision
 				Logger.WriteLine( "Servo Move Complete 대기" );
 
 				//modbus.WriteSingleCoil( 0, 0x0B, true );
-				modbus.OutputCoil[ 0x0B ] = true;
+				_modbus.OutputCoil[ 0x0B ] = true;
 				while (true)
 				{
 					//bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
 					//modbus.OutputCoil[ 0x0B ] = false;
-					if (modbus.InputCoil[ 0x0B ])
+					if (_modbus.InputCoil[ 0x0B ])
 					{
 						//modbus.WriteSingleCoil( 0, 0x0B, false );
-						modbus.OutputCoil[ 0x0B ] = false;
+						_modbus.OutputCoil[ 0x0B ] = false;
 						Logger.WriteLine( "Servo Move Complete" );
 						break;
 					}
 					if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
 					{
-						modbus.OutputCoil[ 0x0B ] = false;
+						_modbus.OutputCoil[ 0x0B ] = false;
 						Logger.WriteLine( "SelfHolding operation timed out." );
 						//throw new TimeoutException( "SelfHolding operation timed out." );
 						break;
@@ -279,7 +279,7 @@ namespace DamoOneVision
 				}
 				else
 				{
-					modbus.HoldingRegister32[ 0x00 ] = value;
+					_modbus.HoldingRegister32[ 0x00 ] = value;
 				}
 			}
 			else
@@ -301,7 +301,7 @@ namespace DamoOneVision
 				else
 				{
 					//modbus.WriteHoldingRegisters32( 0, 0x02, value );
-					modbus.HoldingRegister32[ 0x01 ] = value;
+					_modbus.HoldingRegister32[ 0x01 ] = value;
 				}
 			}
 			else
