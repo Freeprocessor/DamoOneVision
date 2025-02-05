@@ -140,6 +140,12 @@ namespace DamoOneVision.ViewModels
 		private MIL_ID _sideCamera3ConversionImage;
 
 
+		private MIL_ID _mainInfraredCameraDisplay;
+		private MIL_ID _mainSideCamera1Display;
+		private MIL_ID _mainSideCamera2Display;
+		private MIL_ID _mainSideCamera3Display;
+
+
 		/// <summary>
 		/// 카메라 연속 촬영 모드
 		/// </summary>
@@ -204,15 +210,23 @@ namespace DamoOneVision.ViewModels
 		// -----------------------------------------------------------------------
 		public ICommand ConnectCommand { get; }
 		public ICommand DisconnectCommand { get; }
+		public ICommand MachineStartCommand { get; }
+		public ICommand MachineStopCommand { get; }
+		public ICommand VisionTriggerCommand { get; }
+		public ICommand ListBoxSelectionChangedCommand { get; }
 
 
 
 
 		SettingManager settingManager;
+		//public MainViewModel()
+		//{
 
+		//}
 
 		public MainViewModel( ModbusService modbus, AdvantechCard advantechCard, CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
-			MIL_ID infraredCameraImage, MIL_ID infraredCameraConversionImage, MIL_ID sideCamera1Image, MIL_ID sideCamera1ConversionImage, MIL_ID sideCamera2Image, MIL_ID sideCamera2ConversionImage, MIL_ID sideCamera3Image, MIL_ID sideCamera3ConversionImage )
+			MIL_ID infraredCameraImage, MIL_ID infraredCameraConversionImage, MIL_ID sideCamera1Image, MIL_ID sideCamera1ConversionImage, MIL_ID sideCamera2Image, MIL_ID sideCamera2ConversionImage, MIL_ID sideCamera3Image, MIL_ID sideCamera3ConversionImage,
+			MIL_ID mainInfraredCameraDisplay, MIL_ID mainSideCamera1Display, MIL_ID mainSideCamera2Display, MIL_ID mainSideCamera3Display)
 		{
 
 			MilSystem = MILContext.Instance.MilSystem;
@@ -225,6 +239,12 @@ namespace DamoOneVision.ViewModels
 			_sideCamera2ConversionImage = sideCamera2ConversionImage;
 			_sideCamera3Image = sideCamera3Image;
 			_sideCamera3ConversionImage = sideCamera3ConversionImage;
+
+			_mainInfraredCameraDisplay = mainInfraredCameraDisplay;
+			_mainSideCamera1Display = mainSideCamera1Display;
+			_mainSideCamera2Display = mainSideCamera2Display;
+			_mainSideCamera3Display = mainSideCamera3Display;
+
 
 			_modbus = modbus;
 			_advantechCard = advantechCard;
@@ -257,6 +277,24 @@ namespace DamoOneVision.ViewModels
 				async _ => await DisconnectAction(),
 				_ => CanDisconnect
 			);
+
+			MachineStartCommand = new AsyncRelayCommand(
+				async _ => await MachineStartAction()
+			);
+
+			MachineStopCommand = new AsyncRelayCommand(
+				async _ => await MachineStopAction()
+			);
+
+			VisionTriggerCommand = new RelayCommand(
+				_ => VisionTrigger()
+			);
+
+			//ListBoxSelectionChangedCommand = new RelayCommand(
+			//	_ => ListBox_SelectionChanged()
+			//);
+
+
 
 
 
@@ -442,7 +480,7 @@ namespace DamoOneVision.ViewModels
 			IsVisionConnected = false;
 		}
 
-		private async void MachineStartAction( )
+		private async Task MachineStartAction( )
 		{
 
 			await ConnectAction();
@@ -539,7 +577,7 @@ namespace DamoOneVision.ViewModels
 			Logger.WriteLine( "Machine Stop." );
 		}
 
-		public async Task VisionTrigger( )
+		private async Task VisionTrigger( )
 		{
 			Stopwatch TectTime = new Stopwatch();
 			TectTime.Start();
@@ -601,15 +639,18 @@ namespace DamoOneVision.ViewModels
 						{
 
 							/// 이미지를 Property에 저장하고 화면에 표시하는 로직을 구성해야함
+							/// 
+
+							MIL.MdispSelect( _mainInfraredCameraDisplay, _infraredCameraImage );
+							MIL.MdispSelect( _mainSideCamera1Display, _sideCamera1Image );
+							MIL.MdispSelect( _mainSideCamera2Display, _sideCamera2Image );
+							MIL.MdispSelect( _mainSideCamera3Display, _sideCamera3Image );
 
 							//MIL.MdispSelect( InfraredCameraDisplay, InfraredCameraImage );
-							//MIL.MdispSelect( MainInfraredCameraDisplay, InfraredCameraImage );
 							//MIL.MdispSelect( SideCamera1Display, SideCamera1Image );
-							//MIL.MdispSelect( MainSideCamera1Display, SideCamera1Image );
 							//MIL.MdispSelect( SideCamera2Display, SideCamera2Image );
-							//MIL.MdispSelect( MainSideCamera2Display, SideCamera2Image );
 							//MIL.MdispSelect( SideCamera3Display, SideCamera3Image );
-							//MIL.MdispSelect( MainSideCamera3Display, SideCamera3Image );
+
 
 							Logger.WriteLine( "카메라 이미지 디스플레이 완료" );
 						}
@@ -649,28 +690,29 @@ namespace DamoOneVision.ViewModels
 							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
 							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
 
-							var tasks = new[]
-							{
-								///Overlay Display  Image 어떻게 처리할 것인지?
-								///디스플레이 선언과 동시에 Overlay Image의 버퍼를 받아서 저장후에 
-								///필요할때마다 가져다가 쓰는 방식으로 해야할 것 같음
-								///
-								Conversion.SideCameraModel( _sideCamera1Image, MainSideCamera1Display ),
-								Conversion.SideCameraModel( _sideCamera2Image, MainSideCamera2Display ),
-								Conversion.SideCameraModel( _sideCamera3Image, MainSideCamera3Display )
-							};
-							bool[] result = await Task.WhenAll( tasks );
+							//var tasks = new[]
+							//{
+							//	///Overlay Display  Image 어떻게 처리할 것인지?
+							//	///디스플레이 선언과 동시에 Overlay Image의 버퍼를 받아서 저장후에 
+							//	///필요할때마다 가져다가 쓰는 방식으로 해야할 것 같음
+							//	///
+							//	Conversion.SideCameraModel( _sideCamera1Image, _mainSideCamera1Display ),
+							//	Conversion.SideCameraModel( _sideCamera2Image, _mainSideCamera2Display ),
+							//	Conversion.SideCameraModel( _sideCamera3Image, _mainSideCamera3Display )
+							//};
+							//bool[] result = await Task.WhenAll( tasks );
 
-							isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
+							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
 							//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
 							Logger.WriteLine( "이미지 처리 완료" );
 
-							if (!Dispatcher.CheckAccess())
-							{
-								// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
-								Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
-							}
-							if (!isGood) EjectAction();
+							///GOOD REJECT LAMP 바인딩
+							//if (!Dispatcher.CheckAccess())
+							//{
+							//	// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
+							//	Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
+							//}
+							//if (!isGood) EjectAction();
 
 							//DisplayConversionImage( ConversionpixelData );
 						}
@@ -697,27 +739,27 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		private void ListBox_SelectionChanged( object sender, System.Windows.Controls.SelectionChangedEventArgs e )
-		{
-			if (e.AddedItems.Count > 0)
-			{
-				string? selectedImagePath = e.AddedItems[0] as string;
-				if (!string.IsNullOrEmpty( selectedImagePath ) && File.Exists( selectedImagePath ))
-				{
-					// 선택된 이미지를 VisionImage에 표시
-					try
-					{
-						_infraredCameraImage = _infraredCamera.LoadImage( MilSystem, selectedImagePath );
-						MIL.MdispSelect( _infraredCameraDisplay, _infraredCameraImage );
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
-						Logger.WriteLine( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
-					}
-				}
-			}
-		}
+		//private void ListBox_SelectionChanged( )
+		//{
+		//	if (e.AddedItems.Count > 0)
+		//	{
+		//		string? selectedImagePath = e.AddedItems[0] as string;
+		//		if (!string.IsNullOrEmpty( selectedImagePath ) && File.Exists( selectedImagePath ))
+		//		{
+		//			// 선택된 이미지를 VisionImage에 표시
+		//			try
+		//			{
+		//				_infraredCameraImage = _infraredCamera.LoadImage( MilSystem, selectedImagePath );
+		//				MIL.MdispSelect( _mainInfraredCameraDisplay, _infraredCameraImage );
+		//			}
+		//			catch (Exception ex)
+		//			{
+		//				MessageBox.Show( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
+		//				Logger.WriteLine( $"이미지를 불러오는 중 오류 발생: {ex.Message}" );
+		//			}
+		//		}
+		//	}
+		//}
 
 		private void LoadModel( string modelData )
 		{

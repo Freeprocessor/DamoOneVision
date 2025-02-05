@@ -9,9 +9,9 @@
         mc:Ignorable="d"
         Title="DamoOne Vision" Height="768" Width="1366" Background="#FFD2D2D2" Icon="/Logo.png" WindowStyle="None" WindowState="Maximized">
 
-    <Window.DataContext>
+    <!--<Window.DataContext>
         <vm:MainViewModel/>
-    </Window.DataContext>
+    </Window.DataContext>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
@@ -154,7 +154,7 @@
                     <TabItem Header="ImageLoad" Margin="0,0,0,0" Height="30">
                         <Grid>
                             <ScrollViewer Margin="10,10,10,40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                <ListBox ItemsSource="{Binding ImagePaths}" SelectionChanged="ListBox_SelectionChanged" 
+                                <ListBox ItemsSource="{Binding ImagePaths}"  
 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
 ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                                     <ListBox.ItemsPanel>
@@ -185,8 +185,8 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                 </TabControl>
 
             </Grid>
-            <Button x:Name="StartButton" Content="Start" HorizontalAlignment="Left" Margin="30,0,0,10" Click="StartButton_Click" Height="20" VerticalAlignment="Bottom"/>
-            <Button x:Name="StopButton" Content="Stop" HorizontalAlignment="Left" Margin="87,0,0,10" Click="StopButton_Click" Height="20" VerticalAlignment="Bottom"/>
+            <Button x:Name="StartButton" Content="Start" HorizontalAlignment="Left" Margin="30,0,0,10" Command="{Binding MachineStartCommand}" Height="20" VerticalAlignment="Bottom"/>
+            <Button x:Name="StopButton" Content="Stop" HorizontalAlignment="Left" Margin="87,0,0,10" Command="{Binding MachineStopCommand}" Height="20" VerticalAlignment="Bottom"/>
             <Button x:Name="DataReadButton" Content="Data Read" HorizontalAlignment="Left" Margin="144,0,0,10"  Height="20" VerticalAlignment="Bottom" Click="DataReadButton_Click"/>
 
         </Grid>
@@ -205,7 +205,7 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
         <Button x:Name="ResetButton" Content="Reset" Margin="0,0,73,-200"  Grid.Row="3" HorizontalAlignment="Right" Width="104" Height="60" VerticalAlignment="Bottom" Grid.Column="1"/>
 
 
-        <Button x:Name="TriggerButton" Content="Software Trigger" Margin="0,0,25,10" VerticalAlignment="Bottom" Grid.Row="1" Height="20" HorizontalAlignment="Right" Width="100" Click="TriggerButton_Click" Grid.Column="1"/>
+        <Button x:Name="TriggerButton" Content="Software Trigger" Margin="0,0,25,10" VerticalAlignment="Bottom" Grid.Row="1" Height="20" HorizontalAlignment="Right" Width="100" Command="{Binding VisionTriggerCommand}" Grid.Column="1"/>
         <Button x:Name="TeachingButton" Content="Teaching" Margin="75,0,230,-96" VerticalAlignment="Bottom" Grid.Row="2" Height="20" Grid.Column="1" />
         <!--<Button x:Name="TeachingButton" Content="Teaching" Click="TeachingButton_Click" Margin="75,0,230,-96" VerticalAlignment="Bottom" Grid.Row="2" Height="20" Grid.Column="1" />-->
 

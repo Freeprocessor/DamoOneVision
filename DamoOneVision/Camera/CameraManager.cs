@@ -10,7 +10,7 @@ using DamoOneVision.Services;
 
 namespace DamoOneVision.Camera
 {
-	internal class CameraManager
+	public class CameraManager
 	{
 		private MIL_ID MilImage = MIL.M_NULL;
 		private ICamera camera;
