@@ -61,7 +61,13 @@ namespace DamoOneVision
 		/// <summary>
 		/// Advantech 카드 서비스
 		/// </summary>
-		private AdvantechCard _advantechCard;
+		private AdvantechCardService _advantechCard;
+
+
+		/// <summary>
+		/// Device Control Service
+		/// </summary>
+		private DeviceControlService _deviceControlService;
 
 
 		private MIL_ID MilSystem = MIL.M_NULL;
@@ -111,7 +117,9 @@ namespace DamoOneVision
 
 			_modbus = new ModbusService( "192.168.2.11", 502 );
 
-			_advantechCard = new AdvantechCard( "192.168.2.20", 502 );
+			_advantechCard = new AdvantechCardService( "192.168.2.20", 502 );
+
+			_deviceControlService = new DeviceControlService( _modbus, _advantechCard );
 
 			_infraredCamera = new CameraManager( "Matrox", "InfraredCamera" );
 			_sideCamera1 = new CameraManager( "Matrox", "SideCamera1" );
@@ -120,7 +128,7 @@ namespace DamoOneVision
 
 			InitMILSystem();
 
-			_viewModel = new MainViewModel( _modbus, _advantechCard, _infraredCamera, _sideCamera1, _sideCamera2 ,_sideCamera3, 
+			_viewModel = new MainViewModel( _deviceControlService, _infraredCamera, _sideCamera1, _sideCamera2 ,_sideCamera3, 
 				_infraredCameraImage, _infraredCameraConversionImage, _sideCamera1Image, _sideCamera1ConversionImage, _sideCamera2Image, _sideCamera2ConversionImage, _sideCamera3Image, _sideCamera3ConversionImage,
 				_mainInfraredCameraDisplay, _mainSideCamera1Display, _mainSideCamera2Display, _mainSideCamera3Display );
 			this.DataContext = _viewModel;

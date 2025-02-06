@@ -37,7 +37,6 @@ namespace DamoOneVision.Services
 		{
 			_ip = ip;
 			_port = port;
-			ConnectAsync();
 		}
 
 		public bool IsConnected => _connected && _tcpClient?.Connected == true;
@@ -66,7 +65,7 @@ namespace DamoOneVision.Services
 			ServoCurrentPositionAsync();
 		}
 
-		public async Task DisconnectAsync( )
+		public async void DisconnectAsync( )
 		{
 			await Task.Run( ( ) =>
 			{

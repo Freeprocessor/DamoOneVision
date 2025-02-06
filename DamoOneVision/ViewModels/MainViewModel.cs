@@ -104,8 +104,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private readonly ModbusService _modbus;
-		private readonly AdvantechCard _advantechCard;
+		private readonly DeviceControlService _deviceControlService;
 
 
 		/// <summary>
@@ -224,7 +223,7 @@ namespace DamoOneVision.ViewModels
 
 		//}
 
-		public MainViewModel( ModbusService modbus, AdvantechCard advantechCard, CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
+		public MainViewModel( DeviceControlService deviceControlService, CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
 			MIL_ID infraredCameraImage, MIL_ID infraredCameraConversionImage, MIL_ID sideCamera1Image, MIL_ID sideCamera1ConversionImage, MIL_ID sideCamera2Image, MIL_ID sideCamera2ConversionImage, MIL_ID sideCamera3Image, MIL_ID sideCamera3ConversionImage,
 			MIL_ID mainInfraredCameraDisplay, MIL_ID mainSideCamera1Display, MIL_ID mainSideCamera2Display, MIL_ID mainSideCamera3Display)
 		{
@@ -245,9 +244,7 @@ namespace DamoOneVision.ViewModels
 			_mainSideCamera2Display = mainSideCamera2Display;
 			_mainSideCamera3Display = mainSideCamera3Display;
 
-
-			_modbus = modbus;
-			_advantechCard = advantechCard;
+			_deviceControlService = deviceControlService;
 
 			_infraredCamera = infraredCamera;
 			_sideCamera1 = sideCamera1;
@@ -262,7 +259,7 @@ namespace DamoOneVision.ViewModels
 
 
 			//이벤트 구독
-			advantechCard.TriggerDetected += async ( ) =>
+			_deviceControlService.TriggerDetected += async ( ) =>
 			{
 				// Service가 "Trigger 발생"을 알리면 이 콜백이 실행됨
 				await VisionTrigger();
@@ -279,11 +276,11 @@ namespace DamoOneVision.ViewModels
 			);
 
 			MachineStartCommand = new AsyncRelayCommand(
-				async _ => await MachineStartAction()
+				async _ => await _deviceControlService.MachineStartAction()
 			);
 
 			MachineStopCommand = new AsyncRelayCommand(
-				async _ => await MachineStopAction()
+				async _ => await _deviceControlService.MachineStopAction()
 			);
 
 			VisionTriggerCommand = new RelayCommand(
@@ -478,103 +475,6 @@ namespace DamoOneVision.ViewModels
 
 			IsBusy = false;
 			IsVisionConnected = false;
-		}
-
-		private async Task MachineStartAction( )
-		{
-
-			await ConnectAction();
-
-			await _modbus.SelfHolding( 1, 1 );
-			await _modbus.SelfHolding( 4, 4 );
-
-			await _modbus.SelfHolding( 0x20, 0x20 );
-			await _modbus.SelfHolding( 0x22, 0x22 );
-			await _modbus.SelfHolding( 0x24, 0x24 );
-
-			//modbus.WriteHoldingRegisters32( 0, 0x00, 20000 );
-			int pos = 85000;
-			int speed = 20000;
-			_modbus.HoldingRegister32[ 0x00 ] = pos;
-			_modbus.HoldingRegister32[ 0x01 ] = speed;
-
-			await Task.Delay( 100 );
-
-			if (_modbus.InputRegister32[ 0x00 ] != pos)
-			{
-				await Task.Run( ( ) =>
-				{
-					//modbus.WriteSingleCoil( 0, 0x0A, true );
-					_modbus.OutputCoil[ 0x0A ] = true;
-					Logger.WriteLine( "Servo Move Start" );
-					var startTime = DateTime.Now;
-					while (true)
-					{
-						//bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
-						if (_modbus.InputCoil[ 0x0A ])
-						{
-							//modbus.WriteSingleCoil( 0, 0x0A, false );
-							_modbus.OutputCoil[ 0x0A ] = false;
-							Logger.WriteLine( "Servo Moveing..." );
-							break;
-						}
-						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
-						{
-							_modbus.OutputCoil[ 0x0A ] = false;
-							Logger.WriteLine( "SelfHolding operation timed out." );
-							//throw new TimeoutException( "SelfHolding operation timed out." );
-							break;
-						}
-						Thread.Sleep( 10 );
-					}
-					startTime = DateTime.Now;
-					Logger.WriteLine( "Servo Move Complete 대기" );
-					//modbus.WriteSingleCoil( 0, 0x0B, true );
-					_modbus.OutputCoil[ 0x0B ] = false;
-					while (true)
-					{
-						//bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
-						if (_modbus.InputCoil[ 0x0B ])
-						{
-							//modbus.WriteSingleCoil( 0, 0x0B, false );
-							_modbus.OutputCoil[ 0x0B ] = false;
-							Logger.WriteLine( "Servo Move Complete" );
-							break;
-						}
-						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
-						{
-							_modbus.OutputCoil[ 0x0B ] = false;
-							Logger.WriteLine( "SelfHolding operation timed out." );
-							//throw new TimeoutException( "SelfHolding operation timed out." );
-							break;
-						}
-						Thread.Sleep( 10 );
-					}
-				} );
-			}
-
-			await _modbus.SelfHolding( 0x10, 0x10 );
-
-
-			Logger.WriteLine( "Trigger Reading Start." );
-			_advantechCard.TriggerReadingStartAsync();
-			Logger.WriteLine( "Machine Start." );
-		}
-
-		private async Task MachineStopAction( )
-		{
-
-
-			Logger.WriteLine( "Trigger Reading Stop." );
-			await _modbus.SelfHolding( 0x11, 0x11 );
-			Logger.WriteLine( "C/V OFF" );
-			await _modbus.SelfHolding( 0x21, 0x21 );
-			await _modbus.SelfHolding( 0x23, 0x23 );
-			await _modbus.SelfHolding( 0x25, 0x25 );
-
-			await _modbus.SelfHolding( 5, 5 );
-			await _modbus.SelfHolding( 0, 0 );
-			Logger.WriteLine( "Machine Stop." );
 		}
 
 		private async Task VisionTrigger( )
@@ -778,16 +678,7 @@ namespace DamoOneVision.ViewModels
 			var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
 		}
 
-		private async void EjectAction( )
-		{
-			await Task.Run( async ( ) =>
-			{
-				await Task.Delay( 3000 );
-				_advantechCard.WriteCoil = true;
-				await Task.Delay( 500 );
-				_advantechCard.WriteCoil = false;
-			} );
-		}
+
 
 
 

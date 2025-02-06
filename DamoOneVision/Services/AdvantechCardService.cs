@@ -14,12 +14,9 @@ using System.Diagnostics;
 
 namespace DamoOneVision.Services
 {
-	internal class AdvantechCard
+	internal class AdvantechCardService
 	{
 		private AdamSocket _adamSocket = new AdamSocket();
-
-
-		public event Func<Task> TriggerDetected;
 
 		/// <summary>
 		/// Advantech IP 주소
@@ -46,21 +43,11 @@ namespace DamoOneVision.Services
 		/// </summary>
 		public bool WriteCoil = false;
 
-		/// <summary>
-		/// Trigger Reading Status
-		/// </summary>
-		private bool _isTriggerReading = false;
 
-		/// <summary>
-		/// Trigger Reading OFF 요청
-		/// </summary>
-		private bool _triggerReadingStop = false;
-
-		public AdvantechCard( string ip, int port )
+		public AdvantechCardService( string ip, int port )
 		{
 			_ip = ip;
 			_port = port;
-			ConnectAsync();
 		}
 
 
@@ -146,62 +133,6 @@ namespace DamoOneVision.Services
 			}
 		}
 
-		/// <summary>
-		/// Advantech Card Trigger(DI0) Read Start Async
-		/// </summary>
-		public async void TriggerReadingStartAsync( )
-		{
 
-			_isTriggerReading = true;
-			_triggerReadingStop = false;
-			await Task.Run( async ( ) =>
-			{
-				//modbus.WriteSingleCoil( 0, 0x2A, true );
-				Logger.WriteLine( "TriggerReadingAsync Start" );
-
-				while (true)
-				{
-					if (_triggerReadingStop)
-					{
-						
-						break;
-					}
-					/// Trigger-1 ON
-					if (ReadCoil[ 0 ] == true)
-					{
-						// Convyer Delay
-						await Task.Delay( 1450 );
-						if(TriggerDetected != null)
-						{
-							await TriggerDetected();
-						}
-						//modbus.WriteSingleCoil( 0, 0x06, false );
-						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
-					}
-
-				}
-				//modbus.WriteSingleCoil( 0, 0x2A, false );
-
-
-				_isTriggerReading = false;
-			} );
-		}
-
-		/// <summary>
-		/// Advantech Card Trigger(DI0) Read Stop Async
-		/// </summary>
-		/// <returns></returns>
-		private async Task TriggerReadingStopAsync( )
-		{
-			_triggerReadingStop = true;
-			await Task.Run( ( ) =>
-			{
-				while (_isTriggerReading)
-				{
-					System.Threading.Thread.Sleep( 1000 );
-				}
-			} );
-			Logger.WriteLine( "TriggerReadingAsync Stop" );
-		}
 	}
 }
