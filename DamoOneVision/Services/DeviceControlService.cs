@@ -31,6 +31,8 @@ namespace DamoOneVision.Services
 			_modbus = modbus;
 			_advantechCard = advantechCard;
 
+			Connect();
+
 		}
 
 		public void Connect( )
@@ -224,7 +226,6 @@ namespace DamoOneVision.Services
 		public async Task MachineStartAction( )
 		{
 			///이걸 어떻게 해야할까?
-			await ConnectAction();
 
 			await _modbus.SelfHolding( 1, 1 );
 			await _modbus.SelfHolding( 4, 4 );

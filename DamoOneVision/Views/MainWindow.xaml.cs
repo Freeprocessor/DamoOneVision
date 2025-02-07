@@ -69,6 +69,8 @@ namespace DamoOneVision
 		/// </summary>
 		private DeviceControlService _deviceControlService;
 
+		private CameraService _cameraService;
+
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
@@ -126,11 +128,13 @@ namespace DamoOneVision
 			_sideCamera2 = new CameraManager( "Matrox", "SideCamera2" );
 			_sideCamera3 = new CameraManager( "Matrox", "SideCamera3" );
 
+			_cameraService = new CameraService( _infraredCamera, _sideCamera1, _sideCamera2, _sideCamera3, _infraredCameraImage, _sideCamera1Image, _sideCamera2Image, _sideCamera3Image,
+				_infraredCameraConversionImage, _sideCamera1ConversionImage, _sideCamera2ConversionImage, _sideCamera3ConversionImage, 
+				_mainInfraredCameraDisplay, _mainSideCamera1Display, _mainSideCamera2Display, _mainSideCamera3Display);
+
 			InitMILSystem();
 
-			_viewModel = new MainViewModel( _deviceControlService, _infraredCamera, _sideCamera1, _sideCamera2 ,_sideCamera3, 
-				_infraredCameraImage, _infraredCameraConversionImage, _sideCamera1Image, _sideCamera1ConversionImage, _sideCamera2Image, _sideCamera2ConversionImage, _sideCamera3Image, _sideCamera3ConversionImage,
-				_mainInfraredCameraDisplay, _mainSideCamera1Display, _mainSideCamera2Display, _mainSideCamera3Display );
+			_viewModel = new MainViewModel( _deviceControlService, _cameraService );
 			this.DataContext = _viewModel;
 
 
