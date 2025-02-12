@@ -95,24 +95,61 @@ namespace DamoOneVision.Camera
 			} );
 		}
 
+		//private async Task<MIL_ID> CaptureImage( CameraManager camera )
+		//{
+		//	MIL_ID MilImage = MIL.M_NULL;
+		//	if (camera.IsConnected)
+		//	{
+		//		MilImage = await CaptureSingleImageAsync();
+		//		Logger.WriteLine( $"{camera._cameraName} : 카메라 이미지 캡처 완료" );
+		//	}
+		//	else if (camera.ReciveImage() != MIL.M_NULL)
+		//	{
+		//		Logger.WriteLine( $"{camera._cameraName} : 로드된 이미지를 사용합니다." );
+		//		MilImage = camera.ReciveImage();
+
+		//	}
+		//	else
+		//	{
+		//		Logger.WriteLine( $"{camera._cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+		//		//MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+		//		return MIL.M_NULL;
+		//	}
+		//	return MilImage;
+		//}
+
 
 		public async Task<MIL_ID> CaptureSingleImageAsync( )
 		{
-			try
+			MIL_ID MilImage = MIL.M_NULL;
+			await Task.Run( ( ) =>
 			{
-				return await Task.Run( ( ) =>
+				try
 				{
-					if (camera == null)
-						throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
+					if (IsConnected)
+					{
+						MilImage = camera.CaptureImage();
+						Logger.WriteLine( $"{_cameraName} : 카메라 이미지 캡처 완료" );
+					}
+					else if (camera.ReciveImage() != MIL.M_NULL)
+					{
+						Logger.WriteLine( $"{_cameraName} : 로드된 이미지를 사용합니다." );
+						MilImage = camera.ReciveImage();
+					}
+					else
+					{
+						Logger.WriteLine( $"{_cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+						//MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+					}
+				}
+				catch (Exception ex)
+				{
+					Logger.WriteLine( $"CaptureSingleImageAsync에서 예외 발생: {ex.Message}" );
+					MilImage = MIL.M_NULL;
+				}
+			} );
 
-					return camera.CaptureImage();
-				} );
-			}
-			catch (Exception ex)
-			{
-				Logger.WriteLine( $"CaptureSingleImageAsync에서 예외 발생: {ex.Message}" );
-				return MIL.M_NULL;
-			}
+			return MilImage;
 		}
 
 		public MIL_ID ReciveImage( )

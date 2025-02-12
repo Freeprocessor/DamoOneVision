@@ -184,10 +184,10 @@ namespace DamoOneVision.Services
 					{
 						var tasks = new []
 						{
-							CaptureImage(_infraredCamera),
-							CaptureImage(_sideCamera1),
-							CaptureImage(_sideCamera2),
-							CaptureImage(_sideCamera3)
+							_infraredCamera.CaptureSingleImageAsync(),
+							_sideCamera1.CaptureSingleImageAsync(),
+							_sideCamera2.CaptureSingleImageAsync(),
+							_sideCamera3.CaptureSingleImageAsync()
 						};
 						await Task.WhenAll( tasks );
 						Logger.WriteLine( "카메라 이미지 캡처 완료" );
@@ -274,29 +274,6 @@ namespace DamoOneVision.Services
 
 		}
 
-		private async Task<MIL_ID> CaptureImage( CameraManager camera )
-		{
-			MIL_ID MilImage = MIL.M_NULL;
-			if (camera.IsConnected)
-			{
-				MilImage = await _infraredCamera.CaptureSingleImageAsync();
-				Logger.WriteLine( $"{camera._cameraName} : 카메라 이미지 캡처 완료" );
-			}
-			else if (camera.ReciveImage() != MIL.M_NULL)
-			{
-				Logger.WriteLine( $"{camera._cameraName} : 로드된 이미지를 사용합니다." );
-				MilImage = camera.ReciveImage();
-				
-			}
-			else
-			{
-				Logger.WriteLine( $"{camera._cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
-				//MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
-				return MIL.M_NULL;
-			}
-			return MilImage;
 
-
-		}
 	}
 }
