@@ -189,7 +189,7 @@ namespace DamoOneVision.Services
 					if (_advantechCard.ReadCoil[ 0 ] == true)
 					{
 						// Convyer Delay
-						await Task.Delay( 1450 );
+						await Task.Delay( 350 );
 						if (TriggerDetected != null)
 						{
 							await TriggerDetected();
@@ -235,7 +235,7 @@ namespace DamoOneVision.Services
 			await _modbus.SelfHolding( 0x24, 0x24 );
 
 			//modbus.WriteHoldingRegisters32( 0, 0x00, 20000 );
-			int pos = 85000;
+			int pos = 108000;
 			int speed = 20000;
 			_modbus.HoldingRegister32[ 0x00 ] = pos;
 			_modbus.HoldingRegister32[ 0x01 ] = speed;

@@ -66,6 +66,7 @@ namespace DamoOneVision.Services
 			if (_isConnected)
 			{
 				Logger.WriteLine( "Adventech Connected" );
+				ReadBitAsync();
 			}
 			else
 			{
@@ -112,25 +113,29 @@ namespace DamoOneVision.Services
 		/// </summary>
 		public async void ReadBitAsync( )
 		{
-			Logger.WriteLine( "ReadBitAsync Start" );
-			while (true)
+			await Task.Run( async( ) =>
 			{
-				if (_isConnected)
+				Logger.WriteLine( "ReadBitAsync Start" );
+				while (true)
 				{
-					bool[] value;
-					_adamSocket.Modbus().ReadCoilStatus( 1, 8, out value );
+					if (_isConnected)
+					{
+						bool[] value;
+						_adamSocket.Modbus().ReadCoilStatus( 1, 8, out value );
 
-					ReadCoil = value;
+						ReadCoil = value;
 
-					_adamSocket.DigitalOutput().SetValue( 0, WriteCoil );
+						_adamSocket.DigitalOutput().SetValue( 0, WriteCoil );
+					}
+					else
+					{
+						Logger.WriteLine( "Advantech Not Connected. ReadBitAsync Stop" );
+						break;
+					}
+					await Task.Delay( 1 );
 				}
-				else
-				{
-					Logger.WriteLine( "Advantech Not Connected. ReadBitAsync Stop" );
-					break;
-				}
-				await Task.Delay( 1 );
-			}
+			} );
+
 		}
 
 

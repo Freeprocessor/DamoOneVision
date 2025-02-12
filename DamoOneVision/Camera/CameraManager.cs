@@ -12,7 +12,6 @@ namespace DamoOneVision.Camera
 {
 	public class CameraManager
 	{
-		private MIL_ID MilImage = MIL.M_NULL;
 		private ICamera camera;
 		//private CancellationTokenSource cts;
 		//private Task captureTask;
@@ -24,8 +23,8 @@ namespace DamoOneVision.Camera
 
 		private bool isContinuous = false;
 
-		private string _cameraName = "";
-		private string _library = "";
+		public string _cameraName = "";
+		public string _library = "";
 
 		public CameraManager( string Library, string CameraName )
 		{
@@ -35,7 +34,7 @@ namespace DamoOneVision.Camera
 
 		public async Task ConnectAsync( )
 		{
-			
+
 			await Task.Run( ( ) =>
 			{
 				if (_library == "Matrox")
@@ -78,20 +77,6 @@ namespace DamoOneVision.Camera
 			{
 				try
 				{
-					//StopContinuousCapture();
-
-					//if (captureTask != null)
-					//{
-					//	try
-					//	{
-					//		await captureTask;
-					//	}
-					//	catch (OperationCanceledException)
-					//	{
-					//		// 작업이 취소되었음을 무시
-					//	}
-					//	captureTask = null;
-					//}
 
 					if (camera != null)
 					{
@@ -104,32 +89,37 @@ namespace DamoOneVision.Camera
 				catch (Exception ex)
 				{
 					Logger.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
-				
+
 					throw;
 				}
 			} );
 		}
 
 
-		public async Task CaptureSingleImageAsync( )
+		public async Task<MIL_ID> CaptureSingleImageAsync( )
 		{
-			await Task.Run( ( ) => 
+			try
 			{
-				if (camera == null)
-					throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
+				return await Task.Run( ( ) =>
+				{
+					if (camera == null)
+						throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
 
-				MilImage = camera.CaptureImage();
-
-			} );
-
+					return camera.CaptureImage();
+				} );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( $"CaptureSingleImageAsync에서 예외 발생: {ex.Message}" );
+				return MIL.M_NULL;
+			}
 		}
 
 		public MIL_ID ReciveImage( )
 		{
-			if(camera != null)
+			if (camera != null)
 			{
-				MilImage = camera.ReciveImage();
-				return MilImage;
+				return camera.ReciveImage(); ;
 			}
 			return MIL.M_NULL;
 
@@ -144,7 +134,7 @@ namespace DamoOneVision.Camera
 		{
 			return camera.Height;
 		}
-		public MIL_INT NbBands()
+		public MIL_INT NbBands( )
 		{
 			return camera.NbBands;
 		}
@@ -158,63 +148,6 @@ namespace DamoOneVision.Camera
 			return camera.LoadImage( MilSystem, filePath );
 		}
 
-		//public void StartContinuousCapture( )
-		//{
-		//	if (camera == null)
-		//		throw new InvalidOperationException( "카메라가 연결되어 있지 않습니다." );
 
-		//	if (captureTask == null || captureTask.IsCompleted)
-		//	{
-		//		isContinuous = true;
-		//		cts = new CancellationTokenSource();
-		//		captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
-		//	}
-		//}
-
-		//public void StopContinuousCapture( )
-		//{
-		//	if (cts != null)
-		//	{
-		//		isContinuous = false;
-		//		cts.Cancel();
-		//		cts = null;
-		//	}
-		//}
-
-		//private async Task CaptureImages( CancellationToken token )
-		//{
-		//	try
-		//	{
-		//		while (!token.IsCancellationRequested && isContinuous)
-		//		{
-		//			try
-		//			{
-		//				byte[] pixelData = camera.CaptureImage();
-
-		//				if (pixelData != null)
-		//				{
-		//					ImageCaptured?.Invoke( pixelData );
-		//				}
-
-		//				token.ThrowIfCancellationRequested();
-		//			}
-		//			catch (OperationCanceledException)
-		//			{
-		//				break;
-		//			}
-		//			catch (Exception ex)
-		//			{
-		//				Debug.WriteLine( $"이미지 캡처 중 예외 발생: {ex.Message}" );
-		//			}
-
-		//			// 필요에 따라 지연 시간 추가
-		//			await Task.Delay( 1 );
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Debug.WriteLine( $"CaptureImages에서 예외 발생: {ex.Message}" );
-		//	}
-		//}
 	}
 }

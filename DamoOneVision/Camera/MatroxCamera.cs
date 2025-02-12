@@ -14,13 +14,15 @@ using System.Windows.Media.Media3D;
 
 namespace DamoOneVision.Camera
 {
-	public class MatroxCamera : ICamera
+	public class MatroxCamera : ICamera,IDisposable
 	{
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
+
+		private MIL_ID MilConversionImage = MIL.M_NULL;
 
 		private int[] _infraredImageFilter;
 
@@ -142,7 +144,7 @@ namespace DamoOneVision.Camera
 
 			if (CameraName == "InfraredCamera")
 			{
-				InfraredCameraNoiseFilter( System.IO.Path.Combine( appfolder, "InfraredCameraNoiseFilter.bmp" ) );
+				//InfraredCameraNoiseFilter( System.IO.Path.Combine( appfolder, "InfraredCameraNoiseFilter.bmp" ) );
 			}
 
 			Logger.WriteLine( $"Camera Name: {CameraName} Connect Success" );
@@ -208,22 +210,16 @@ namespace DamoOneVision.Camera
 				MIL.MdigGrab( MilDigitizer, MilImage );
 			}
 
-			//MIL.MdigGrab( MilDigitizer, MilImage );
-			//MIL.MdigGrabContinuous( MilDigitizer, MilImage );
 			MIL.MdigHalt( MilDigitizer );
 			///
 			//Logger.WriteLine($"{CameraName} Grab Complete");
 
-			//MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref MilDisplay );
-			//MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
-			//MIL.MdispSelect( MilDisplay, MilImage );
-
 			SaveImage( MilImage , $"RAW{CameraName}" );
 
-			if (CameraName == "InfraredCamera" && _infraredImageFilter != null)
-			{
+			//if (CameraName == "InfraredCamera" && _infraredImageFilter != null)
+			//{
 
-			}
+			//}
 
 			if (true)
 			{
@@ -299,10 +295,10 @@ namespace DamoOneVision.Camera
 		{
 			for (int i = 0; i < ImageData.Length; i++)
 			{
-				// ushort -> int 변환 후 _infraredImageFilter[i] 빼기
+				/// ushort -> int 변환 후 _infraredImageFilter[i] 빼기
 				int diff = (int)ImageData[i] - _infraredImageFilter[i];
 
-				// 음수나 65535를 초과하지 않는 것이 보장된다면 바로 캐스팅 가능
+				/// 음수나 65535를 초과하지 않는 것이 보장된다면 바로 캐스팅 가능
 				if (diff < 0) diff = 0;
 				else if (diff > ushort.MaxValue) diff = ushort.MaxValue;
 
@@ -312,23 +308,14 @@ namespace DamoOneVision.Camera
 
 		private void InfraredCameraScaleImage( MIL_ID MilImage ) 
 		{
-			//MIL_INT SizeByte = 0;
-			//MIL_ID MilBayerImage = MIL.M_NULL;
-			//버퍼에 쓴 Scale 데이터를 byte로 변환
-			//MIL.MbufInquire( MilImage, MIL.M_SIZE_BYTE, ref SizeByte );
-
-
-
-			///
-			// 버퍼이미지를 Scale히여 16bit 이미지로 변환
+			/// 버퍼이미지를 Scale히여 16bit 이미지로 변환
 			if (true)
 			{
 				if (this.DataType == 16 && this.NbBands == 1)
 				{
 					ushort [] ushortScaleImageData = ShortMilImageShortScale(MilImage);
 
-					//byte [] byteImageData = ShortToByte(ushortScaleImageData);
-					// Scale된 이미지 데이터 Buffer에 전송
+					/// Scale된 이미지 데이터 Buffer에 전송
 					//MIL.MbufPut( MilImage, ushortScaleImageData );
 					MIL.MbufPut( MilImage, ushortScaleImageData );
 				}
@@ -358,10 +345,10 @@ namespace DamoOneVision.Camera
 
 			MIL.MbufGet( MilImage, ImageData );
 
-			//이미지 데이터 레밸링
-			InfraredNoiseFiltering( ImageData );
+			///이미지 데이터 레밸링
+			//InfraredNoiseFiltering( ImageData );
 
-			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
+			/// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
 			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
 			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
 			if (distinctNumbersDesc.Length > 1)
@@ -404,8 +391,8 @@ namespace DamoOneVision.Camera
 			MIL.MbufGet( MilImage, ImageData );
 
 
-			// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
-			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
+			/// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
+			/// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
 			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
 			//if (distinctNumbersDesc[ 1 ] != null)
 			//{
@@ -465,6 +452,15 @@ namespace DamoOneVision.Camera
 
 			}
 			return MilImage;
+		}
+
+		public void Dispose( )
+		{
+			Disconnect( );
+			if(MilImage == MIL.M_NULL)
+			{
+				MIL.MbufFree( MilImage );
+			}
 		}
 	}
 }
