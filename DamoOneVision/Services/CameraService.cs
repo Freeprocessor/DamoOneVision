@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace DamoOneVision.Services
 {
-	internal class CameraService
+	internal class CameraService : IDisposable
 	{
 		/// <summary>
 		/// 열화상 Camera
@@ -272,8 +273,20 @@ namespace DamoOneVision.Services
 			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
 
 
-		}
 
+
+		}
+		public void Dispose( )
+		{
+			// 관리하는 모든 CameraManager의 Dispose를 호출합니다.
+			_infraredCamera?.Dispose();
+			_sideCamera1?.Dispose();
+			_sideCamera2?.Dispose();
+			_sideCamera3?.Dispose();
+
+			// 가비지 컬렉터가 파이널라이저를 호출하지 않도록 합니다.
+			GC.SuppressFinalize( this );
+		}
 
 	}
 }

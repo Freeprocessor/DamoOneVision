@@ -349,12 +349,12 @@ namespace DamoOneVision.Camera
 			//InfraredNoiseFiltering( ImageData );
 
 			/// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
-			// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
-			var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
-			if (distinctNumbersDesc.Length > 1)
-			{
-				ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
-			}
+			/// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
+			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			//if (distinctNumbersDesc.Length > 1)
+			//{
+			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			//}
 
 			ushort MinPixelValue = ImageData.Min();
 			ushort MaxPixelValue = ImageData.Max();
@@ -457,7 +457,7 @@ namespace DamoOneVision.Camera
 		public void Dispose( )
 		{
 			Disconnect( );
-			if(MilImage == MIL.M_NULL)
+			if(MilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage );
 			}

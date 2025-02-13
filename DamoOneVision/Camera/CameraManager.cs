@@ -10,7 +10,7 @@ using DamoOneVision.Services;
 
 namespace DamoOneVision.Camera
 {
-	public class CameraManager
+	public class CameraManager : IDisposable
 	{
 		private ICamera camera;
 		//private CancellationTokenSource cts;
@@ -95,29 +95,6 @@ namespace DamoOneVision.Camera
 			} );
 		}
 
-		//private async Task<MIL_ID> CaptureImage( CameraManager camera )
-		//{
-		//	MIL_ID MilImage = MIL.M_NULL;
-		//	if (camera.IsConnected)
-		//	{
-		//		MilImage = await CaptureSingleImageAsync();
-		//		Logger.WriteLine( $"{camera._cameraName} : 카메라 이미지 캡처 완료" );
-		//	}
-		//	else if (camera.ReciveImage() != MIL.M_NULL)
-		//	{
-		//		Logger.WriteLine( $"{camera._cameraName} : 로드된 이미지를 사용합니다." );
-		//		MilImage = camera.ReciveImage();
-
-		//	}
-		//	else
-		//	{
-		//		Logger.WriteLine( $"{camera._cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
-		//		//MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
-		//		return MIL.M_NULL;
-		//	}
-		//	return MilImage;
-		//}
-
 
 		public async Task<MIL_ID> CaptureSingleImageAsync( )
 		{
@@ -185,6 +162,17 @@ namespace DamoOneVision.Camera
 			return camera.LoadImage( MilSystem, filePath );
 		}
 
+		public void Dispose( )
+		{
+			if (camera is IDisposable disposableCamera)
+			{
+				disposableCamera.Dispose();
+			}
+
+			camera = null;
+
+			GC.SuppressFinalize( this );
+		}
 
 	}
 }
