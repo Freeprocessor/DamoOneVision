@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.Windows;
 using Matrox.MatroxImagingLibrary;
+using CommunityToolkit.Mvvm.Input;
 
 
 namespace DamoOneVision.ViewModels
@@ -29,8 +30,8 @@ namespace DamoOneVision.ViewModels
 					_selectedProcessingOption = value;
 					OnPropertyChanged();
 					// CanExecute 상태 업데이트
-					(LoadTempleteFileCommand as RelayCommand)?.RaiseCanExecuteChanged();
-					(LoadFileCommand as RelayCommand)?.RaiseCanExecuteChanged();
+					(LoadTempleteFileCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+					(LoadFileCommand as IRelayCommand)?.NotifyCanExecuteChanged();
 				}
 			}
 		}
@@ -264,8 +265,8 @@ namespace DamoOneVision.ViewModels
 			WriteLow = 0;
 			WriteHigh = 0;
 
-			LoadTempleteFileCommand = new RelayCommand( LoadTempleteFile, CanLoadTempleteFile );
-			LoadFileCommand = new RelayCommand( LoadFile, CanLoadFile );
+			LoadTempleteFileCommand = new RelayCommand<object>( LoadTempleteFile, CanLoadTempleteFile );
+			LoadFileCommand = new RelayCommand<object>( LoadFile, CanLoadFile );
 		}
 
 		public ICommand LoadTempleteFileCommand { get; set; }

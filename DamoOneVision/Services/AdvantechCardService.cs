@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace DamoOneVision.Services
 {
-	internal class AdvantechCardService
+	public class AdvantechCardService
 	{
 		private AdamSocket _adamSocket = new AdamSocket();
 
@@ -41,7 +41,7 @@ namespace DamoOneVision.Services
 		/// <summary>
 		/// Advantech Card Output Status
 		/// </summary>
-		public bool WriteCoil = false;
+		public bool[ ] WriteCoil = new bool[8];
 
 
 		public AdvantechCardService( string ip, int port )
@@ -120,12 +120,16 @@ namespace DamoOneVision.Services
 				{
 					if (_isConnected)
 					{
-						bool[] value;
-						_adamSocket.Modbus().ReadCoilStatus( 1, 8, out value );
+						bool[] readcoil;
+						_adamSocket.Modbus().ReadCoilStatus( 1, 8, out readcoil );
 
-						ReadCoil = value;
+						ReadCoil = readcoil;
 
-						_adamSocket.DigitalOutput().SetValue( 0, WriteCoil );
+						_adamSocket.Modbus().ForceMultiCoils( 17, WriteCoil );
+
+						bool[] writecoil;
+
+						_adamSocket.Modbus().ReadCoilStatus( 17, 8, out writecoil );
 					}
 					else
 					{

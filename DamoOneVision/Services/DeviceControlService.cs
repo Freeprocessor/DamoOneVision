@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DamoOneVision.Services
 {
-	internal class DeviceControlService
+	public class DeviceControlService
 	{
 		public event Func<Task> TriggerDetected;
 
@@ -19,6 +20,17 @@ namespace DamoOneVision.Services
 		/// Trigger Reading OFF 요청
 		/// </summary>
 		private bool _triggerReadingStop = false;
+
+		const int EMSTOPSW = 0x00;
+		const int INVERTERALARM = 0x03;
+		const int VISIONTRIGGER1 = 0x06;
+		const int VISIONTRIGGER2 = 0x07;
+
+		const int TOWERLAMP_RED = 0x00;
+		const int TOWERLAMP_YELLOW = 0x01;
+		const int TOWERLAMP_GREEN = 0x02;
+		const int EJECTOR = 0x03;
+		const int MAINCV = 0x06;
 
 
 		ModbusService _modbus;
@@ -47,29 +59,21 @@ namespace DamoOneVision.Services
 			_advantechCard.DisconnectAsync();
 		}
 
-		public async Task TowerLampAsync(string status)
+		public void TowerLampAsync(string status)
 		{
 			if(status == "STOP")
 			{
 				_isError = false;
-				var tasks = new[]
-				{
-				_modbus.SelfHolding( 1, 1 ),
-				_modbus.SelfHolding( 2, 2 ),
-				_modbus.SelfHolding( 5, 5 )
-				};
-				await Task.WhenAll( tasks );
+				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = true;
+				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
 			}
 			else if(status == "START")
 			{
 				_isError = false;
-				var tasks = new[]
-				{
-				_modbus.SelfHolding( 1, 1 ),
-				_modbus.SelfHolding( 3, 3 ),
-				_modbus.SelfHolding( 4, 4 )
-				};
-				await Task.WhenAll( tasks );
+				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = true;
 			}
 			else if (status == "ERROR")
 			{
@@ -82,76 +86,68 @@ namespace DamoOneVision.Services
 		{
 			while(_isError)
 			{
-				var tasks1 = new[]
-				{
-				_modbus.SelfHolding( 0, 0 ),
-				_modbus.SelfHolding( 3, 3 ),
-				_modbus.SelfHolding( 5, 5 )
-				};
-				await Task.WhenAll( tasks1 );
+				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = true;
+				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
 
 				await Task.Delay( 500 );
 
-				var tasks2 = new[]
-				{
-				_modbus.SelfHolding( 1, 1 ),
-				_modbus.SelfHolding( 3, 3 ),
-				_modbus.SelfHolding( 5, 5 )
-				};
-				await Task.WhenAll( tasks2 );
+				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
 
 				await Task.Delay( 500 );
 			}
 		}
 
-		public async void MainCVRunAsync( )
+		public void MainCVOn( )
 		{
-			await _modbus.SelfHolding( 0x10, 0x10 );
+			_advantechCard.WriteCoil[ MAINCV ] = true;
 		}
 
-		public async void MainCVStopAsync( )
+		public void MainCVOff( )
 		{
-			await _modbus.SelfHolding( 0x11, 0x11 );
+			_advantechCard.WriteCoil[ MAINCV ] = false;
 		}
 
-		public async void Vision1LampONAsync( )
-		{
-			await _modbus.SelfHolding( 0x20, 0x20 );
-		}
+		//public async void Vision1LampONAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x20, 0x20 );
+		//}
 
-		public async void Vision1LampOFFAsync( )
-		{
-			await _modbus.SelfHolding( 0x21, 0x21 );
-		}
+		//public async void Vision1LampOFFAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x21, 0x21 );
+		//}
 
-		public async void Vision2LampONAsync( )
-		{
-			await _modbus.SelfHolding( 0x22, 0x22 );
-		}
+		//public async void Vision2LampONAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x22, 0x22 );
+		//}
 
-		public async void Vision2LampOFFAsync( )
-		{
-			await _modbus.SelfHolding( 0x23, 0x23 );
-		}
+		//public async void Vision2LampOFFAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x23, 0x23 );
+		//}
 
-		public async void Vision3LampONAsync( )
-		{
-			await _modbus.SelfHolding( 0x24, 0x24 );
-		}
+		//public async void Vision3LampONAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x24, 0x24 );
+		//}
 
-		public async void Vision3LampOFFAsync( )
-		{
-			await _modbus.SelfHolding( 0x25, 0x25 );
-		}
+		//public async void Vision3LampOFFAsync( )
+		//{
+		//	await _modbus.SelfHolding( 0x25, 0x25 );
+		//}
 
 		public void EjectorManualON( )
 		{
-			_advantechCard.WriteBit( 0x01, true );
+			_advantechCard.WriteCoil[ EJECTOR ] = true;
 		}
 
 		public void EjectorManualOFF( )
 		{
-			_advantechCard.WriteBit( 0x01, false );
+			_advantechCard.WriteCoil[ EJECTOR ] = false;
 		}
 
 		public async void EjectActionAsync( )
@@ -159,9 +155,9 @@ namespace DamoOneVision.Services
 			await Task.Run( async ( ) =>
 			{
 				await Task.Delay( 3000 );
-				_advantechCard.WriteCoil = true;
+				_advantechCard.WriteCoil[ EJECTOR ] = true;
 				await Task.Delay( 500 );
-				_advantechCard.WriteCoil = false;
+				_advantechCard.WriteCoil[ EJECTOR ] = false;
 			} );
 		}
 
@@ -223,80 +219,17 @@ namespace DamoOneVision.Services
 			Logger.WriteLine( "TriggerReadingAsync Stop" );
 		}
 
-		public async Task MachineStartAction( )
+		public void MachineStartAction( )
 		{
-			///이걸 어떻게 해야할까?
+			TowerLampAsync( "START" );
 
-			await _modbus.SelfHolding( 1, 1 );
-			await _modbus.SelfHolding( 4, 4 );
+			/// Vision Lamp ON
+			/// 
+			//await _modbus.SelfHolding( 0x20, 0x20 );
+			//await _modbus.SelfHolding( 0x22, 0x22 );
+			//await _modbus.SelfHolding( 0x24, 0x24 );
 
-			await _modbus.SelfHolding( 0x20, 0x20 );
-			await _modbus.SelfHolding( 0x22, 0x22 );
-			await _modbus.SelfHolding( 0x24, 0x24 );
-
-			//modbus.WriteHoldingRegisters32( 0, 0x00, 20000 );
-			int pos = 108000;
-			int speed = 20000;
-			_modbus.HoldingRegister32[ 0x00 ] = pos;
-			_modbus.HoldingRegister32[ 0x01 ] = speed;
-
-			await Task.Delay( 100 );
-
-			if (_modbus.InputRegister32[ 0x00 ] != pos)
-			{
-				await Task.Run( ( ) =>
-				{
-					//modbus.WriteSingleCoil( 0, 0x0A, true );
-					_modbus.OutputCoil[ 0x0A ] = true;
-					Logger.WriteLine( "Servo Move Start" );
-					var startTime = DateTime.Now;
-					while (true)
-					{
-						//bool[] coil = modbus.ReadInputs( 0, 0x0A, 1 );
-						if (_modbus.InputCoil[ 0x0A ])
-						{
-							//modbus.WriteSingleCoil( 0, 0x0A, false );
-							_modbus.OutputCoil[ 0x0A ] = false;
-							Logger.WriteLine( "Servo Moveing..." );
-							break;
-						}
-						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
-						{
-							_modbus.OutputCoil[ 0x0A ] = false;
-							Logger.WriteLine( "SelfHolding operation timed out." );
-							//throw new TimeoutException( "SelfHolding operation timed out." );
-							break;
-						}
-						Thread.Sleep( 10 );
-					}
-					startTime = DateTime.Now;
-					Logger.WriteLine( "Servo Move Complete 대기" );
-					//modbus.WriteSingleCoil( 0, 0x0B, true );
-					_modbus.OutputCoil[ 0x0B ] = false;
-					while (true)
-					{
-						//bool[] coil = modbus.ReadInputs( 0, 0x0B, 1 );
-						if (_modbus.InputCoil[ 0x0B ])
-						{
-							//modbus.WriteSingleCoil( 0, 0x0B, false );
-							_modbus.OutputCoil[ 0x0B ] = false;
-							Logger.WriteLine( "Servo Move Complete" );
-							break;
-						}
-						if ((DateTime.Now - startTime).TotalMilliseconds > 15000) // 10초 타임아웃
-						{
-							_modbus.OutputCoil[ 0x0B ] = false;
-							Logger.WriteLine( "SelfHolding operation timed out." );
-							//throw new TimeoutException( "SelfHolding operation timed out." );
-							break;
-						}
-						Thread.Sleep( 10 );
-					}
-				} );
-			}
-
-			await _modbus.SelfHolding( 0x10, 0x10 );
-
+			MainCVOn();
 
 			Logger.WriteLine( "Trigger Reading Start." );
 			TriggerReadingStartAsync();
@@ -308,14 +241,9 @@ namespace DamoOneVision.Services
 
 
 			Logger.WriteLine( "Trigger Reading Stop." );
-			await _modbus.SelfHolding( 0x11, 0x11 );
+			MainCVOn();
 			Logger.WriteLine( "C/V OFF" );
-			await _modbus.SelfHolding( 0x21, 0x21 );
-			await _modbus.SelfHolding( 0x23, 0x23 );
-			await _modbus.SelfHolding( 0x25, 0x25 );
-
-			await _modbus.SelfHolding( 5, 5 );
-			await _modbus.SelfHolding( 0, 0 );
+			TowerLampAsync( "STOP" );
 			Logger.WriteLine( "Machine Stop." );
 		}
 

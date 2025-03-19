@@ -12,6 +12,7 @@ using System.Windows.Media;
 using Newtonsoft.Json;
 using System.IO;
 using DamoOneVision.ImageProcessing;
+using CommunityToolkit.Mvvm.Input;
 
 
 namespace DamoOneVision.ViewModels
@@ -61,9 +62,11 @@ namespace DamoOneVision.ViewModels
 			//MilSystem = MILContext.Instance.MilSystem;
 
 			ComboBoxItems = new ObservableCollection<ComboBoxItemViewModel>();
-			AddComboBoxCommand = new RelayCommand( AddComboBox );
-			DeleteComboBoxCommand = new RelayCommand( DeleteComboBox );
-			ConversionProcessCommand = new AsyncRelayCommand( ConversionProcessAsync, CanExecuteConversionProcess );
+			AddComboBoxCommand = new RelayCommand<object>( AddComboBox );
+			DeleteComboBoxCommand = new RelayCommand<object>( DeleteComboBox );
+			ConversionProcessCommand = new AsyncRelayCommand<object?>( 
+				async param => await ConversionProcessAsync( param ),
+				param => CanExecuteConversionProcess( param ) );
 
 			//Model 저장을 위한 ICommand 추가
 			//SaveModelCommand = new RelayCommand( SaveModel );

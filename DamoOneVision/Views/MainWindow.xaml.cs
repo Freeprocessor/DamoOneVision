@@ -24,6 +24,7 @@ using System.Windows.Media.Converters;
 using Newtonsoft.Json.Linq;
 using DamoOneVision.ImageProcessing;
 using DamoOneVision.Models;
+using DamoOneVision.Views;
 
 
 namespace DamoOneVision
@@ -57,6 +58,8 @@ namespace DamoOneVision
 		/// Modbus 서비스
 		/// </summary>
 		private ModbusService _modbus;
+
+		private MotionService _motionService;
 
 		/// <summary>
 		/// Advantech 카드 서비스
@@ -109,7 +112,9 @@ namespace DamoOneVision
 		{
 			InitializeComponent();
 
-			_modbus = new ModbusService( "192.168.2.11", 502 );
+			_modbus = new ModbusService( "192.168.2.100", 502 );
+
+			_motionService = new MotionService();
 
 			_advantechCard = new AdvantechCardService( "192.168.2.20", 502 );
 
@@ -128,6 +133,7 @@ namespace DamoOneVision
 
 
 			_viewModel = new MainViewModel( _deviceControlService, _cameraService );
+			
 			this.DataContext = _viewModel;
 
 
@@ -241,7 +247,10 @@ namespace DamoOneVision
 		private void ManualButton_Click( object sender, RoutedEventArgs e )
 		{
 
-			ManualWindow manualWindow = new ManualWindow( _modbus );
+			//ManualWindow manualWindow = new ManualWindow( _modbus );
+			//manualWindow.ShowDialog();
+
+			ManualWindow manualWindow = new ManualWindow( _deviceControlService, _motionService );
 			manualWindow.ShowDialog();
 
 		}

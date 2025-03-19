@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using DamoOneVision.ImageProcessing;
 using Newtonsoft.Json;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace DamoOneVision.ViewModels
 {
@@ -120,10 +121,10 @@ namespace DamoOneVision.ViewModels
 				{
 					_isVisionConnected = value;
 					OnPropertyChanged( nameof( IsVisionConnected ) );
-					(ConnectCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
-					(DisconnectCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 				}
-			}
+			}	
 		}
 
 		private bool _isBusy;
@@ -136,8 +137,8 @@ namespace DamoOneVision.ViewModels
 				{
 					_isBusy = value;
 					OnPropertyChanged( nameof( IsBusy ) );
-					(ConnectCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
-					(DisconnectCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 				}
 			}
 		}
@@ -192,19 +193,19 @@ namespace DamoOneVision.ViewModels
 			};
 
 			ConnectCommand = new AsyncRelayCommand(
-				async _ => await _cameraService.ConnectAction(),
-				_ => CanConnect
+				_cameraService.ConnectAction,
+				() => CanConnect
 			);
 
 			DisconnectCommand = new AsyncRelayCommand(
-				async _ => await _cameraService.DisconnectAction(),
-				_ => CanDisconnect
+				_cameraService.DisconnectAction,
+				() => CanDisconnect
 			);
 
 			MachineStartCommand = new AsyncRelayCommand(
 				async _ => await Task.Run(async()=>{
 					await _cameraService.ConnectAction();
-					await _deviceControlService.MachineStartAction();
+					_deviceControlService.MachineStartAction();
 			} )
 			);
 

@@ -9,6 +9,7 @@ using static OpenCvSharp.FileStorage;
 using System.Windows.Threading;
 using Advantech.Adam;
 using System.Windows;
+using DamoOneVision.Views;
 
 namespace DamoOneVision.Services
 {
@@ -24,13 +25,20 @@ namespace DamoOneVision.Services
 		private bool _lifeBitStatus = false;
 		private bool _readServoPosition = false;
 
-		public bool[ ] InputCoil = new bool[0x40];
-		public bool[ ] OutputCoil = new bool[0x40];
-		public ushort[ ] InputRegister = new ushort[0x10];
-		public ushort[ ] HoldingRegister = new ushort[0x10];
+		//public bool[ ] InputCoil = new bool[0x40];
+		//public bool[ ] OutputCoil = new bool[0x40];
 
-		public int[ ] InputRegister32 = new int[0x05];
-		public int[ ] HoldingRegister32 = new int[0x02];
+		public bool[ ] InputCoil = new bool[0x10];
+		public bool[ ] OutputCoil = new bool[0x10];
+
+		public ushort[ ] InputRegister = new ushort[0x20];
+		public ushort[ ] HoldingRegister = new ushort[0x20];
+
+		public int[ ] InputRegister32 = new int[0x10];
+		public int[ ] HoldingRegister32 = new int[0x10];
+
+		int Lifebit = 0x01;
+		//int Lifebit = 0x2F;
 
 
 		public ModbusService( string ip, int port )
@@ -61,8 +69,9 @@ namespace DamoOneVision.Services
 			}
 
 			_modbusPollingAsync();
-			StartLifeBitAsync();
-			ServoCurrentPositionAsync();
+			//StartLifeRegAsync();
+			//GVAsync();
+			//ServoCurrentPositionAsync();
 		}
 
 		public async void DisconnectAsync( )
@@ -84,10 +93,11 @@ namespace DamoOneVision.Services
 				_modbusHoldingRegister32();
 				WriteHoldingRegisters( 0, 0x00, HoldingRegister );
 
-				InputRegister = ReadInputRegisters( 0, 0x00, 0x10 );
+				InputRegister = ReadInputRegisters( 0, 0x00, 0x20 );
 				_modbusInputRegister32();
 
-				InputCoil = ReadInputs( 0, 0, 0x40 );
+				//InputCoil = ReadInputs( 0, 0, 0x40 );
+				InputCoil = ReadInputs( 0, 0, 0x10 );
 				WriteMultipleCoils( 0, 0, OutputCoil );
 
 				await Task.Delay( 50 );
@@ -472,11 +482,13 @@ namespace DamoOneVision.Services
 				{
 					_lifeBitStatus = true;
 					Logger.WriteLine( "LifeBit ON" );
+					ushort i = 0;
 					while (_connected)
 					{
-						if (InputCoil[ 0x2F ])
+						///
+						if (InputCoil[ Lifebit ])
 						{
-							OutputCoil[ 0x2F ] = false;
+							OutputCoil[ Lifebit ] = false;
 
 							Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
 							{
@@ -489,7 +501,7 @@ namespace DamoOneVision.Services
 						}
 						else
 						{
-							OutputCoil[ 0x2F ] = true;
+							OutputCoil[ Lifebit ] = true;
 							Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
 							{
 								if (Application.Current.MainWindow is MainWindow mainWindow)
@@ -511,39 +523,123 @@ namespace DamoOneVision.Services
 			{
 				Logger.WriteLine( ex.Message );
 			}
-
-
 		}
 
-		private async void ServoCurrentPositionAsync( )
-		{
-			try
-			{
-				if (!IsConnected) throw new Exception( "Modbus is not connected." );
-				await Task.Run( ( ) =>
-				{
-					Logger.WriteLine( "ServoCurrentPosition Start" );
-					while (_connected)
-					{
-						string CurrentPosition = InputRegister32[0].ToString();
-						Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
-						{
-							if (Application.Current.MainWindow is MainWindow mainWindow)
-							{
-								mainWindow.ServoPosition.Content = CurrentPosition;
-							}
-						} ) );
-						Thread.Sleep( 100 );
-					}
-					Logger.WriteLine( "ServoCurrentPosition Stop" );
-				} );
-			}
-			catch (Exception ex)
-			{
-				Logger.WriteLine( ex.Message );
-			}
+		//private async void StartLifeRegAsync( )
+		//{
+		//	try
+		//	{
+		//		if (!IsConnected) throw new Exception( "Modbus is not connected." );
+		//		await Task.Run( ( ) =>
+		//		{
+		//			_lifeBitStatus = true;
+		//			Logger.WriteLine( "LifeBit ON" );
+		//			ushort i = 0;
+		//			while (_connected)
+		//			{
+		//				///
+		//				if (HoldingRegister32[0x0f]==1)
+		//				{
+		//					HoldingRegister32[ 0x0f ] = 0;
 
-		}
+		//					Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+		//					{
+		//						if (Application.Current.MainWindow is MainWindow mainWindow)
+		//						{
+		//							mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.White;
+		//							mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+		//						}
+		//					} ) );
+		//				}
+		//				else
+		//				{
+		//					HoldingRegister32[ 0x0f ] = 1;
+		//					Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+		//					{
+		//						if (Application.Current.MainWindow is MainWindow mainWindow)
+		//						{
+		//							mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+		//							mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.White;
+		//						}
+		//					} ) );
+		//				}
+
+
+		//				System.Threading.Thread.Sleep( 1000 );
+		//			}
+		//			_lifeBitStatus = false;
+		//			Logger.WriteLine( "LifeBit OFF" );
+		//		} );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Logger.WriteLine( ex.Message );
+		//	}
+		//}
+
+		//private async void ServoCurrentPositionAsync( )
+		//{
+		//	try
+		//	{
+		//		if (!IsConnected) throw new Exception( "Modbus is not connected." );
+		//		await Task.Run( ( ) =>
+		//		{
+		//			Logger.WriteLine( "ServoCurrentPosition Start" );
+		//			while (_connected)
+		//			{
+		//				string CurrentPosition = InputRegister32[0].ToString();
+		//				Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+		//				{
+		//					if (Application.Current.MainWindow is MainWindow mainWindow)
+		//					{
+		//						mainWindow.ServoPosition.Content = CurrentPosition;
+		//					}
+		//				} ) );
+		//				Thread.Sleep( 100 );
+		//			}
+		//			Logger.WriteLine( "ServoCurrentPosition Stop" );
+		//		} );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Logger.WriteLine( ex.Message );
+		//	}
+
+		//}
+
+		//private async void GVAsync( )
+		//{
+		//	try
+		//	{
+		//		if (!IsConnected) throw new Exception( "Modbus is not connected." );
+		//		await Task.Run( ( ) =>
+		//		{
+		//			Logger.WriteLine( "ServoCurrentPosition Start" );
+		//			while (_connected)
+		//			{
+		//				string GV0 = InputRegister[0].ToString();
+		//				string GV1 = InputRegister[0].ToString();
+		//				string GV2 = InputRegister[0].ToString();
+		//				Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
+		//				{
+		//					if (Application.Current.MainWindow is RobotManualWindow robotManualWindow)
+		//					{
+		//						robotManualWindow.GV1Label.Content = GV0;
+		//						robotManualWindow.GV1Label.Content = GV1;
+		//						robotManualWindow.GV1Label.Content = GV2;
+		//					}
+		//				} ) );
+		//				Thread.Sleep( 100 );
+		//			}
+		//			Logger.WriteLine( "ServoCurrentPosition Stop" );
+		//		} );
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Logger.WriteLine( ex.Message );
+		//	}
+
+		//}
 
 
 
