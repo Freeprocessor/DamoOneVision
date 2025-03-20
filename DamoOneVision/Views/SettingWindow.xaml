@@ -5,35 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DamoOneVision"
         mc:Ignorable="d"
-        Title="SettingWindow" Height="450" Width="800">
+        Title="SettingWindow" Height="555" Width="1070">
     <Grid>
         <Button x:Name="button" Content="Save" HorizontalAlignment="Left" Margin="735,404,0,0" VerticalAlignment="Top"  Width="55" Click="SaveButton_Click"/>
-        <DataGrid x:Name="ModelsDataGrid" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Models}" Margin="-365,-431,505,520">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="M" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Threshold 1" Binding="{Binding BinarizedThreshold1, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Threshold 2" Binding="{Binding BinarizedThreshold2, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Threshold 3" Binding="{Binding BinarizedThreshold3, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Threshold 4" Binding="{Binding BinarizedThreshold4, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
 
-        <Grid Margin="210,49,210,35">
+        <Grid Margin="10,10,740,269">
             <Border BorderBrush="Black" BorderThickness="1"  Margin="10,10,10,10" >
                 <Grid Margin="0">
-                    <Label x:Name="InfraredCameraLabel" Content="InfraredCamera" HorizontalAlignment="Left" Margin="24,23,0,0" VerticalAlignment="Top"/>
-                    <Label x:Name="InfraredCameraModelLabel" Content="Model Name" HorizontalAlignment="Left" Margin="24,66,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="InfraredCameraModelNameText" HorizontalAlignment="Left" Margin="149,72,0,0" TextWrapping="Wrap" Text="InfraredCamera" VerticalAlignment="Top" Width="120" />
-                    <Label x:Name="CircleCenterXLabel" Content="Circle Center Xpos" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="CircleCenterXText" HorizontalAlignment="Left" Margin="149,92,0,0" TextWrapping="Wrap" Text="CircleCenterX" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
-                    <Label x:Name="CircleCenterYLabel" Content="Circle Center Ypos" HorizontalAlignment="Left" Margin="24,106,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="CircleCenterYText" HorizontalAlignment="Left" Margin="149,112,0,0" TextWrapping="Wrap" Text="CircleCenterY" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
-                    <Label x:Name="CircleMinRadiusLabel" Content="Circle Min Radius" HorizontalAlignment="Left" Margin="24,126,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="CircleMinRadiusText" HorizontalAlignment="Left" Margin="149,131,0,0" TextWrapping="Wrap" Text="Circle Min Radius" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
-                    <Label x:Name="CircleMaxRadiusLabel" Content="Circle Max Radius" HorizontalAlignment="Left" Margin="24,146,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="CircleMaxRadiusText" HorizontalAlignment="Left" Margin="149,151,0,0" TextWrapping="Wrap" Text="Circle Max Radius" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
-                    <Label x:Name="BinarizedThresholdLabel" Content="Binarized Threshold" HorizontalAlignment="Left" Margin="24,166,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="BinarizedThresholdText" HorizontalAlignment="Left" Margin="149,171,0,0" TextWrapping="Wrap" Text="Binarized Threshold" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
+                    <Label Content="InfraredCamera Parameter" HorizontalAlignment="Left" Margin="24,23,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Model Name" HorizontalAlignment="Left" Margin="24,66,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="InfraredCamera" HorizontalAlignment="Left" Margin="149,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Center Xpos" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="CircleCenterX" HorizontalAlignment="Left" Margin="149,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Center Ypos" HorizontalAlignment="Left" Margin="24,106,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="CircleCenterY" HorizontalAlignment="Left" Margin="149,112,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Min Radius" HorizontalAlignment="Left" Margin="24,126,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Circle Min Radius" HorizontalAlignment="Left" Margin="149,131,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Max Radius" HorizontalAlignment="Left" Margin="24,146,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Circle Max Radius" HorizontalAlignment="Left" Margin="149,151,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Binarized Threshold" HorizontalAlignment="Left" Margin="24,166,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Binarized Threshold" HorizontalAlignment="Left" Margin="149,171,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+                </Grid>
+
+
+
+            </Border>
+        </Grid>
+        <Grid Margin="345,10,405,269">
+            <Border BorderBrush="Black" BorderThickness="1"  Margin="10,10,10,10" >
+                <Grid Margin="0">
+                    <Label Content="InfraredCamera Parameter" HorizontalAlignment="Left" Margin="24,23,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Model Name" HorizontalAlignment="Left" Margin="24,66,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="InfraredCamera" HorizontalAlignment="Left" Margin="149,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Center Xpos" HorizontalAlignment="Left" Margin="24,86,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="CircleCenterX" HorizontalAlignment="Left" Margin="149,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Center Ypos" HorizontalAlignment="Left" Margin="24,106,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="CircleCenterY" HorizontalAlignment="Left" Margin="149,112,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Min Radius" HorizontalAlignment="Left" Margin="24,126,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Circle Min Radius" HorizontalAlignment="Left" Margin="149,131,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Circle Max Radius" HorizontalAlignment="Left" Margin="24,146,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Circle Max Radius" HorizontalAlignment="Left" Margin="149,151,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Binarized Threshold" HorizontalAlignment="Left" Margin="24,166,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="Binarized Threshold" HorizontalAlignment="Left" Margin="149,171,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
                 </Grid>
 

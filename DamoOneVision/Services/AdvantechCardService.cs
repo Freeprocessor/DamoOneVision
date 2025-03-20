@@ -115,7 +115,7 @@ namespace DamoOneVision.Services
 		{
 			await Task.Run( async( ) =>
 			{
-				Logger.WriteLine( "ReadBitAsync Start" );
+				Logger.WriteLine( "Advantech ReadBitAsync Start" );
 				while (true)
 				{
 					if (_isConnected)
@@ -127,9 +127,11 @@ namespace DamoOneVision.Services
 
 						_adamSocket.Modbus().ForceMultiCoils( 17, WriteCoil );
 
-						bool[] writecoil;
+						//bool[] writecoil;
 
-						_adamSocket.Modbus().ReadCoilStatus( 17, 8, out writecoil );
+						//_adamSocket.Modbus().ReadCoilStatus( 17, 8, out writecoil );
+
+						//WriteCoil = writecoil;
 					}
 					else
 					{

@@ -82,11 +82,33 @@ namespace DamoOneVision.Data
 					CircleMaxRadius = 183.5,
 					BinarizedThreshold = 12500
 				};
-				InfraredCameraModelData infraredCameraModelData = new InfraredCameraModelData();
-				infraredCameraModelData.InfraredCameraModels.Add( infraredCameraModels );
+
+				MotionModel motionModel = new MotionModel
+				{
+					Name = "Default",
+					XAxisSpeed = 100,
+					XAxisReturnSpeed = 100,
+					XAxisAcceleration = 100,
+					XAxisDeceleration = 100,
+					XAxisJogSpeed = 100,
+					XAxisWaitingPostion = 100,
+					XAxisEndPostion = 100,
+					ZAxisSpeed = 100,
+					ZAxisReturnSpeed = 100,
+					ZAxisAcceleration = 100,
+					ZAxisDeceleration = 100,
+					ZAxisJogSpeed = 100,
+					ZAxisWaitingPostion = 100,
+					ZAxisEndPostion = 100
+				};
+
+
+				ModelData ModelData = new ModelData();
+				ModelData.InfraredCameraModels.Add( infraredCameraModels );
+				ModelData.MotionModels.Add( motionModel );
 
 				var options = new JsonSerializerOptions { WriteIndented = true };
-				string json = JsonSerializer.Serialize(infraredCameraModelData, options);
+				string json = JsonSerializer.Serialize(ModelData, options);
 				File.WriteAllText( ModelPath, json );
 			}
 		}

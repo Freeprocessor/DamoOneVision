@@ -182,7 +182,7 @@ namespace DamoOneVision.ViewModels
 			_jsonHandler = new JsonHandler( modelfile );
 
 			InfraredCameraModels = new ObservableCollection<InfraredCameraModel>();
-			LoadInfraredModelsAsync();
+			LoadModelsAsync();
 
 
 			//이벤트 구독
@@ -289,18 +289,18 @@ namespace DamoOneVision.ViewModels
 		/// <summary>
 		/// 모델 데이터를 JSON 파일로 저장하는 메서드
 		/// </summary>
-		private async void SaveInfraredModelsAsync( )
+		private async void SaveModelsAsync( )
 		{
-			var data = new InfraredCameraModelData { InfraredCameraModels = new List<InfraredCameraModel>(InfraredCameraModels) };
-			await _jsonHandler.SaveInfraredModelsAsync( data );
+			var data = new ModelData { InfraredCameraModels = new List<InfraredCameraModel>(InfraredCameraModels) };
+			await _jsonHandler.SaveModelsAsync( data );
 		}
 
 		/// <summary>
 		/// 적외선 열화상 카메라 모델 추가 버튼 클릭 이벤트 핸들러
 		/// </summary>
-		private async void LoadInfraredModelsAsync( )
+		private async void LoadModelsAsync( )
 		{
-			var data = await _jsonHandler.LoadInfraredModelsAsync();
+			var data = await _jsonHandler.LoadModelsAsync();
 			InfraredCameraModels.Clear();
 			foreach (var model in data.InfraredCameraModels)
 			{
@@ -329,19 +329,20 @@ namespace DamoOneVision.ViewModels
 					BinarizedThreshold = currentInfraredCameraModel.BinarizedThreshold
 				};
 
-				var saveWindow = new SettingWindow(modelCopy);
-				if (saveWindow.ShowDialog() == true)
-				{
-					// 원본 모델 업데이트
-					currentInfraredCameraModel.Name = saveWindow.Model.Name;
-					currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
-					currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
-					currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
-					currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
-					currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
+				/// TODO : 수정할 모델을 설정하는 창 생성
+				//var saveWindow = new SettingWindow(modelCopy);
+				//if (saveWindow.ShowDialog() == true)
+				//{
+				//	// 원본 모델 업데이트
+				//	currentInfraredCameraModel.Name = saveWindow.Model.Name;
+				//	currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
+				//	currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
+				//	currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
+				//	currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
+				//	currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
 
-					SaveInfraredModelsAsync(); // 자동 저장
-				}
+				//	SaveModelsAsync(); // 자동 저장
+				//}
 			}
 			//else
 			//{

@@ -7,98 +7,71 @@
         xmlns:vm="clr-namespace:DamoOneVision.ViewModels"
         xmlns:local="clr-namespace:DamoOneVision"
         mc:Ignorable="d"
-        Title="ManualWindow" Height="520" Width="800">
+        Title="ManualWindow" Height="800" Width="1000">
 
     <Grid>
 
-        <Grid Margin="415,27,20,45">
-            <Button x:Name="EjectONButton" Content="Eject V/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectONCommand}" />
-            <Button x:Name="EjectOFFButton" Content="Eject V/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="128,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectOFFCommand}"/>
-            <Button x:Name="MainCVONButton" Content="Main C/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,187,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding MainCVOnCommand}"/>
-            <Button x:Name="MainCVOFFButton" Content="Main C/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="128,187,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding MainCVOffCommand}"/>
-            <Button x:Name="EjectRoutineButton" Content="Eject V/V&#xA;Routine Button" HorizontalAlignment="Left" Margin="72,89,0,0" VerticalAlignment="Top" Height="60" Width="106" />
-            <Button x:Name="TowerLampStart" Content="Tower Lamp&#xA;Start Button" HorizontalAlignment="Left" Margin="18,282,0,0" VerticalAlignment="Top" Height="60" Width="106"  Command="{Binding TowerLampStartCommand}"/>
-            <Button x:Name="TowerLampStop" Content="Tower Lamp&#xA;Stop Button" HorizontalAlignment="Center" Margin="0,282,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding TowerLampStopCommand}"/>
-            <Button x:Name="TowerLampReset" Content="Tower Lamp&#xA;Reset Button" HorizontalAlignment="Left" Margin="241,282,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding TowerLampErrorCommand}"/>
+        <Grid Margin="610,27,20,45">
+            <Button Content="Eject V/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectONCommand}" />
+            <Button Content="Eject V/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="128,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectOFFCommand}"/>
+            <Button Content="Main C/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,187,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding MainCVOnCommand}"/>
+            <Button Content="Main C/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="128,187,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding MainCVOffCommand}"/>
+            <Button Content="Eject V/V&#xA;Routine Button" HorizontalAlignment="Left" Margin="72,89,0,0" VerticalAlignment="Top" Height="60" Width="106" />
+            <Button Content="Tower Lamp&#xA;Start Button" HorizontalAlignment="Left" Margin="18,282,0,0" VerticalAlignment="Top" Height="60" Width="106"  Command="{Binding TowerLampStartCommand}"/>
+            <Button Content="Tower Lamp&#xA;Stop Button" HorizontalAlignment="Left" Margin="130,282,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding TowerLampStopCommand}"/>
+            <Button Content="Tower Lamp&#xA;Reset Button" HorizontalAlignment="Left" Margin="241,282,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding TowerLampErrorCommand}"/>
 
         </Grid>
 
-        <Grid HorizontalAlignment="Left" Height="154" Margin="40,27,0,0" VerticalAlignment="Top" Width="345">
-            <TextBox x:Name="ServoXAxisCurrentPositionTextBox"  HorizontalAlignment="Left" Margin="138,14,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-            <Label x:Name="ServoXAxisCurrentPositionLabel" Content="Servo X-Axis Cutrrent" HorizontalAlignment="Left" Margin="6,10,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="ServoXAxisPositionTextBox" HorizontalAlignment="Left" Margin="138,41,0,0" TextWrapping="Wrap" Text="20000" VerticalAlignment="Top" Width="120"/>
-            <Label x:Name="ServoXAxisPositionLabel" Content="Servo X-Axis Position" HorizontalAlignment="Left" Margin="6,37,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="ServoXAxisSpeedTextBox" HorizontalAlignment="Left" Margin="138,0,0,0" TextWrapping="Wrap" Text="10000" VerticalAlignment="Center" Width="120"/>
-            <Label x:Name="ServoXAxisSpeedLabel" Content="Servo X-Axis Speed" HorizontalAlignment="Left" Margin="6,0,0,0" VerticalAlignment="Center"/>
-            <Button x:Name="ServoXAxisMoveButton" Content="Move" HorizontalAlignment="Left" Margin="280,31,0,0" VerticalAlignment="Top" Height="37" Width="55" />
-            <Label x:Name="ServoXAxis" Content="Servo Z-Axis " HorizontalAlignment="Left" Margin="64,113,0,0" VerticalAlignment="Top"/>
-            <Button x:Name="XJogPlusButton" Content="Jog +" HorizontalAlignment="Left" Margin="155,107,0,0" VerticalAlignment="Top" Height="37" Width="55" Focusable="False">
-                <!-- 라우트 이벤트에 대한 트리거들 -->
-                <i:Interaction.Triggers>
-                    <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseDown">
-                        <i:InvokeCommandAction Command="{Binding XAxisJogPStartCommand}" />
-                    </i:EventTrigger>
+        <Grid HorizontalAlignment="Left" Height="275" Margin="40,27,0,0" VerticalAlignment="Top" Width="380">
+            <Border BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Label Content="X-Axis" HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Servo X-Axis Command" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding CommandPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Feedback" HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding FeedbackPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Target" HorizontalAlignment="Left" Margin="10,84,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding TargetPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Acc" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding Decel, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Dec" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding Accel, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Speed" HorizontalAlignment="Left" Margin="10,153,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding Velocity, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Label Content="Servo Z-Axis" HorizontalAlignment="Left" Margin="82,228,0,0" VerticalAlignment="Top"/>
+                    <Button Content="Move" HorizontalAlignment="Left" Margin="313,91,0,0" VerticalAlignment="Top" Height="37" Width="55" />
+                    <Button Content="Jog +" HorizontalAlignment="Left" Margin="173,222,0,0" VerticalAlignment="Top" Height="37" Width="55" Focusable="False">
+                        <!-- 라우트 이벤트에 대한 트리거들 -->
+                        <i:Interaction.Triggers>
+                            <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <i:InvokeCommandAction Command="{Binding XAxisJogPStartCommand}" />
+                            </i:EventTrigger>
 
-                    <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseUp">
-                        <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-            <Button x:Name="XJogMinusButton" Content="Jog -" HorizontalAlignment="Left" Margin="220,107,0,0" VerticalAlignment="Top" Height="37" Width="55">
-                <!-- 라우트 이벤트에 대한 트리거들 -->
-                <i:Interaction.Triggers>
-                    <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseDown">
-                        <i:InvokeCommandAction Command="{Binding XAxisJogNStartCommand}" />
-                    </i:EventTrigger>
+                            <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseUp">
+                                <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Content="Jog -" HorizontalAlignment="Left" Margin="238,222,0,0" VerticalAlignment="Top" Height="37" Width="55">
+                        <!-- 라우트 이벤트에 대한 트리거들 -->
+                        <i:Interaction.Triggers>
+                            <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <i:InvokeCommandAction Command="{Binding XAxisJogNStartCommand}" />
+                            </i:EventTrigger>
 
-                    <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseUp">
-                        <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-        </Grid>
+                            <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseUp">
+                                <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
 
-        <Grid HorizontalAlignment="Left" Height="154" Margin="40,234,0,0" VerticalAlignment="Top" Width="345">
-            <TextBox x:Name="ServoZAxisCurrentPositionTextBox"  HorizontalAlignment="Left" Margin="138,14,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-            <Label x:Name="ServoZAxisCurrentPositionLabel" Content="Servo Z-Axis Cutrrent" HorizontalAlignment="Left" Margin="6,10,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="ServoZAxisPositionTextBox" HorizontalAlignment="Left" Margin="138,41,0,0" TextWrapping="Wrap" Text="20000" VerticalAlignment="Top" Width="120"/>
-            <Label x:Name="ServoZAxisPositionLabel" Content="Servo Z-Axis Position" HorizontalAlignment="Left" Margin="6,37,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="ServoZAxisSpeedTextBox" HorizontalAlignment="Left" Margin="138,0,0,0" TextWrapping="Wrap" Text="10000" VerticalAlignment="Center" Width="120"/>
-            <Label x:Name="ServoZAxisSpeedLabel" Content="Servo Z-Axis Speed" HorizontalAlignment="Left" Margin="6,0,0,0" VerticalAlignment="Center"/>
-            <Button x:Name="ServoZAxisMoveButton" Content="Move" HorizontalAlignment="Left" Margin="280,31,0,0" VerticalAlignment="Top" Height="37" Width="55"/>
-            <Label x:Name="ServoZAxis" Content="Servo X-Axis " HorizontalAlignment="Left" Margin="64,113,0,0" VerticalAlignment="Top"/>
-            <Button x:Name="ZJogPlusButton" Content="Jog +" HorizontalAlignment="Left" Margin="155,107,0,0" VerticalAlignment="Top" Height="37" Width="55" Focusable="False">
-                <!-- 라우트 이벤트에 대한 트리거들 -->
-                <i:Interaction.Triggers>
-                    <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseDown">
-                        <i:InvokeCommandAction Command="{Binding ZAxisJogPStartCommand}" />
-                    </i:EventTrigger>
-
-                    <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseUp">
-                        <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-            <Button x:Name="ZJogMinusButton" Content="Jog -" HorizontalAlignment="Left" Margin="220,107,0,0" VerticalAlignment="Top" Height="37" Width="55">
-                <!-- 라우트 이벤트에 대한 트리거들 -->
-                <i:Interaction.Triggers>
-                    <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseDown">
-                        <i:InvokeCommandAction Command="{Binding ZAxisJogNStartCommand}" />
-                    </i:EventTrigger>
-
-                    <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
-                    <i:EventTrigger EventName="PreviewMouseUp">
-                        <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
+                </Grid>
+            </Border>
         </Grid>
 
     </Grid>

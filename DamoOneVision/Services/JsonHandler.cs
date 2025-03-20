@@ -18,7 +18,7 @@ namespace DamoOneVision.Services
 			_filePath = filePath;
 		}
 
-		public async Task SaveInfraredModelsAsync( InfraredCameraModelData data )
+		public async Task SaveModelsAsync( ModelData data )
 		{
 			string jsonString = JsonConvert.SerializeObject(data, Formatting.Indented);
 			using (StreamWriter writer = new StreamWriter( _filePath, false ))
@@ -27,10 +27,10 @@ namespace DamoOneVision.Services
 			}
 		}
 
-		public async Task<InfraredCameraModelData> LoadInfraredModelsAsync( )
+		public async Task<ModelData> LoadModelsAsync( )
 		{
 			if (!File.Exists( _filePath ))
-				return new InfraredCameraModelData();
+				return new ModelData();
 
 			string jsonString;
 			using (StreamReader reader = new StreamReader( _filePath ))
@@ -38,30 +38,8 @@ namespace DamoOneVision.Services
 				jsonString = await reader.ReadToEndAsync();
 			}
 
-			return JsonConvert.DeserializeObject<InfraredCameraModelData>( jsonString ) ?? new InfraredCameraModelData();
+			return JsonConvert.DeserializeObject<ModelData>( jsonString ) ?? new ModelData();
 		}
 
-		public async Task SaveSideModelsAsync( SideCameraModelData data )
-		{
-			string jsonString = JsonConvert.SerializeObject(data, Formatting.Indented);
-			using (StreamWriter writer = new StreamWriter( _filePath, false ))
-			{
-				await writer.WriteAsync( jsonString );
-			}
-		}
-
-		public async Task<SideCameraModelData> LoadSideModelsAsync( )
-		{
-			if (!File.Exists( _filePath ))
-				return new SideCameraModelData();
-
-			string jsonString;
-			using (StreamReader reader = new StreamReader( _filePath ))
-			{
-				jsonString = await reader.ReadToEndAsync();
-			}
-
-			return JsonConvert.DeserializeObject<SideCameraModelData>( jsonString ) ?? new SideCameraModelData();
-		}
 	}
 }

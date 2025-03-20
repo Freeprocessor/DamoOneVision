@@ -49,13 +49,13 @@ namespace DamoOneVision.Services
 
 		public void Connect( )
 		{
-			_modbus.ConnectAsync();
+			//_modbus.ConnectAsync();
 			_advantechCard.ConnectAsync();
 		}
 
 		public void Disconnect( )
 		{
-			_modbus.DisconnectAsync();
+			//_modbus.DisconnectAsync();
 			_advantechCard.DisconnectAsync();
 		}
 
@@ -86,13 +86,7 @@ namespace DamoOneVision.Services
 		{
 			while(_isError)
 			{
-				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = true;
-				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
-				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
-
-				await Task.Delay( 500 );
-
-				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
+				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = !_advantechCard.WriteCoil[ TOWERLAMP_RED ];
 				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
 				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
 
@@ -182,7 +176,7 @@ namespace DamoOneVision.Services
 						break;
 					}
 					/// Trigger-1 ON
-					if (_advantechCard.ReadCoil[ 0 ] == true)
+					if (_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
 					{
 						// Convyer Delay
 						await Task.Delay( 350 );
