@@ -126,44 +126,37 @@ namespace DamoOneVision.Services
 			CAXM.AxmSignalServoOn( axisNum, 0 );
 		}
 
-		private void JogPStart( )
+		private void JogStart( int axisNum, int dir )
 		{
+			if(!(dir == 1) || (dir == -1))
+			{
+				Logger.WriteLine( "JogStart: dir 값이 잘못되었습니다." );
+				return;
+			}
+
+			uint duRetCode   = 0;
+
+			double dVelocity = Math.Abs(100);
+			double dAccel    = Math.Abs(100);
+			double dDecel    = Math.Abs(100);
+
+			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
+			duRetCode = CAXM.AxmMoveVel( axisNum, dVelocity * dir, dAccel, dDecel );
+			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
+				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
+
+			Logger.WriteLine( "Jog Start" );
 
 		}
 
 		public void XAxisJogPStart( )
 		{
-			uint duRetCode   = 0;
-
-			double dVelocity = Math.Abs(100);
-			double dAccel    = Math.Abs(100);
-			double dDecel    = Math.Abs(100);
-
-			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
-			duRetCode = CAXM.AxmMoveVel( 0, dVelocity, dAccel, dDecel );
-			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
-
-			Logger.WriteLine( "JogPX_Start" );
+			JogStart( X, 1 );
 		}
 
 		public void XAxisJogNStart( )
 		{
-			uint duRetCode   = 0;
-
-			//double dVelocity = Math.Abs(Convert.ToDouble(edtJogVel.Value));
-			//double dAccel    = Math.Abs(Convert.ToDouble(edtJogAcc.Value));
-			//double dDecel    = Math.Abs(Convert.ToDouble(edtJogDec.Value));
-			double dVelocity = Math.Abs(100);
-			double dAccel    = Math.Abs(100);
-			double dDecel    = Math.Abs(100);
-
-			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
-			duRetCode = CAXM.AxmMoveVel( 0, -dVelocity, dAccel, dDecel );
-			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
-
-			Logger.WriteLine( "JogPX_Start" );
+			JogStart( X, -1 );
 		}
 
 		public void XAxisStop( )
@@ -176,34 +169,12 @@ namespace DamoOneVision.Services
 
 		public void ZAxisJogPStart( )
 		{
-			uint duRetCode   = 0;
-
-			double dVelocity = Math.Abs(100);
-			double dAccel    = Math.Abs(100);
-			double dDecel    = Math.Abs(100);
-
-			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
-			duRetCode = CAXM.AxmMoveVel( 1, dVelocity, dAccel, dDecel );
-			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
-
-			Logger.WriteLine( "JogPX_Start" );
+			JogStart( Z, 1 );
 		}
 
 		public void ZAxisJogNStart( )
 		{
-			uint duRetCode   = 0;
-
-			double dVelocity = Math.Abs(100);
-			double dAccel    = Math.Abs(100);
-			double dDecel    = Math.Abs(100);
-
-			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
-			duRetCode = CAXM.AxmMoveVel( 1, -dVelocity, dAccel, dDecel );
-			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
-
-			Logger.WriteLine( "JogPX_Start" );
+			JogStart( Z, -1 );
 		}
 
 		public void ZAxisJogStop( )
