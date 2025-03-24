@@ -205,7 +205,7 @@ namespace DamoOneVision.ViewModels
 			MachineStartCommand = new AsyncRelayCommand(
 				async _ => await Task.Run(async()=>{
 					await _cameraService.ConnectAction();
-					_deviceControlService.MachineStartAction();
+					await _deviceControlService.MachineStartAction();
 			} )
 			);
 

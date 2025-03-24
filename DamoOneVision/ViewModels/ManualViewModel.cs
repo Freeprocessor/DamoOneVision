@@ -349,7 +349,6 @@ namespace DamoOneVision.ViewModels
 
 		private async Task XAxisMoveToTargetAsync( double TargetPosition )
 		{
-
 			_xAxisIsMoving = true;
 			(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();

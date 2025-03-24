@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DamoOneVision.Ajinextek.Motion;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
@@ -10,6 +11,10 @@ namespace DamoOneVision.Services
 	public class DeviceControlService
 	{
 		public event Func<Task> TriggerDetected;
+
+		const int X = 0;
+		//const uint Y = 1;
+		const int Z = 2;
 
 		/// <summary>
 		/// Trigger Reading Status
@@ -35,13 +40,15 @@ namespace DamoOneVision.Services
 
 		ModbusService _modbus;
 		AdvantechCardService _advantechCard;
+		MotionService _motionService;
 
 		bool _isError = false;
 
-		public DeviceControlService( ModbusService modbus, AdvantechCardService advantechCard)
+		public DeviceControlService( ModbusService modbus, AdvantechCardService advantechCard, MotionService motionService)
 		{
 			_modbus = modbus;
 			_advantechCard = advantechCard;
+			_motionService = motionService;
 
 			Connect();
 
@@ -178,11 +185,20 @@ namespace DamoOneVision.Services
 					/// Trigger-1 ON
 					if (_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
 					{
+
+
 						// Convyer Delay
-						await Task.Delay( 350 );
+						//await Task.Delay( 350 );
+						Logger.WriteLine( "Trigger Detected" );
 						if (TriggerDetected != null)
 						{
+							await _motionService.XAxisMoveWaitPos();
+							_ = _motionService.XAxisMoveEndPos();
+							await Task.Delay( (int)(_motionService.XAxisAcceleration*100.000*5.000) );
 							await TriggerDetected();
+							_motionService.XAxisStop();
+							await _motionService.XAxisWaitingStop();
+							await _motionService.XAxisMoveWaitPos();
 						}
 						//modbus.WriteSingleCoil( 0, 0x06, false );
 						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
@@ -195,6 +211,8 @@ namespace DamoOneVision.Services
 				_isTriggerReading = false;
 			} );
 		}
+
+
 
 		/// <summary>
 		/// Advantech Card Trigger(DI0) Read Stop Async
@@ -213,7 +231,7 @@ namespace DamoOneVision.Services
 			Logger.WriteLine( "TriggerReadingAsync Stop" );
 		}
 
-		public void MachineStartAction( )
+		public async Task MachineStartAction( )
 		{
 			TowerLampAsync( "START" );
 
@@ -224,7 +242,7 @@ namespace DamoOneVision.Services
 			//await _modbus.SelfHolding( 0x24, 0x24 );
 
 			MainCVOn();
-
+			await _motionService.XAxisMoveWaitPos();
 			Logger.WriteLine( "Trigger Reading Start." );
 			TriggerReadingStartAsync();
 			Logger.WriteLine( "Machine Start." );
@@ -233,9 +251,9 @@ namespace DamoOneVision.Services
 		public async Task MachineStopAction( )
 		{
 
-
+			await TriggerReadingStopAsync();
 			Logger.WriteLine( "Trigger Reading Stop." );
-			MainCVOn();
+			MainCVOff();
 			Logger.WriteLine( "C/V OFF" );
 			TowerLampAsync( "STOP" );
 			Logger.WriteLine( "Machine Stop." );

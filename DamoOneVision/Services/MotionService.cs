@@ -25,15 +25,42 @@ namespace DamoOneVision.Services
 		const int ZPHASE_POSITIVE = 1;
 		const int ZPHASE_NEGATIVE = 2;
 
+		public double XAxisWaitingPostion { get; set; }
+		public double XAxisEndPostion { get; set; }
+		public double XAxisTrackingSpeed { get; set; }
+		public double XAxisReturnSpeed { get; set; }
+		public double XAxisAcceleration { get; set; }
+		public double XAxisDeceleration { get; set; }
+		public double XAxisJogSpeed { get; set; }
+		public double XAxisJogAcceleration { get; set; }
+		public double XAxisJogDeceleration { get; set; }
+
+
+
+
+
 
 		private bool _isInitialized = false; // 라이브러리 초기화 여부
 
+		//public bool MotionStopRequested { get; set; }
+
 		public MotionService( )
 		{
+
+			XAxisWaitingPostion = 1000;
+			XAxisEndPostion = 100000;
+			XAxisTrackingSpeed = 10000;
+			XAxisReturnSpeed = 100000;
+			XAxisAcceleration = 0.1;
+			XAxisDeceleration = 0.1;
+
 			InitLibrary();
 			ServoOn( X );
 			ServoOn( Z );
-			
+
+			XAxisHome();
+			ZAxisHome();
+
 		}
 
 		private bool MotionInit( )
@@ -203,8 +230,83 @@ namespace DamoOneVision.Services
 			{
 				MessageBox.Show( $"AxmHomeGetResult return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
 			}
+
 			Logger.WriteLine( "Z-Axis Home End" );
 		}
+
+		public async Task XAxisMoveWaitPos( )
+		{
+			await XAxisMoveToPosition( XAxisWaitingPostion, XAxisReturnSpeed, XAxisAcceleration, XAxisDeceleration );
+			await XAxisWaitingStop();
+		}
+
+		public async Task XAxisMoveEndPos( )
+		{
+			await XAxisMoveToPosition( XAxisEndPostion, XAxisReturnSpeed, XAxisAcceleration, XAxisDeceleration );
+			//await XAxisWaitingStop();
+		}
+
+		public async Task XAxisWaitingStop( )
+		{
+			uint upStatus = 0;
+			await Task.Run( ( ) => 
+			{
+				while (true)
+				{
+					CAXM.AxmStatusReadInMotion( X, ref upStatus );
+					if (upStatus == 0)
+					{
+						break;
+					}
+				}
+			});
+		}
+
+		public async void ZAxisWaitingStop( )
+		{
+			uint upStatus = 0;
+			await Task.Run( ( ) =>
+			{
+				while (true)
+				{
+
+					CAXM.AxmStatusReadInMotion( Z, ref upStatus );
+					if (upStatus == 0)
+					{
+						break;
+					}
+				}
+			} );
+		}
+
+
+
+		/// <summary>
+		/// 지정한 축의 실제 위치 변화를 기반으로 속도를 계산합니다.
+		/// </summary>
+		/// <param name="axisNo">측정할 축 번호</param>
+		/// <param name="intervalMs">측정 간격 (ms)</param>
+		/// <returns>초당 이동 거리 (단위는 설정된 유닛 기준)</returns>
+		public async static Task<double> GetEncoderVelocity( int axisNo, int intervalMs = 100 )
+		{
+			double pos1 = 0.0, pos2 = 0.0;
+
+			// 1) 현재 실제 위치 읽기
+			CAXM.AxmStatusGetActPos( axisNo, ref pos1 );
+
+			// 2) 잠깐 대기
+			await Task.Delay( intervalMs );
+
+			// 3) 다시 실제 위치 읽기
+			CAXM.AxmStatusGetActPos( axisNo, ref pos2 );
+
+			// 4) 위치 변화량 / 시간으로 속도 계산 (초 단위)
+			double delta = pos2 - pos1;
+			double seconds = intervalMs / 1000.0;
+
+			return delta / seconds; // 단위: mm/s 또는 pulse/s (축 설정에 따라)
+		}
+
 
 		public double XAxisGetCommandPosition( )
 		{
@@ -255,22 +357,24 @@ namespace DamoOneVision.Services
 
 		}
 
+
+
 		public void XAxisJogPStart( )
 		{
-			Logger.WriteLine( "X-Axis Jog+ Start" );
+			//Logger.WriteLine( "X-Axis Jog+ Start" );
 			JogStart( X, 1 );
 		}
 
 		public void XAxisJogNStart( )
 		{
-			Logger.WriteLine( "X-Axis Jog- Start" );
+			//Logger.WriteLine( "X-Axis Jog- Start" );
 			JogStart( X, -1 );
 		}
 
 		public void XAxisStop( )
 		{
 			//++ 지정한 축의 Jog구동(모션구동)을 종료합니다.  
-			Logger.WriteLine( "X-Axis Stop" );
+			//Logger.WriteLine( "X-Axis Stop" );
 			CAXM.AxmMoveSStop( X );
 		}
 
@@ -278,20 +382,20 @@ namespace DamoOneVision.Services
 
 		public void ZAxisJogPStart( )
 		{
-			Logger.WriteLine( "Z-Axis Jog+ Start" );
+			//Logger.WriteLine( "Z-Axis Jog+ Start" );
 			JogStart( Z, 1 );
 		}
 
 		public void ZAxisJogNStart( )
 		{
-			Logger.WriteLine( "Z-Axis Jog- Start" );
+			//Logger.WriteLine( "Z-Axis Jog- Start" );
 			JogStart( Z, -1 );
 		}
 
 		public void ZAxisStop( )
 		{
 			//++ 지정한 축의 Jog구동(모션구동)을 종료합니다.  
-			Logger.WriteLine( "Z-Axis Stop" );
+			//Logger.WriteLine( "Z-Axis Stop" );
 			CAXM.AxmMoveSStop( Z );
 		}
 	}

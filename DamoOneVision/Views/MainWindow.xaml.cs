@@ -118,7 +118,7 @@ namespace DamoOneVision
 
 			_advantechCard = new AdvantechCardService( "192.168.2.20", 502 );
 
-			_deviceControlService = new DeviceControlService( _modbus, _advantechCard );
+			_deviceControlService = new DeviceControlService( _modbus, _advantechCard, _motionService);
 
 			_infraredCamera = new CameraManager( "Matrox", "InfraredCamera" );
 			_sideCamera1 = new CameraManager( "Matrox", "SideCamera1" );

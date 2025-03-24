@@ -181,14 +181,15 @@ namespace DamoOneVision.Services
 					_isCameraCapturing = true;
 
 					// 카메라에서 이미지 캡처
+					/// SideCamera 제거 후 InfraredCamera만 사용
 					try
 					{
 						var tasks = new []
 						{
 							_infraredCamera.CaptureSingleImageAsync(),
-							_sideCamera1.CaptureSingleImageAsync(),
-							_sideCamera2.CaptureSingleImageAsync(),
-							_sideCamera3.CaptureSingleImageAsync()
+							//_sideCamera1.CaptureSingleImageAsync(),
+							//_sideCamera2.CaptureSingleImageAsync(),
+							//_sideCamera3.CaptureSingleImageAsync()
 						};
 						await Task.WhenAll( tasks );
 						Logger.WriteLine( "카메라 이미지 캡처 완료" );
