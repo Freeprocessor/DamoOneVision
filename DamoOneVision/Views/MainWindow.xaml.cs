@@ -267,14 +267,14 @@ namespace DamoOneVision
 			{
 				Logger.WriteLine( "Reject" );
 
-				GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
-				GoodRejectText.Content = "Reject";
+				//GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
+				//GoodRejectText.Content = "Reject";
 			}
 			else
 			{
 				Logger.WriteLine( "Good" );
-				GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
-				GoodRejectText.Content = "Good";
+				//GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
+				//GoodRejectText.Content = "Good";
 			}
 		}
 
