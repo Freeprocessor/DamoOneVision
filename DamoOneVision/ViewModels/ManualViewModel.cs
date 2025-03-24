@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using DamoOneVision.Services;
@@ -17,14 +18,22 @@ namespace DamoOneVision.ViewModels
 		private MotionService _motionService;
 		private DeviceControlService _deviceControlService;
 
-		private double _waitingPosition;
-		private double _endPosition;
-		private double _currentPosition;
-		private double _targetPosition;
-		private double _velocity;
-		private double _acceleration = 400.0; // 기본 가속도
-		private double _deceleration = 400.0; // 기본 감속도
-		private bool _isMoving;
+		private double _xAxisWaitingPosition;
+		private double _xAxisEndPosition;
+		private double _xAxisCommandPosition;
+		private double _xAxisVelocity = 10000;
+		private double _xAxisAcceleration = 0.5; // 기본 가속도
+		private double _xAxisDeceleration = 0.5; // 기본 감속도
+		private bool _xAxisIsMoving;
+
+		private double _zAxisWorkPosition;
+		private double _zAxisCommandPosition;
+		private double _zAxisVelocity = 10000;
+		private double _zAxisAcceleration = 0.5; // 기본 가속도
+		private double _zAxisDeceleration = 0.5; // 기본 감속도
+		private bool _zAxisIsMoving;
+
+		private readonly DispatcherTimer _positionTimer;
 
 		/// <summary>
 		/// PropertyChanged 이벤트 핸들러, WPF 바인딩을 위해 필요
@@ -45,8 +54,20 @@ namespace DamoOneVision.ViewModels
 			ZAxisJogNStartCommand = new RelayCommand( ( ) => ZAxisJogNStart() );
 			ZAxisJogStopCommand = new RelayCommand( ( ) => ZAxisJogStop() );
 
-			MoveCommand = new AsyncRelayCommand( XAxisMoveToTargetAsync, CanMove );
-			StopCommand = new RelayCommand( StopMotion );
+			XAxisMoveWaitCommand = new AsyncRelayCommand( XAxisMoveWaitAsync, XAxisCanMove );
+			XAxisMoveEndCommand = new AsyncRelayCommand( XAxisMoveEndAsync, XAxisCanMove );
+			XAxisStopCommand = new RelayCommand( XAxisStopMotion );
+
+			ZAxisMoveWorkCommand = new AsyncRelayCommand( ZAxisMoveWorkAsync, ZAxisCanMove );
+			ZAxisStopCommand = new RelayCommand( ZAxisStopMotion );
+
+			XAxisServoONCommand = new RelayCommand( ( ) => XAxizServoON() );
+			ZAxisServoONCommand = new RelayCommand( ( ) => ZAxizServoON() );
+			XAxisServoOFFCommand = new RelayCommand( ( ) => XAxizServoOFF() );
+			ZAxisServoOFFCommand = new RelayCommand( ( ) => ZAxizServoOFF() );
+
+			XAxisHomeCommand = new RelayCommand( ( ) => XAxisHome() );
+			ZAxisHomeCommand = new RelayCommand( ( ) => ZAxisHome() );
 
 			EjectONCommand = new RelayCommand( ( ) => EjectorManualON() );
 			EjectOFFCommand = new RelayCommand( ( ) => EjectorManualOFF() );
@@ -58,69 +79,134 @@ namespace DamoOneVision.ViewModels
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
 
 
+			_positionTimer = new DispatcherTimer();
+			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
+			_positionTimer.Tick += PositionTimer_Tick;
+			_positionTimer.Start();
+
+
 		}
 
-		public double WaitingPosition
+		public double XAxisWaitingPosition
 		{
-			get => _waitingPosition;
+			get => _xAxisWaitingPosition;
 			set
 			{
-				_waitingPosition = value;
-				OnPropertyChanged( nameof( WaitingPosition ) );
-				(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				_xAxisWaitingPosition = value;
+				OnPropertyChanged( nameof( XAxisWaitingPosition ) );
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
 		}
 
-		public double EndPosition
+		public double XAxisEndPosition
 		{
-			get => _endPosition;
+			get => _xAxisEndPosition;
 			set
 			{
-				_endPosition = value;
-				OnPropertyChanged( nameof( EndPosition ) );
-				(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				_xAxisEndPosition = value;
+				OnPropertyChanged( nameof( XAxisEndPosition ) );
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
 		}
 
-		public double CurrentPosition
+		public double XAxisCommandPosition
 		{
-			get => _currentPosition;
+			get => _xAxisCommandPosition;
 			set
 			{
-				_currentPosition = value;
-				OnPropertyChanged( nameof( CurrentPosition ) );
-				(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				_xAxisCommandPosition = value;
+				OnPropertyChanged( nameof( XAxisCommandPosition ) );
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
 		}
 
-		public double Velocity
+		public double XAxisVelocity
 		{
-			get => _velocity;
+			get => _xAxisVelocity;
 			set
 			{
-				_velocity = value;
-				OnPropertyChanged( nameof( Velocity ) );
-				(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				_xAxisVelocity = value;
+				OnPropertyChanged( nameof( XAxisVelocity ) );
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
 		}
 
-		public double Acceleration
+		public double XAxisAcceleration
 		{
-			get => _acceleration;
+			get => _xAxisAcceleration;
 			set
 			{
-				_acceleration = value;
-				OnPropertyChanged( nameof( Acceleration ) );
+				_xAxisAcceleration = value;
+				OnPropertyChanged( nameof( XAxisAcceleration ) );
 			}
 		}
 
-		public double Deceleration
+		public double XAxisDeceleration
 		{
-			get => _deceleration;
+			get => _xAxisDeceleration;
 			set
 			{
-				_deceleration = value;
-				OnPropertyChanged( nameof( Deceleration ) );
+				_xAxisDeceleration = value;
+				OnPropertyChanged( nameof( XAxisDeceleration ) );
+			}
+		}
+
+
+		public double ZAxisWorkPosition
+		{
+			get => _zAxisWorkPosition;
+			set
+			{
+				_zAxisWorkPosition = value;
+				OnPropertyChanged( nameof( ZAxisWorkPosition ) );
+				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			}
+		}
+
+
+		public double ZAxisCommandPosition
+		{
+			get => _zAxisCommandPosition;
+			set
+			{
+				_zAxisCommandPosition = value;
+				OnPropertyChanged( nameof( ZAxisCommandPosition ) );
+				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			}
+		}
+
+		public double ZAxisVelocity
+		{
+			get => _zAxisVelocity;
+			set
+			{
+				_zAxisVelocity = value;
+				OnPropertyChanged( nameof( ZAxisVelocity ) );
+				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			}
+		}
+
+		public double ZAxisAcceleration
+		{
+			get => _zAxisAcceleration;
+			set
+			{
+				_zAxisAcceleration = value;
+				OnPropertyChanged( nameof( ZAxisAcceleration ) );
+			}
+		}
+
+		public double ZAxisDeceleration
+		{
+			get => _zAxisDeceleration;
+			set
+			{
+				_zAxisDeceleration = value;
+				OnPropertyChanged( nameof( ZAxisDeceleration ) );
 			}
 		}
 
@@ -142,13 +228,30 @@ namespace DamoOneVision.ViewModels
 		public ICommand ZAxisJogStopCommand { get; }
 
 
-		public ICommand MoveCommand { get; }
-		public ICommand StopCommand { get; }
+		public ICommand XAxisMoveWaitCommand { get; }
+		public ICommand XAxisMoveEndCommand { get; }
+		public ICommand XAxisStopCommand { get; }
+		public ICommand ZAxisMoveWorkCommand { get; }
+		public ICommand ZAxisStopCommand { get; }
+
+		public ICommand XAxisServoONCommand { get; }
+		public ICommand ZAxisServoONCommand { get; }
+		public ICommand XAxisServoOFFCommand { get; }
+		public ICommand ZAxisServoOFFCommand { get; }
+
+		public ICommand XAxisHomeCommand { get; }
+		public ICommand ZAxisHomeCommand { get; }
 
 
-		private bool CanMove( )
+
+		private bool XAxisCanMove( )
 		{
-			return !_isMoving && Velocity > 0;
+			return !_xAxisIsMoving && XAxisVelocity > 0;
+		}
+
+		private bool ZAxisCanMove( )
+		{
+			return !_zAxisIsMoving && ZAxisVelocity > 0;
 		}
 
 
@@ -224,30 +327,105 @@ namespace DamoOneVision.ViewModels
 
 		private void ZAxisJogStop( )
 		{
-			_motionService.ZAxisJogStop();
+			_motionService.ZAxisStop();
 			// MouseUp 시 실행할 로직
 			// ex) CAXM.AxmMoveSStop(axisNo);
 		}
 
-		private async Task XAxisMoveToTargetAsync( )
+		private async Task XAxisMoveWaitAsync( )
 		{
-			_isMoving = true;
-			(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			await XAxisMoveToTargetAsync( XAxisWaitingPosition );
+		}
+
+		private async Task XAxisMoveEndAsync( )
+		{
+			await XAxisMoveToTargetAsync( XAxisEndPosition );
+		}
+
+		private async Task ZAxisMoveWorkAsync( )
+		{
+			await ZAxisMoveToTargetAsync( ZAxisWorkPosition );
+		}
+
+		private async Task XAxisMoveToTargetAsync( double TargetPosition )
+		{
+
+			_xAxisIsMoving = true;
+			(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 
 			try
 			{
-				await _motionService.XAxisMoveToPosition( _targetPosition, Velocity, Acceleration, Deceleration );
+				await _motionService.XAxisMoveToPosition( TargetPosition, XAxisVelocity, XAxisAcceleration, XAxisDeceleration );
 			}
 			finally
 			{
-				_isMoving = false;
-				(MoveCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				_xAxisIsMoving = false;
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
 		}
 
-		private void StopMotion( )
+		private async Task ZAxisMoveToTargetAsync( double TargetPosition )
+		{
+			_zAxisIsMoving = true;
+			(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+
+			try
+			{
+				await _motionService.ZAxisMoveToPosition( TargetPosition, ZAxisVelocity, ZAxisAcceleration, ZAxisDeceleration );
+			}
+			finally
+			{
+				_zAxisIsMoving = false;
+				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			}
+		}
+
+		private void XAxizServoON( )
+		{
+			_motionService.ServoOn( MotionService.X );
+		}
+
+		private void ZAxizServoON( )
+		{
+			_motionService.ServoOn( MotionService.Z );
+		}
+
+		private void XAxizServoOFF( )
+		{
+			_motionService.ServoOff( MotionService.X );
+		}
+
+		private void ZAxizServoOFF( )
+		{
+			_motionService.ServoOff( MotionService.Z );
+		}
+
+		private void XAxisHome( )
+		{
+			_motionService.XAxisHome();
+		}
+
+		private void ZAxisHome( )
+		{
+			_motionService.ZAxisHome();
+		}
+
+		private void XAxisStopMotion( )
 		{
 			_motionService.XAxisStop();
+		}
+
+		private void ZAxisStopMotion( )
+		{
+			_motionService.ZAxisStop();
+		}
+
+		private void PositionTimer_Tick( object? sender, EventArgs e )
+		{
+			XAxisCommandPosition = _motionService.XAxisGetCommandPosition();
+			ZAxisCommandPosition = _motionService.ZAxisGetCommandPosition();
 		}
 
 		protected void OnPropertyChanged( string propertyName )

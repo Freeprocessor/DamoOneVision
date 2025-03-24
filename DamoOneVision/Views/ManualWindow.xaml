@@ -11,7 +11,7 @@
 
     <Grid>
 
-        <Grid Margin="610,27,20,45">
+        <Grid Margin="610,27,20,392">
             <Button Content="Eject V/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectONCommand}" />
             <Button Content="Eject V/V&#xA;OFF Button" HorizontalAlignment="Left" Margin="128,19,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding EjectOFFCommand}"/>
             <Button Content="Main C/V&#xA;ON Button" HorizontalAlignment="Left" Margin="16,187,0,0" VerticalAlignment="Top" Height="60" Width="106" Command="{Binding MainCVOnCommand}"/>
@@ -28,19 +28,21 @@
                 <Grid>
                     <Label Content="X-Axis" HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
                     <Label Content="Servo X-Axis Command" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding CommandPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <TextBox Text="{Binding XAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
                     <Label Content="Servo X-Axis Feedback" HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding FeedbackPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                    <Label Content="Servo X-Axis Target" HorizontalAlignment="Left" Margin="10,84,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding TargetPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                    <Label Content="Servo X-Axis Acc" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding Decel, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                    <Label Content="Servo X-Axis Dec" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding Accel, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                    <Label Content="Servo X-Axis Speed" HorizontalAlignment="Left" Margin="10,153,0,0" VerticalAlignment="Top"/>
-                    <TextBox Text="{Binding Velocity, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
-                    <Label Content="Servo Z-Axis" HorizontalAlignment="Left" Margin="82,228,0,0" VerticalAlignment="Top"/>
-                    <Button Content="Move" HorizontalAlignment="Left" Margin="313,91,0,0" VerticalAlignment="Top" Height="37" Width="55" />
+                    <TextBox Text="{Binding XAxisFeedbackPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Waiting" HorizontalAlignment="Left" Margin="10,84,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis End" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Acc" HorizontalAlignment="Left" Margin="11,130,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding XAxisDeceleration, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Dec" HorizontalAlignment="Left" Margin="10,153,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding XAxisAcceleration, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo X-Axis Speed" HorizontalAlignment="Left" Margin="11,176,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding XAxisVelocity, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,180,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Button Content="Waiting Pos&#xA;Move" Command="{Binding XAxisMoveWaitCommand}" HorizontalAlignment="Left" Margin="300,91,0,0" VerticalAlignment="Top" Height="37" Width="68" />
+                    <Button Content="End Pos&#xA;Move" Command="{Binding XAxisMoveEndCommand}" HorizontalAlignment="Left" Margin="300,133,0,0" VerticalAlignment="Top" Height="37" Width="68" />
                     <Button Content="Jog +" HorizontalAlignment="Left" Margin="173,222,0,0" VerticalAlignment="Top" Height="37" Width="55" Focusable="False">
                         <!-- 라우트 이벤트에 대한 트리거들 -->
                         <i:Interaction.Triggers>
@@ -69,6 +71,63 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
+                    <Button Content="Servo ON" Command="{Binding XAxisServoONCommand}" HorizontalAlignment="Left" Margin="10,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+                    <Button Content="Servo OFF" Command="{Binding XAxisServoOFFCommand}" HorizontalAlignment="Left" Margin="79,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+                    <Button Content="Home" Command="{Binding XAxisHomeCommand}" HorizontalAlignment="Left" Margin="310,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid HorizontalAlignment="Left" Height="275" Margin="40,400,0,0" VerticalAlignment="Top" Width="380">
+            <Border BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Label Content="Z-Axis" HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Servo Z-Axis Command" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo Z-Axis Feedback" HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisFeedbackPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo Z-Axis Work" HorizontalAlignment="Left" Margin="10,84,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo Z-Axis Acc" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisDeceleration, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo Z-Axis Dec" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisAcceleration, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <Label Content="Servo Z-Axis Speed" HorizontalAlignment="Left" Margin="10,153,0,0" VerticalAlignment="Top"/>
+                    <TextBox Text="{Binding ZAxisVelocity, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="173,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+                    <Button Content="Work Pos&#xA;Move" Command="{Binding ZAxisMoveWorkCommand}" HorizontalAlignment="Left" Margin="300,91,0,0" VerticalAlignment="Top" Height="37" Width="68" />
+                    <Button Content="Jog +" HorizontalAlignment="Left" Margin="173,222,0,0" VerticalAlignment="Top" Height="37" Width="55" Focusable="False">
+                        <!-- 라우트 이벤트에 대한 트리거들 -->
+                        <i:Interaction.Triggers>
+                            <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <i:InvokeCommandAction Command="{Binding ZAxisJogPStartCommand}" />
+                            </i:EventTrigger>
+
+                            <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseUp">
+                                <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Content="Jog -" HorizontalAlignment="Left" Margin="238,222,0,0" VerticalAlignment="Top" Height="37" Width="55">
+                        <!-- 라우트 이벤트에 대한 트리거들 -->
+                        <i:Interaction.Triggers>
+                            <!-- 1) MouseDown 이벤트가 발생하면 JogPlusDownCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <i:InvokeCommandAction Command="{Binding ZAxisJogNStartCommand}" />
+                            </i:EventTrigger>
+
+                            <!-- 2) MouseUp 이벤트가 발생하면 JogPlusUpCommand 호출 -->
+                            <i:EventTrigger EventName="PreviewMouseUp">
+                                <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Content="Servo ON" Command="{Binding ZAxisServoONCommand}" HorizontalAlignment="Left" Margin="10,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+                    <Button Content="Servo OFF" Command="{Binding ZAxisServoOFFCommand}" HorizontalAlignment="Left" Margin="79,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+                    <Button Content="Home" Command="{Binding ZAxisHomeCommand}" HorizontalAlignment="Left" Margin="310,222,0,0" VerticalAlignment="Top" Height="37" Width="60" />
+
 
                 </Grid>
             </Border>

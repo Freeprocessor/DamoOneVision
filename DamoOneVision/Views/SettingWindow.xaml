@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="SettingWindow" Height="555" Width="1070">
     <Grid>
-        <Button x:Name="button" Content="Save" HorizontalAlignment="Left" Margin="735,404,0,0" VerticalAlignment="Top"  Width="55" Click="SaveButton_Click"/>
+        <Button x:Name="button" Content="Save" HorizontalAlignment="Left" Margin="735,404,0,0" VerticalAlignment="Top"  Width="55"/>
 
         <Grid Margin="10,10,740,269">
             <Border BorderBrush="Black" BorderThickness="1"  Margin="10,10,10,10" >

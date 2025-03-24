@@ -295,6 +295,8 @@ namespace DamoOneVision
 
 			_cameraService.Dispose();
 
+			_motionService.ReleaseLibrary();
+
 			///장비가 Stop 상태가 아니면 프로그램이 종료되지 않게 해야함
 
 			var tasks = new[]

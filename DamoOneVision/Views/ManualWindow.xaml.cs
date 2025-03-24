@@ -30,6 +30,7 @@ namespace DamoOneVision
 		private readonly MotionService _motionService;
 		private ManualViewModel _viewModel;
 
+
 		public ManualWindow( DeviceControlService deviceControlService, MotionService motionService )
         {
 			this._deviceControlService = deviceControlService;

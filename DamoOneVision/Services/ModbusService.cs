@@ -494,8 +494,8 @@ namespace DamoOneVision.Services
 							{
 								if (Application.Current.MainWindow is MainWindow mainWindow)
 								{
-									mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.White;
-									mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+									//mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.White;
+									//mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.Green;
 								}
 							} ) );
 						}
@@ -506,8 +506,8 @@ namespace DamoOneVision.Services
 							{
 								if (Application.Current.MainWindow is MainWindow mainWindow)
 								{
-									mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
-									mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.White;
+									//mainWindow.pcLifeBit.Fill = System.Windows.Media.Brushes.Green;
+									//mainWindow.plcLifeBit.Fill = System.Windows.Media.Brushes.White;
 								}
 							} ) );
 						}
