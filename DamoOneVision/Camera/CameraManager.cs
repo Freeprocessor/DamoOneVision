@@ -162,6 +162,11 @@ namespace DamoOneVision.Camera
 			return camera.LoadImage( MilSystem, filePath );
 		}
 
+		public void AutoFocus( )
+		{
+			camera.AutoFocus();
+		}
+
 		public void Dispose( )
 		{
 			if (camera is IDisposable disposableCamera)

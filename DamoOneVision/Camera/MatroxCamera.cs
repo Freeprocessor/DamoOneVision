@@ -454,6 +454,11 @@ namespace DamoOneVision.Camera
 			return MilImage;
 		}
 
+		public void AutoFocus( )
+		{
+			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_EXECUTE, "AutoFocus", MIL.M_DEFAULT );
+		}
+
 		public void Dispose( )
 		{
 			Disconnect( );

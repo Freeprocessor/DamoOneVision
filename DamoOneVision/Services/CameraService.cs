@@ -12,7 +12,7 @@ using System.Windows;
 
 namespace DamoOneVision.Services
 {
-	internal class CameraService : IDisposable
+	public class CameraService : IDisposable
 	{
 		/// <summary>
 		/// 열화상 Camera
@@ -149,6 +149,11 @@ namespace DamoOneVision.Services
 
 			SetBusy(false);
 			SetVisionConnected(false);
+		}
+
+		public void InfraredCameraAutoFocus( )
+		{
+			_infraredCamera.AutoFocus();
 		}
 
 		private void SetVisionConnected( bool connected )

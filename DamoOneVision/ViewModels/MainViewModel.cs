@@ -223,7 +223,7 @@ namespace DamoOneVision.ViewModels
 			//);
 
 
-			settingManager = new SettingManager();
+			settingManager = new SettingManager( deviceControlService );
 		}
 
 		private void OnCameraConnectedChanged( bool connected )

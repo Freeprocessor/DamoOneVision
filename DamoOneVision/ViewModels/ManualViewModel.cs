@@ -17,6 +17,7 @@ namespace DamoOneVision.ViewModels
 
 		private MotionService _motionService;
 		private DeviceControlService _deviceControlService;
+		private CameraService _cameraService;
 
 		private double _xAxisWaitingPosition;
 		private double _xAxisEndPosition;
@@ -33,6 +34,10 @@ namespace DamoOneVision.ViewModels
 		private double _zAxisDeceleration = 0.5; // 기본 감속도
 		private bool _zAxisIsMoving;
 
+		private double _conveyorSpeed;
+
+
+
 		private readonly DispatcherTimer _positionTimer;
 
 		/// <summary>
@@ -42,13 +47,14 @@ namespace DamoOneVision.ViewModels
 
 
 
-		public ManualViewModel( DeviceControlService deviceControlService, MotionService motionService )
+		public ManualViewModel( DeviceControlService deviceControlService, MotionService motionService, CameraService cameraService )
 		{
 			_deviceControlService = deviceControlService;
 			_motionService = motionService;
+			_cameraService = cameraService;
 
-			XAxisJogPStartCommand = new RelayCommand( () => XAxisJogPStart() );
-			XAxisJogNStartCommand = new RelayCommand( () => XAxisJogNStart() );
+			XAxisJogPStartCommand = new RelayCommand( ( ) => XAxisJogPStart() );
+			XAxisJogNStartCommand = new RelayCommand( ( ) => XAxisJogNStart() );
 			XAxisJogStopCommand = new RelayCommand( ( ) => XAxisJogStop() );
 			ZAxisJogPStartCommand = new RelayCommand( ( ) => ZAxisJogPStart() );
 			ZAxisJogNStartCommand = new RelayCommand( ( ) => ZAxisJogNStart() );
@@ -77,6 +83,8 @@ namespace DamoOneVision.ViewModels
 			TowerLampStartCommand = new RelayCommand( ( ) => TowerLampStart() );
 			TowerLampStopCommand = new RelayCommand( ( ) => TowerLampStop() );
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
+
+			AutoFocusCommand = new RelayCommand( ( ) => AutoFocus() );
 
 
 			_positionTimer = new DispatcherTimer();
@@ -210,6 +218,17 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		public double ConveyorSpeed
+		{
+			get => _conveyorSpeed;
+			set
+			{
+				_conveyorSpeed = value;
+				OnPropertyChanged( nameof( ConveyorSpeed ) );
+			}
+		}
+
+
 		public ICommand EjectONCommand { get; }
 		public ICommand EjectOFFCommand { get; }
 		public ICommand MainCVOnCommand { get; }
@@ -241,6 +260,7 @@ namespace DamoOneVision.ViewModels
 
 		public ICommand XAxisHomeCommand { get; }
 		public ICommand ZAxisHomeCommand { get; }
+		public ICommand AutoFocusCommand { get; }
 
 
 
@@ -383,22 +403,22 @@ namespace DamoOneVision.ViewModels
 
 		private void XAxizServoON( )
 		{
-			_motionService.ServoOn( MotionService.X );
+			_motionService.XAxisServoOn( );
 		}
 
 		private void ZAxizServoON( )
 		{
-			_motionService.ServoOn( MotionService.Z );
+			_motionService.ZAxisServoOn( );
 		}
 
 		private void XAxizServoOFF( )
 		{
-			_motionService.ServoOff( MotionService.X );
+			_motionService.XAxisServoOff();
 		}
 
 		private void ZAxizServoOFF( )
 		{
-			_motionService.ServoOff( MotionService.Z );
+			_motionService.ZAxisServoOff();
 		}
 
 		private void XAxisHome( )
@@ -421,10 +441,17 @@ namespace DamoOneVision.ViewModels
 			_motionService.ZAxisStop();
 		}
 
+		private void AutoFocus( )
+		{
+			_cameraService.InfraredCameraAutoFocus();
+		}
+
+
 		private void PositionTimer_Tick( object? sender, EventArgs e )
 		{
 			XAxisCommandPosition = _motionService.XAxisGetCommandPosition();
 			ZAxisCommandPosition = _motionService.ZAxisGetCommandPosition();
+			ConveyorSpeed = _motionService.GetConveyorSpeed();
 		}
 
 		protected void OnPropertyChanged( string propertyName )

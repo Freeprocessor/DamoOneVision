@@ -23,6 +23,7 @@
 
         </Grid>
 
+
         <Grid HorizontalAlignment="Left" Height="275" Margin="40,27,0,0" VerticalAlignment="Top" Width="380">
             <Border BorderBrush="Black" BorderThickness="1">
                 <Grid>
@@ -132,6 +133,9 @@
                 </Grid>
             </Border>
         </Grid>
+        <Label Content="ConveyorSpeed : " HorizontalAlignment="Left" Margin="456,611,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="567,611,0,0" Width="100" Height="26" VerticalAlignment="Top"/>
+        <Button Content="Camera&#xA;Auto Focus" HorizontalAlignment="Left" Margin="839,529,0,0" VerticalAlignment="Top" Height="60" Width="106"  Command="{Binding AutoFocusCommand}"/>
 
     </Grid>
 </Window>

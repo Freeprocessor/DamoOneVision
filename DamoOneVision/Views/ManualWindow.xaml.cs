@@ -28,15 +28,16 @@ namespace DamoOneVision
     {
 		private readonly DeviceControlService _deviceControlService;
 		private readonly MotionService _motionService;
+		private readonly CameraService _cameraService;
 		private ManualViewModel _viewModel;
 
 
-		public ManualWindow( DeviceControlService deviceControlService, MotionService motionService )
+		public ManualWindow( DeviceControlService deviceControlService, MotionService motionService, CameraService cameraService )
         {
 			this._deviceControlService = deviceControlService;
 			this._motionService = motionService;
 			InitializeComponent();
-			_viewModel = new ManualViewModel( deviceControlService, motionService );
+			_viewModel = new ManualViewModel( deviceControlService, motionService, cameraService );
 
 			this.DataContext = _viewModel;
 		}

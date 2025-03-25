@@ -250,7 +250,7 @@ namespace DamoOneVision
 			//ManualWindow manualWindow = new ManualWindow( _modbus );
 			//manualWindow.ShowDialog();
 
-			ManualWindow manualWindow = new ManualWindow( _deviceControlService, _motionService );
+			ManualWindow manualWindow = new ManualWindow( _deviceControlService, _motionService, _cameraService );
 			manualWindow.ShowDialog();
 
 		}

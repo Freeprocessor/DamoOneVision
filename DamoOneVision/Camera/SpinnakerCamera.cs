@@ -215,6 +215,11 @@ namespace DamoOneVision.Camera
 			return MilImage;
 		}
 
+		public void AutoFocus( )
+		{
+
+		}
+
 
 	}
 }

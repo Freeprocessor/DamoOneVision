@@ -17,6 +17,8 @@ namespace DamoOneVision.Camera
 
 		MIL_ID ReciveImage( );
 
+		void AutoFocus( );
+
 		MIL_INT Width { get; set; }
 
 		MIL_INT Height { get; set; }
