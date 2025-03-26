@@ -124,6 +124,7 @@ namespace DamoOneVision.Services
 			}
 			finally
 			{
+				//_infraredCamera.AutoFocus();
 				SetBusy(false);
 			}
 		}
@@ -155,6 +156,13 @@ namespace DamoOneVision.Services
 		{
 			_infraredCamera.AutoFocus();
 		}
+
+		public void InfraredCameraManualFocus( )
+		{
+			_infraredCamera.ManualFocus();
+		}
+
+
 
 		private void SetVisionConnected( bool connected )
 		{

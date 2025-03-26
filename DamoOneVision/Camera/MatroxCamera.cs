@@ -457,6 +457,15 @@ namespace DamoOneVision.Camera
 		public void AutoFocus( )
 		{
 			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_EXECUTE, "AutoFocus", MIL.M_DEFAULT );
+			//ManualFocus();
+			Logger.WriteLine( $"{CameraName} AutoFocus" );
+		}
+
+		public void ManualFocus(double focusValue )
+		{
+			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance", MIL.M_TYPE_DOUBLE, ref focusValue );
+
+			Logger.WriteLine( $"{CameraName} ManualFocus" );
 		}
 
 		public void Dispose( )

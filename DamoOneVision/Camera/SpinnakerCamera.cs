@@ -219,6 +219,10 @@ namespace DamoOneVision.Camera
 		{
 
 		}
+		public void ManualFocus( double focusValue )
+		{
+
+		}
 
 
 	}

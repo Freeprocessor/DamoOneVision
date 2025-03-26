@@ -226,19 +226,19 @@ namespace DamoOneVision
 			sideCamera1Display.DisplayId = _sideCamera1Display;
 			sideCamera1ConversionDisplay.DisplayId = _sideCamera1ConversionDisplay;
 
-			mainSideCamera1Display.DisplayId = _sideCamera1Display;
+			//mainSideCamera1Display.DisplayId = _sideCamera1Display;
 			//mainSideCamera1ConversionDisplay.DisplayId = MainSideCamera1ConversionDisplay;
 
 			sideCamera2Display.DisplayId = _sideCamera2Display;
 			sideCamera2ConversionDisplay.DisplayId = _sideCamera2ConversionDisplay;
 
-			mainSideCamera2Display.DisplayId = _sideCamera2Display;
+			//mainSideCamera2Display.DisplayId = _sideCamera2Display;
 			//mainSideCamera2ConversionDisplay.DisplayId = MainSideCamera2ConversionDisplay;
 
 			sideCamera3Display.DisplayId = _sideCamera3Display;
 			sideCamera3ConversionDisplay.DisplayId = _sideCamera3ConversionDisplay;
 
-			mainSideCamera3Display.DisplayId = _sideCamera3Display;
+			//mainSideCamera3Display.DisplayId = _sideCamera3Display;
 			//mainSideCamera3ConversionDisplay.DisplayId = MainSideCamera3ConversionDisplay;
 
 		}
@@ -340,10 +340,10 @@ namespace DamoOneVision
 				sideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
 			}
 
-			if (mainSideCamera1Display != null)
-			{
-				mainSideCamera1Display.DisplayId = MIL.M_NULL;
-			}
+			//if (mainSideCamera1Display != null)
+			//{
+			//	mainSideCamera1Display.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera1ConversionDisplay != null)
 			//{
@@ -360,10 +360,10 @@ namespace DamoOneVision
 				sideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
 			}
 
-			if (mainSideCamera2Display != null)
-			{
-				mainSideCamera2Display.DisplayId = MIL.M_NULL;
-			}
+			//if (mainSideCamera2Display != null)
+			//{
+			//	mainSideCamera2Display.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera2ConversionDisplay != null)
 			//{
@@ -380,10 +380,10 @@ namespace DamoOneVision
 				sideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
 			}
 
-			if (mainSideCamera3Display != null)
-			{
-				mainSideCamera3Display.DisplayId = MIL.M_NULL;
-			}
+			//if (mainSideCamera3Display != null)
+			//{
+			//	mainSideCamera3Display.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera3ConversionDisplay != null)
 			//{
@@ -505,7 +505,7 @@ namespace DamoOneVision
 			//	_sideCamera3ConversionImage = MIL.M_NULL;
 			//	Logger.WriteLine( "_sideCamera3ConversionImage 해제 완료." );
 			//}
-
+			await Task.Delay( 100 );
 			Logger.Shutdown();
 
 			Application.Current.Shutdown();

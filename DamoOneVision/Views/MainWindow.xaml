@@ -214,7 +214,7 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
 
                 <TabItem Header="Main" Margin="0,0,0,0" Height="30">
                     <Grid>
-                        <Grid.ColumnDefinitions>
+                        <!--<Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
 
@@ -223,12 +223,12 @@ ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
 
-                        </Grid.RowDefinitions>
+                        </Grid.RowDefinitions>-->
 
                         <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" Margin="0,0,0,0"/>
-                        <milwpf:MILWPFDisplay x:Name="mainSideCamera1Display" Grid.Column="1" Margin="0,0,0,0"/>
+                        <!--<milwpf:MILWPFDisplay x:Name="mainSideCamera1Display" Grid.Column="1" Margin="0,0,0,0"/>
                         <milwpf:MILWPFDisplay x:Name="mainSideCamera2Display" Margin="0,0,0,0" Grid.Row="1"/>
-                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3Display" Grid.Column="2" Margin="0,0,0,0" Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1"/>
+                        <milwpf:MILWPFDisplay x:Name="mainSideCamera3Display" Grid.Column="2" Margin="0,0,0,0" Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1"/>-->
 
 
                     </Grid>

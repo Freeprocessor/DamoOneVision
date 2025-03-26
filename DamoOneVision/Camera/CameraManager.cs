@@ -59,6 +59,7 @@ namespace DamoOneVision.Camera
 				{
 					//cts = new CancellationTokenSource();
 					//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
+					camera.ManualFocus( 0.21140 );
 					IsConnected = true;
 
 				}
@@ -165,6 +166,11 @@ namespace DamoOneVision.Camera
 		public void AutoFocus( )
 		{
 			camera.AutoFocus();
+		}
+
+		public void ManualFocus( double focusValue = 0.21140 )
+		{
+			camera.ManualFocus( focusValue );
 		}
 
 		public void Dispose( )

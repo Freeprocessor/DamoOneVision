@@ -19,6 +19,8 @@ namespace DamoOneVision.Camera
 
 		void AutoFocus( );
 
+		void ManualFocus( double focusValue );
+
 		MIL_INT Width { get; set; }
 
 		MIL_INT Height { get; set; }

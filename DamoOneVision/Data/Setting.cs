@@ -115,7 +115,7 @@ namespace DamoOneVision.Data
 					XAxisOriginSensor = 1,
 					XAxisOriginUseZPhase = 0,
 					XAxisOriginDelay = 1000.0,
-					XAxisOriginOffset = 0.0,
+					XAxisOriginOffset = 2000.0,
 
 					XAxisOriginSpeed1 = 10000.0,
 					XAxisOriginSpeed2 = 5000.0,
@@ -125,7 +125,8 @@ namespace DamoOneVision.Data
 					XAxisOriginDeceleration = 0.1,
 
 
-					ZAxisWorkPostion = 50000.0,
+					ZAxisWorkPostion = 43000.0,
+					ZAxisEndPostion = 130000.0,
 					ZAxisSpeed = 20000.0,
 					ZAxisAcceleration = 0.1,
 					ZAxisDeceleration = 0.1,
@@ -135,7 +136,7 @@ namespace DamoOneVision.Data
 
 					ZAxisOriginDirection = 0,
 					ZAxisOriginSensor = 1,
-					ZAxisOriginUseZPhase = 0,
+					ZAxisOriginUseZPhase = 1,
 					ZAxisOriginDelay = 1000.0,
 					ZAxisOriginOffset = 0.0,
 

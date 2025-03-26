@@ -205,12 +205,24 @@ namespace DamoOneVision.ViewModels
 			MachineStartCommand = new AsyncRelayCommand(
 				async _ => await Task.Run(async()=>{
 					await _cameraService.ConnectAction();
+					_deviceControlService.ConveyorReadStart();
+					//await _deviceControlService.ZAxisMoveEndPos();
+					//Logger.WriteLine( "Camera AutoFocus Start" );
+					//_cameraService.InfraredCameraAutoFocus();
+					//await Task.Delay( 5000 );
+					//Logger.WriteLine( "Camera AutoFocus End" );
+					//_cameraService.InfraredCameraManualFocus();
+					await _deviceControlService.ZAxisMoveWorkPos();
 					await _deviceControlService.MachineStartAction();
-			} )
+
+				} )
 			);
 
 			MachineStopCommand = new AsyncRelayCommand(
-				async _ => await _deviceControlService.MachineStopAction()
+				async _ => await Task.Run( async ( ) => {
+					await _deviceControlService.MachineStopAction();
+					_deviceControlService.ConveyorReadStop();
+				} )
 			);
 
 			VisionTriggerCommand = new AsyncRelayCommand(

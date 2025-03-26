@@ -446,6 +446,11 @@ namespace DamoOneVision.ViewModels
 			_cameraService.InfraredCameraAutoFocus();
 		}
 
+		private void ManualFocus( )
+		{
+			_cameraService.InfraredCameraManualFocus();
+		}
+
 
 		private void PositionTimer_Tick( object? sender, EventArgs e )
 		{

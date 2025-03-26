@@ -36,6 +36,7 @@ namespace DamoOneVision.Models
 
 
 		public double ZAxisWorkPostion { get; set; }
+		public double ZAxisEndPostion { get; set; }
 		public double ZAxisSpeed { get; set; }
 		public double ZAxisAcceleration { get; set; }
 		public double ZAxisDeceleration { get; set; }

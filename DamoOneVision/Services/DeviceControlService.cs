@@ -55,6 +55,16 @@ namespace DamoOneVision.Services
 
 		}
 
+		public void ConveyorReadStart( )
+		{
+			_motionService.ConveyorReadStart();
+		}
+
+		public void ConveyorReadStop( )
+		{
+			_motionService.ConveyorReadStop();
+		}
+
 		public void Connect( )
 		{
 			//_modbus.ConnectAsync();
@@ -168,6 +178,16 @@ namespace DamoOneVision.Services
 			_motionService.SetModel( motionModel );
 		}
 
+		public async Task ZAxisMoveWorkPos( )
+		{
+			await _motionService.ZAxisMoveWorkPos();
+		}
+
+		public async Task ZAxisMoveEndPos( )
+		{
+			await _motionService.ZAxisMoveEndPos();
+		}
+
 		/// <summary>
 		/// Advantech Card Trigger(DI0) Read Start Async
 		/// </summary>
@@ -208,6 +228,7 @@ namespace DamoOneVision.Services
 						}
 						//modbus.WriteSingleCoil( 0, 0x06, false );
 						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
+						while (_advantechCard.ReadCoil[ VISIONTRIGGER1 ]) ;
 					}
 
 				}

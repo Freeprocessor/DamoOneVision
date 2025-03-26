@@ -33,7 +33,7 @@ namespace DamoOneVision.Services
 		const int ALARMRESET = 1;
 		const int SERVOBREAK = 2;
 
-		public int CameraDelay;
+		public int CameraDelay { get; set; }
 
 		private double _lastPosition = 0;
 		private DateTime _lastTime = DateTime.Now;
@@ -56,19 +56,31 @@ namespace DamoOneVision.Services
 			//motionModel.XAxisReturnSpeed = 100000;
 			//motionModel.XAxisAcceleration = 0.1;
 			//motionModel.XAxisDeceleration = 0.1;
-			//CameraDelay = (int)(_motionModel.XAxisAcceleration*1000.0*5.0);
+			
 			InitLibrary();
 			_positionTimer = new DispatcherTimer();
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
 			_positionTimer.Tick += PositionTimer_Tick;
-			_positionTimer.Start();
+			
 
+		}
+
+		public void ConveyorReadStart( )
+		{
+			_lastTime = DateTime.Now;
+			_positionTimer.Start();
+		}
+
+		public void ConveyorReadStop( )
+		{
+			_positionTimer.Stop();
 		}
 
 		public void SetModel(MotionModel motionModel )
 		{
 			_motionModel = motionModel;
 
+			CameraDelay = (int) (_motionModel.XAxisAcceleration * 1000.0 * 1.0);
 			XAxisServoOn();
 			ZAxisServoOn();
 
@@ -267,6 +279,12 @@ namespace DamoOneVision.Services
 			await ZAxisWaitingStop();
 		}
 
+		public async Task ZAxisMoveEndPos( )
+		{
+			await ZAxisMoveToPosition( _motionModel.ZAxisEndPostion, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
+			await ZAxisWaitingStop();
+		}
+
 		public async Task XAxisWaitingStop( )
 		{
 			uint upStatus = 0;
@@ -331,13 +349,17 @@ namespace DamoOneVision.Services
 
 			// 상태 갱신
 			_lastTime = now;
-			_lastPosition = currentPulse;
+			_lastPosition = 0; // 다음 계산을 위해 기준값 0으로 고정
+
+			// 💡 위치를 0으로 초기화 (커맨드/액츄얼 모두)
+			CAXM.AxmStatusSetPosMatch( axisNo, 0.0 );
 
 			speedMmPerSec = Math.Round( speedMmPerSec, 2 );
 			speedMmPerSec = Math.Abs( speedMmPerSec );
-			//Logger.WriteLine( $"Speed: {speedMmPerSec} mm/s" );
+			
 
 			ConveyorSpeed = speedMmPerSec;
+			//Logger.WriteLine( $"Speed: {ConveyorSpeed} mm/s" );
 			return speedMmPerSec;
 		}
 
