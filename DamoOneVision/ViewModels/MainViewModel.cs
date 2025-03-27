@@ -413,10 +413,6 @@ namespace DamoOneVision.ViewModels
 		/// <summary>
 		/// 현재 시간을 1초마다 업데이트
 		/// </summary>
-		public async void StartClockAsync( )
-		{
-			//시계 중지 플래그 초기화
-			_stopClock = false;
 
 			await Task.Run( ( ) =>
 			{
