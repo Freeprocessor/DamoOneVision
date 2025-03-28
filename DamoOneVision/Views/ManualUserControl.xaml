@@ -410,9 +410,22 @@
                         <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" 
                                VerticalAlignment="Center"
                                Width="100" />
+
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- 4) ConveyorSpeed, Camera Auto Focus 등 -->
+                <materialDesign:Card Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button Content="Camera&#x0A;Manual Focus"
+                                Margin="0,0,0,0"
+                                Height="50" Width="120"
+                                Style="{DynamicResource MaterialDesignRaisedButton}"
+                                Command="{Binding AutoFocusCommand}"/>
+                        
                         <Button Content="Camera&#x0A;Auto Focus"
                                 Margin="20,0,0,0"
-                                Height="50" Width="110"
+                                Height="50" Width="120"
                                 Style="{DynamicResource MaterialDesignRaisedButton}"
                                 Command="{Binding AutoFocusCommand}"/>
                     </StackPanel>

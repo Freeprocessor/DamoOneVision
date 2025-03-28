@@ -37,57 +37,6 @@ namespace DamoOneVision
 	{
 		//private ICamera camera;
 		//private TemplateMatcher templateMatcher;
-		/// <summary>
-		/// 열화상 Camera
-		/// </summary>
-		private CameraManager _infraredCamera;
-		/// <summary>
-		/// 측면 1 Camera
-		/// </summary>
-		private CameraManager _sideCamera1;
-		/// <summary>
-		/// 측면 2 Camera
-		/// </summary>
-		private CameraManager _sideCamera2;
-		/// <summary>
-		/// 측면	3 Camera	
-		/// </summary>
-		private CameraManager _sideCamera3;
-
-		/// <summary>
-		/// Modbus 서비스
-		/// </summary>
-		private ModbusService _modbus;
-
-		private MotionService _motionService;
-
-		/// <summary>
-		/// Advantech 카드 서비스
-		/// </summary>
-		private AdvantechCardService _advantechCard;
-
-
-		/// <summary>
-		/// Device Control Service
-		/// </summary>
-		private DeviceControlService _deviceControlService;
-
-		private CameraService _cameraService;
-
-
-		private MIL_ID MilSystem = MIL.M_NULL;
-
-		private MIL_ID _infraredCameraDisplay;
-		private MIL_ID _infraredCameraConversionDisplay;
-
-		private MIL_ID _sideCamera1Display;
-		private MIL_ID _sideCamera1ConversionDisplay;
-
-		private MIL_ID _sideCamera2Display;
-		private MIL_ID _sideCamera2ConversionDisplay;
-
-		private MIL_ID _sideCamera3Display;
-		private MIL_ID _sideCamera3ConversionDisplay;
 
 		//private MIL_ID _infraredCameraImage;
 		//private MIL_ID _infraredCameraConversionImage;
@@ -111,40 +60,27 @@ namespace DamoOneVision
 
 		private ManualUserControl _manualUserControl;
 
+		private readonly MilSystemService _milSystemService;
 
 
 
-		public MainWindow( )
+
+		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, MilSystemService milSystemService )
 		{
 			InitializeComponent();
 
-			_modbus = new ModbusService( "192.168.2.100", 502 );
 
-			_motionService = new MotionService();
-
-			_advantechCard = new AdvantechCardService( "192.168.2.20", 502 );
-
-			_deviceControlService = new DeviceControlService( _modbus, _advantechCard, _motionService);
-
-			_infraredCamera = new CameraManager( "Matrox", "InfraredCamera" );
-			_sideCamera1 = new CameraManager( "Matrox", "SideCamera1" );
-			_sideCamera2 = new CameraManager( "Matrox", "SideCamera2" );
-			_sideCamera3 = new CameraManager( "Matrox", "SideCamera3" );
-
-			InitMILSystem();
-
-			_cameraService = new CameraService( _infraredCamera, _sideCamera1, _sideCamera2, _sideCamera3, 
-				_infraredCameraDisplay, _sideCamera1Display, _sideCamera2Display, _sideCamera3Display);
-
-
-			/// ViewModel 생성
-			_mainViewModel = new MainViewModel( _deviceControlService, _cameraService );
-			_manualViewModel = new ManualViewModel(_deviceControlService, _motionService, _cameraService );
-
-
+			_mainViewModel = mainViewModel;
+			_manualViewModel = manualViewModel;
 
 			/// ViewModel을 DataContext로 설정
 			this.DataContext = _mainViewModel;
+
+			_milSystemService = milSystemService;
+
+
+			InitMILDisplay();
+
 
 			_mainUserControl = new MainUserControl( _mainViewModel );
 
@@ -188,62 +124,13 @@ namespace DamoOneVision
 		}
 
 
-		private void InitMILSystem()
+		private void InitMILDisplay()
 		{
-			MilSystem = MILContext.Instance.MilSystem;
 
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _infraredCameraDisplay );
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _infraredCameraConversionDisplay );
+			infraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
+			infraredCameraConversionDisplay.DisplayId = _milSystemService.InfraredConversionDisplay;
 
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera1Display );
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera1ConversionDisplay );
-
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera2Display );
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera2ConversionDisplay );
-
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera3Display );
-			MIL.MdispAlloc( MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WPF, ref _sideCamera3ConversionDisplay );
-
-			MIL.MdispControl( _infraredCameraDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _infraredCameraDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _infraredCameraDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _infraredCameraConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _infraredCameraConversionDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _infraredCameraConversionDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera1Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera1Display, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera1Display, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera1ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera1ConversionDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera1ConversionDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera2Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera2Display, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera2Display, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera2ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera2ConversionDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera2ConversionDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera3Display, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera3Display, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera3Display, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-			MIL.MdispControl( _sideCamera3ConversionDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
-			MIL.MdispControl( _sideCamera3ConversionDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
-			MIL.MdispControl( _sideCamera3ConversionDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
-
-
-			/// 컬러맵 설정은 필요에 따라 변경 가능
-			MIL.MdispLut( _infraredCameraDisplay, MIL.M_COLORMAP_JET );
-
-			infraredCameraDisplay.DisplayId = _infraredCameraDisplay;
-			infraredCameraConversionDisplay.DisplayId = _infraredCameraConversionDisplay;
-
-			mainInfraredCameraDisplay.DisplayId = _infraredCameraDisplay;
+			mainInfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
 			//mainInfraredCameraConversionDisplay.DisplayId = MainInfraredCameraConversionDisplay;
 
 			//sideCamera1Display.DisplayId = _sideCamera1Display;
@@ -306,228 +193,13 @@ namespace DamoOneVision
 			base.OnClosed( e );
 
 			// MILContext 해제
-			MILContext.Instance.Dispose();
+			
 		}
 
 
 		private async void ExitProgram( object sender, EventArgs e )
 		{
-
-			_cameraService.Dispose();
-
-			_motionService.ReleaseLibrary();
-
-			///장비가 Stop 상태가 아니면 프로그램이 종료되지 않게 해야함
-
-			var tasks = new[]
-				{
-					_infraredCamera.DisconnectAsync(),
-					_sideCamera1.DisconnectAsync(),
-					_sideCamera2.DisconnectAsync(),
-					_sideCamera3.DisconnectAsync()
-				};
-
-			await Task.WhenAll( tasks );
-
-			// 1. UI 요소의 DisplayId를 MIL.M_NULL로 설정하여 참조 해제
-			if (infraredCameraDisplay != null)
-			{
-				infraredCameraDisplay.DisplayId = MIL.M_NULL;
-			}
-
-			if (infraredCameraConversionDisplay != null)
-			{
-				infraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
-			}
-
-			if (mainInfraredCameraDisplay != null)
-			{
-				mainInfraredCameraDisplay.DisplayId = MIL.M_NULL;
-			}
-
-			//if (mainInfraredCameraConversionDisplay != null)
-			//{
-			//	mainInfraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera1Display != null)
-			//{
-			//	sideCamera1Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera1ConversionDisplay != null)
-			//{
-			//	sideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera1Display != null)
-			//{
-			//	mainSideCamera1Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera1ConversionDisplay != null)
-			//{
-			//	mainSideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera2Display != null)
-			//{
-			//	sideCamera2Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera2ConversionDisplay != null)
-			//{
-			//	sideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera2Display != null)
-			//{
-			//	mainSideCamera2Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera2ConversionDisplay != null)
-			//{
-			//	mainSideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera3Display != null)
-			//{
-			//	sideCamera3Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (sideCamera3ConversionDisplay != null)
-			//{
-			//	sideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera3Display != null)
-			//{
-			//	mainSideCamera3Display.DisplayId = MIL.M_NULL;
-			//}
-
-			//if (mainSideCamera3ConversionDisplay != null)
-			//{
-			//	mainSideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
-			//}
-
-			// 2. disp 버퍼 해제
-			if (_infraredCameraDisplay != MIL.M_NULL)
-			{
-				MIL.MdispFree( _infraredCameraDisplay );
-				_infraredCameraDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_infraredCameraDisplay 해제 완료." );
-			}
-
-			if (_infraredCameraConversionDisplay != MIL.M_NULL)
-			{
-				MIL.MdispFree( _infraredCameraConversionDisplay );
-				_infraredCameraConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_infraredCameraConversionDisplay 해제 완료." );
-			}
-
-			if (_sideCamera1Display != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera1Display );
-				_sideCamera1Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera1Display 해제 완료." );
-			}
-
-			if (_sideCamera1ConversionDisplay != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera1ConversionDisplay );
-				_sideCamera1ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera1ConversionDisplay 해제 완료." );
-			}
-
-			if (_sideCamera2Display != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera2Display );
-				_sideCamera2Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera2Display 해제 완료." );
-			}
-
-			if (_sideCamera2ConversionDisplay != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera2ConversionDisplay );
-				_sideCamera2ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera2ConversionDisplay 해제 완료." );
-			}
-
-			if (_sideCamera3Display != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera3Display );
-				_sideCamera3Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera3Display 해제 완료." );
-			}
-
-			if (_sideCamera3ConversionDisplay != MIL.M_NULL)
-			{
-				MIL.MdispFree( _sideCamera3ConversionDisplay );
-				_sideCamera3ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera3ConversionDisplay 해제 완료." );
-			}
-
-			/// 어떻게 이미지를 해제할 것인지?
-			/// 
-			//3.이미지 버퍼 해제
-			//if (_infraredCameraImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _infraredCameraImage );
-			//	_infraredCameraImage = MIL.M_NULL;
-			//	Logger.WriteLine( "_infraredCameraImage 해제 완료." );
-			//}
-
-			//if (_infraredCameraConversionImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _infraredCameraConversionImage );
-			//	_infraredCameraConversionImage = MIL.M_NULL;
-			//	Logger.WriteLine( "_infraredCameraConversionImage 해제 완료." );
-			//}
-
-			//if (_sideCamera1Image != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera1Image );
-			//	_sideCamera1Image = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera1Image 해제 완료." );
-			//}
-
-			//if (_sideCamera1ConversionImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera1ConversionImage );
-			//	_sideCamera1ConversionImage = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera1ConversionImage 해제 완료." );
-			//}
-
-			//if (_sideCamera2Image != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera2Image );
-			//	_sideCamera2Image = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera2Image 해제 완료." );
-			//}
-
-			//if (_sideCamera2ConversionImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera2ConversionImage );
-			//	_sideCamera2ConversionImage = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera2ConversionImage 해제 완료." );
-			//}
-
-			//if (_sideCamera3Image != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera3Image );
-			//	_sideCamera3Image = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera3Image 해제 완료." );
-			//}
-
-			//if (_sideCamera3ConversionImage != MIL.M_NULL)
-			//{
-			//	MIL.MbufFree( _sideCamera3ConversionImage );
-			//	_sideCamera3ConversionImage = MIL.M_NULL;
-			//	Logger.WriteLine( "_sideCamera3ConversionImage 해제 완료." );
-			//}
-			await Task.Delay( 100 );
-			Logger.Shutdown();
-
+			await Task.Delay( 1 );
 			Application.Current.Shutdown();
 		}
 

@@ -80,7 +80,7 @@ namespace DamoOneVision.Services
 		{
 			_motionModel = motionModel;
 
-			CameraDelay = (int) (_motionModel.XAxisAcceleration * 1000.0 * 1.0);
+			CameraDelay = (int) (_motionModel.XAxisAcceleration * 1000.0 * 5 );
 			XAxisServoOn();
 			ZAxisServoOn();
 
@@ -262,7 +262,7 @@ namespace DamoOneVision.Services
 
 		public async Task XAxisMoveWaitPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, _motionModel.XAxisAcceleration, _motionModel.XAxisDeceleration );
+			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, 0.05, 0.05 );
 			await XAxisWaitingStop();
 		}
 

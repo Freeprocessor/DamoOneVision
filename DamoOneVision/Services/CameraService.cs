@@ -206,6 +206,7 @@ namespace DamoOneVision.Services
 						};
 						await Task.WhenAll( tasks );
 						Logger.WriteLine( "카메라 이미지 캡처 완료" );
+						//Logger.WriteLine( $"Test: {TectTime.ElapsedMilliseconds}ms" );
 					}
 					catch (Exception ex)
 					{
@@ -218,6 +219,7 @@ namespace DamoOneVision.Services
 					MIL.MdispSelect( _sideCamera1Display, _sideCamera1.ReciveImage() );
 					MIL.MdispSelect( _sideCamera2Display, _sideCamera2.ReciveImage() );
 					MIL.MdispSelect( _sideCamera3Display, _sideCamera3.ReciveImage() );
+					//Logger.WriteLine( $"Test2: {TectTime.ElapsedMilliseconds}ms" );
 
 
 					//try
@@ -285,9 +287,6 @@ namespace DamoOneVision.Services
 			} );
 			TectTime.Stop();
 			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
-
-
-
 
 		}
 		public void Dispose( )

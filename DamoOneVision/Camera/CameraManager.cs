@@ -35,7 +35,7 @@ namespace DamoOneVision.Camera
 		public async Task ConnectAsync( )
 		{
 
-			await Task.Run( ( ) =>
+			await Task.Run( async ( ) =>
 			{
 				if (_library == "Matrox")
 				{
@@ -59,6 +59,7 @@ namespace DamoOneVision.Camera
 				{
 					//cts = new CancellationTokenSource();
 					//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
+					await Task.Delay( 1000 );
 					camera.ManualFocus( 0.21140 );
 					IsConnected = true;
 
