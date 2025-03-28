@@ -1,33 +1,14 @@
-﻿<Window x:Class="DamoOneVision.ManualWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:vm="clr-namespace:DamoOneVision.ViewModels"
-        xmlns:local="clr-namespace:DamoOneVision"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d"
-        Title="ManualWindow"
-        Height="800" Width="1000"
-        WindowStyle="None"
-        Background="{DynamicResource MaterialDesignPaper}">
-
-    <!-- Material Design 테마(예: Light, Indigo/Lime) 로드 -->
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- Light Theme + Default Controls -->
-                <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
-                -->
-                <!-- Primary = Indigo, Accent = Lime (원하는 색상 조합으로 변경 가능) -->
-                <!--
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Indigo.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml"/>-->
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
+﻿<UserControl x:Class="DamoOneVision.Views.ManualUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DamoOneVision.Views"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:vm="clr-namespace:DamoOneVision.ViewModels" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" d:DesignWidth="400"
+             Background="{DynamicResource MaterialDesignPaper}">
 
     <Grid>
         <!-- 상단 'Manual Window' 타이틀 바 -->
@@ -56,11 +37,12 @@
                 <Button Content="×"
                         Width="48"
                         FontSize="20"
-                        Margin="944,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
+                        Margin="0,6,10,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
                         Style="{DynamicResource MaterialDesignFlatButton}"
-                        Foreground="Black" />
+                        Foreground="Black" 
+                        Click="GoMain_Click"/>
             </Grid>
         </Border>
 
@@ -147,10 +129,9 @@
                         <!-- 여기서는 Grid 로 줄 맞춤 -->
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="98" />
                                 <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -165,121 +146,123 @@
                             </Grid.RowDefinitions>
 
                             <!-- Row 0 -->
-                            <Label Content="Command Pos"
-                                   Grid.Row="0" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                            <Label Content="Command Pos" Grid.Column="0"
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="0" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Feedback Pos -->
                             <Label Content="Feedback Pos"
                                    Grid.Row="1" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisFeedbackPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="1" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Waiting Pos -->
                             <Label Content="Waiting Pos"
                                    Grid.Row="2" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Button Content="Move Wait"
+                            <Button Content="Move"
                                     Command="{Binding XAxisMoveWaitCommand}"
-                                    Grid.Row="2" Grid.Column="3"
-                                    Margin="5"
-                                    Height="32"
+                                    Grid.Row="2" Grid.Column="2"
+                                    Margin="5,14,5,14"
                                     Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
                             <!-- End Pos -->
                             <Label Content="End Pos"
                                    Grid.Row="3" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Button Content="Move End"
+                            <Button Content="Move"
                                     Command="{Binding XAxisMoveEndCommand}"
-                                    Grid.Row="3" Grid.Column="3"
-                                    Margin="5"
-                                    Height="32"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    Grid.Row="3" Grid.Column="2"
+                                    Margin="5,14,5,14"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}" />
 
                             <!-- Acc / Dec -->
                             <Label Content="Acc"
                                    Grid.Row="4" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisDeceleration, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="4" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <Label Content="Dec"
                                    Grid.Row="5" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisAcceleration, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="5" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Speed -->
                             <Label Content="Speed"
                                    Grid.Row="6" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisVelocity, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="6" Grid.Column="1"
-                                     Margin="5"
+                                     Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Servo ON/OFF, Jog +, -, Home -->
-                            <StackPanel Orientation="Horizontal"
-                                        Grid.Row="7" Grid.ColumnSpan="4"
-                                        Margin="5">
-                                <Button Content="Servo ON"
+                            <StackPanel Orientation="Vertical" Grid.Row="7" Grid.ColumnSpan="3" Margin="5,5,5,5">
+                                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                                    <Button Content="Servo ON"
                                         Command="{Binding XAxisServoONCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"
                                         Margin="0,0,5,0"/>
-                                <Button Content="Servo OFF"
+                                    <Button Content="Servo OFF"
                                         Command="{Binding XAxisServoOFFCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"
                                         Margin="0,0,5,0"/>
-                                <Button Content="Jog +"
-                                        Width="60"
-                                        Margin="0,0,5,0"
-                                        Style="{DynamicResource MaterialDesignRaisedButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseDown">
-                                            <i:InvokeCommandAction Command="{Binding XAxisJogPStartCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseUp">
-                                            <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Content="Jog -"
-                                        Width="60"
-                                        Margin="0,0,5,0"
-                                        Style="{DynamicResource MaterialDesignRaisedButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseDown">
-                                            <i:InvokeCommandAction Command="{Binding XAxisJogNStartCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseUp">
-                                            <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Content="Home"
+
+                                    <Button Content="Home"
                                         Command="{Binding XAxisHomeCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                                    <Button Content="Jog +"
+                                        Width="60"
+                                        Margin="0,0,5,0"
+                                        Style="{DynamicResource MaterialDesignRaisedButton}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseDown">
+                                                <i:InvokeCommandAction Command="{Binding XAxisJogPStartCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseUp">
+                                                <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Button>
+                                    <Button Content="Jog -"
+                                        Width="60"
+                                        Margin="0,0,5,0"
+                                        Style="{DynamicResource MaterialDesignRaisedButton}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseDown">
+                                                <i:InvokeCommandAction Command="{Binding XAxisJogNStartCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseUp">
+                                                <i:InvokeCommandAction Command="{Binding XAxisJogStopCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Button>
+                                </StackPanel>
                             </StackPanel>
+
+
                         </Grid>
                     </StackPanel>
                 </materialDesign:Card>
@@ -294,10 +277,9 @@
 
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="98"/>
                                 <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -371,46 +353,49 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Servo ON/OFF, Jog +, -, Home -->
-                            <StackPanel Orientation="Horizontal"
-                                        Grid.Row="7" Grid.ColumnSpan="4"
-                                        Margin="5">
-                                <Button Content="Servo ON"
+                            <StackPanel Orientation="Vertical" Grid.Row="7" Grid.ColumnSpan="3" Margin="5,5,5,5">
+                                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                                    <Button Content="Servo ON"
                                         Command="{Binding ZAxisServoONCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"
                                         Margin="0,0,5,0"/>
-                                <Button Content="Servo OFF"
+                                    <Button Content="Servo OFF"
                                         Command="{Binding ZAxisServoOFFCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"
                                         Margin="0,0,5,0"/>
-                                <Button Content="Jog +"
-                                        Width="60"
-                                        Margin="0,0,5,0"
-                                        Style="{DynamicResource MaterialDesignRaisedButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseDown">
-                                            <i:InvokeCommandAction Command="{Binding ZAxisJogPStartCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseUp">
-                                            <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Content="Jog -"
-                                        Width="60"
-                                        Margin="0,0,5,0"
-                                        Style="{DynamicResource MaterialDesignRaisedButton}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewMouseDown">
-                                            <i:InvokeCommandAction Command="{Binding ZAxisJogNStartCommand}"/>
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="PreviewMouseUp">
-                                            <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Button>
-                                <Button Content="Home"
+
+                                    <Button Content="Home"
                                         Command="{Binding ZAxisHomeCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                                    <Button Content="Jog +"
+                                        Width="60"
+                                        Margin="0,0,5,0"
+                                        Style="{DynamicResource MaterialDesignRaisedButton}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseDown">
+                                                <i:InvokeCommandAction Command="{Binding ZAxisJogPStartCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseUp">
+                                                <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Button>
+                                    <Button Content="Jog -"
+                                        Width="60"
+                                        Margin="0,0,5,0"
+                                        Style="{DynamicResource MaterialDesignRaisedButton}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseDown">
+                                                <i:InvokeCommandAction Command="{Binding ZAxisJogNStartCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseUp">
+                                                <i:InvokeCommandAction Command="{Binding ZAxisJogStopCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Button>
+                                </StackPanel>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -436,4 +421,4 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</Window>
+</UserControl>

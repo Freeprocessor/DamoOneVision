@@ -103,7 +103,13 @@ namespace DamoOneVision
 
 
 
-		private MainViewModel _viewModel;
+		private MainViewModel _mainViewModel;
+
+		private ManualViewModel _manualViewModel;
+
+		private MainUserControl _mainUserControl;
+
+		private ManualUserControl _manualUserControl;
 
 
 
@@ -131,10 +137,27 @@ namespace DamoOneVision
 				_infraredCameraDisplay, _sideCamera1Display, _sideCamera2Display, _sideCamera3Display);
 
 
+			/// ViewModel 생성
+			_mainViewModel = new MainViewModel( _deviceControlService, _cameraService );
+			_manualViewModel = new ManualViewModel(_deviceControlService, _motionService, _cameraService );
 
-			_viewModel = new MainViewModel( _deviceControlService, _cameraService );
-			
-			this.DataContext = _viewModel;
+
+
+			/// ViewModel을 DataContext로 설정
+			this.DataContext = _mainViewModel;
+
+			_mainUserControl = new MainUserControl( _mainViewModel );
+
+			_manualUserControl = new ManualUserControl( _manualViewModel );
+
+			MainContent.Content = _mainUserControl;
+
+			// ManualUserControl에서 이벤트 구독 (예: "돌아가기" 신호)
+			_manualUserControl.GoMainRequested += ( s, e ) =>
+			{
+				MainContent.Content = _mainUserControl;
+				_manualViewModel.PositionReadStop();
+			};
 
 
 			//윈도우 로드, 클로즈 이벤트 핸들러 등록
@@ -154,13 +177,13 @@ namespace DamoOneVision
 		{
 			// 모델 데이터 로드
 			//LoadModelData();
-			_viewModel?.StartClockAsync();
+			_mainViewModel?.StartClockAsync();
 
 		}
 
 		private void MainWindow_Closing( object? sender, EventArgs e )
 		{
-			_viewModel?.StopClock();
+			_mainViewModel?.StopClock();
 			//row new NotImplementedException();
 		}
 
@@ -223,20 +246,20 @@ namespace DamoOneVision
 			mainInfraredCameraDisplay.DisplayId = _infraredCameraDisplay;
 			//mainInfraredCameraConversionDisplay.DisplayId = MainInfraredCameraConversionDisplay;
 
-			sideCamera1Display.DisplayId = _sideCamera1Display;
-			sideCamera1ConversionDisplay.DisplayId = _sideCamera1ConversionDisplay;
+			//sideCamera1Display.DisplayId = _sideCamera1Display;
+			//sideCamera1ConversionDisplay.DisplayId = _sideCamera1ConversionDisplay;
 
 			//mainSideCamera1Display.DisplayId = _sideCamera1Display;
 			//mainSideCamera1ConversionDisplay.DisplayId = MainSideCamera1ConversionDisplay;
 
-			sideCamera2Display.DisplayId = _sideCamera2Display;
-			sideCamera2ConversionDisplay.DisplayId = _sideCamera2ConversionDisplay;
+			//sideCamera2Display.DisplayId = _sideCamera2Display;
+			//sideCamera2ConversionDisplay.DisplayId = _sideCamera2ConversionDisplay;
 
 			//mainSideCamera2Display.DisplayId = _sideCamera2Display;
 			//mainSideCamera2ConversionDisplay.DisplayId = MainSideCamera2ConversionDisplay;
 
-			sideCamera3Display.DisplayId = _sideCamera3Display;
-			sideCamera3ConversionDisplay.DisplayId = _sideCamera3ConversionDisplay;
+			//sideCamera3Display.DisplayId = _sideCamera3Display;
+			//sideCamera3ConversionDisplay.DisplayId = _sideCamera3ConversionDisplay;
 
 			//mainSideCamera3Display.DisplayId = _sideCamera3Display;
 			//mainSideCamera3ConversionDisplay.DisplayId = MainSideCamera3ConversionDisplay;
@@ -246,12 +269,9 @@ namespace DamoOneVision
 
 		private void ManualButton_Click( object sender, RoutedEventArgs e )
 		{
-
-			//ManualWindow manualWindow = new ManualWindow( _modbus );
-			//manualWindow.ShowDialog();
-
-			ManualWindow manualWindow = new ManualWindow( _deviceControlService, _motionService, _cameraService );
-			manualWindow.ShowDialog();
+			// Manual 화면으로 전환
+			MainContent.Content = _manualUserControl;
+			_manualViewModel.PositionReadStart();
 
 		}
 
@@ -330,15 +350,15 @@ namespace DamoOneVision
 			//	mainInfraredCameraConversionDisplay.DisplayId = MIL.M_NULL;
 			//}
 
-			if (sideCamera1Display != null)
-			{
-				sideCamera1Display.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera1Display != null)
+			//{
+			//	sideCamera1Display.DisplayId = MIL.M_NULL;
+			//}
 
-			if (sideCamera1ConversionDisplay != null)
-			{
-				sideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera1ConversionDisplay != null)
+			//{
+			//	sideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera1Display != null)
 			//{
@@ -350,15 +370,15 @@ namespace DamoOneVision
 			//	mainSideCamera1ConversionDisplay.DisplayId = MIL.M_NULL;
 			//}
 
-			if (sideCamera2Display != null)
-			{
-				sideCamera2Display.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera2Display != null)
+			//{
+			//	sideCamera2Display.DisplayId = MIL.M_NULL;
+			//}
 
-			if (sideCamera2ConversionDisplay != null)
-			{
-				sideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera2ConversionDisplay != null)
+			//{
+			//	sideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera2Display != null)
 			//{
@@ -370,15 +390,15 @@ namespace DamoOneVision
 			//	mainSideCamera2ConversionDisplay.DisplayId = MIL.M_NULL;
 			//}
 
-			if (sideCamera3Display != null)
-			{
-				sideCamera3Display.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera3Display != null)
+			//{
+			//	sideCamera3Display.DisplayId = MIL.M_NULL;
+			//}
 
-			if (sideCamera3ConversionDisplay != null)
-			{
-				sideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
-			}
+			//if (sideCamera3ConversionDisplay != null)
+			//{
+			//	sideCamera3ConversionDisplay.DisplayId = MIL.M_NULL;
+			//}
 
 			//if (mainSideCamera3Display != null)
 			//{
@@ -511,20 +531,7 @@ namespace DamoOneVision
 			Application.Current.Shutdown();
 		}
 
-		private void DataReadButton_Click( object sender, RoutedEventArgs e )
-		{
-			//ushort[] data = modbus.ReadHoldingRegisters( 0, 0x00, 20 );
-			//foreach (var item in data)
-			//{
-			//	Data.Log.WriteLine( $"{item}" );
-			//}
-			_modbus.WriteHoldingRegisters32( 0, 15, 1000000 );
 
-			Logger.WriteLine($"{_modbus.ReadHoldingRegisters32( 0, 15, 1 )[0]}" );
-
-			//modbus.ReadInputRegisters( 0, 0x00, 10 );
-
-		}
 
 
 

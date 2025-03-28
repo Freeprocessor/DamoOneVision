@@ -17,7 +17,7 @@ namespace DamoOneVision.Services
 		/// 싱글톤 Logger
 		/// </summary>
 
-
+		public static event EventHandler<string> OnLogReceived;
 		// 로그 쓰기용 백그라운드 태스크를 중단시키기 위한 토큰
 		private static readonly CancellationTokenSource _cts = new CancellationTokenSource();
 		// 로그 메시지를 담아둘 BlockingCollection(큐 역할)
@@ -60,14 +60,7 @@ namespace DamoOneVision.Services
 
 					// 5) (옵션) WPF UI에 로그를 표시해야 하면 Dispatcher를 통해 실행
 					//    필요 없다면 이 부분은 제거하세요.
-					Application.Current?.Dispatcher?.BeginInvoke( DispatcherPriority.Background, new Action( ( ) =>
-					{
-						if (Application.Current.MainWindow is MainWindow mainWindow)
-						{
-							mainWindow.LogTextBlock.Text += message + Environment.NewLine;
-							mainWindow.LogScroll.ScrollToEnd();
-						}
-					} ) );
+					OnLogReceived?.Invoke( null, message );
 				}
 			}
 			catch (OperationCanceledException)

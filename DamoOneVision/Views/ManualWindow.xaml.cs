@@ -26,52 +26,18 @@ namespace DamoOneVision
 	/// </summary>
 	public partial class ManualWindow : Window
     {
-		private readonly DeviceControlService _deviceControlService;
-		private readonly MotionService _motionService;
-		private readonly CameraService _cameraService;
 		private ManualViewModel _viewModel;
 
 
-		public ManualWindow( DeviceControlService deviceControlService, MotionService motionService, CameraService cameraService )
+		public ManualWindow( ManualViewModel viewModel )
         {
-			this._deviceControlService = deviceControlService;
-			this._motionService = motionService;
 			InitializeComponent();
-			_viewModel = new ManualViewModel( deviceControlService, motionService, cameraService );
+			_viewModel = viewModel;
 
 			this.DataContext = _viewModel;
 		}
 
-		private void NumericTextBox_PreviewTextInput( object sender, TextCompositionEventArgs e )
-		{
-			// 숫자만 허용
-			Regex regex = new Regex("[^0-9]+");
-			e.Handled = regex.IsMatch( e.Text );
-		}
-
-		private void OnPaste( object sender, DataObjectPastingEventArgs e )
-		{
-			if (e.DataObject.GetDataPresent( typeof( string ) ))
-			{
-				string text = (string)e.DataObject.GetData(typeof(string));
-				if (!IsTextNumeric( text ))
-				{
-					e.CancelCommand();
-				}
-			}
-			else
-			{
-				e.CancelCommand();
-			}
-		}
-
-		private bool IsTextNumeric( string text )
-		{
-			Regex regex = new Regex("^[0-9]+$");
-			return regex.IsMatch( text );
-		}
-
-	}
+    }
 
 
 

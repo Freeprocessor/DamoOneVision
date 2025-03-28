@@ -22,7 +22,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace DamoOneVision.ViewModels
 {
-	internal class MainViewModel: INotifyPropertyChanged
+	public class MainViewModel: INotifyPropertyChanged
 	{
 		/// <summary>
 		/// PropertyChanged 이벤트 핸들러, WPF 바인딩을 위해 필요
@@ -35,6 +35,19 @@ namespace DamoOneVision.ViewModels
 		/// <param name="propertyName"></param>
 		private void OnPropertyChanged( string propertyName )
 		=> PropertyChanged?.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
+
+
+		
+		private StringBuilder _logBuilder = new StringBuilder();
+		public string LogContents
+		{
+			get => _logBuilder.ToString();
+			private set
+			{
+				_logBuilder = new StringBuilder( value );
+				OnPropertyChanged( nameof( LogContents ) );
+			}
+		}
 
 		/// <summary>
 		/// 로컬 앱 폴더 경로 app/local/DamoOneVision
@@ -184,6 +197,17 @@ namespace DamoOneVision.ViewModels
 			InfraredCameraModels = new ObservableCollection<InfraredCameraModel>();
 			LoadModelsAsync();
 
+
+			// Logger 이벤트를 받아, ViewModel에서 로그를 누적
+			Logger.OnLogReceived += ( s, msg ) =>
+			{
+				Application.Current?.Dispatcher?.Invoke( ( ) =>
+				{
+					_logBuilder.AppendLine( msg );
+					// TextBox와 바인딩된 프로퍼티를 갱신
+					OnPropertyChanged( nameof( LogContents ) );
+				} );
+			};
 
 			//이벤트 구독
 			_deviceControlService.TriggerDetected += async ( ) =>
@@ -413,6 +437,10 @@ namespace DamoOneVision.ViewModels
 		/// <summary>
 		/// 현재 시간을 1초마다 업데이트
 		/// </summary>
+		public async void StartClockAsync( )
+		{
+			//시계 중지 플래그 초기화
+			_stopClock = false;
 
 			await Task.Run( ( ) =>
 			{

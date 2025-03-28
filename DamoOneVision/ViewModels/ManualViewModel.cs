@@ -11,7 +11,7 @@ using DamoOneVision.Services;
 
 namespace DamoOneVision.ViewModels
 {
-	class ManualViewModel : INotifyPropertyChanged
+	public class ManualViewModel : INotifyPropertyChanged
 	{
 
 
@@ -90,9 +90,19 @@ namespace DamoOneVision.ViewModels
 			_positionTimer = new DispatcherTimer();
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
 			_positionTimer.Tick += PositionTimer_Tick;
+			
+
+
+		}
+
+		public void PositionReadStart( )
+		{
 			_positionTimer.Start();
+		}
 
-
+		public void PositionReadStop( )
+		{
+			_positionTimer.Stop();
 		}
 
 		public double XAxisWaitingPosition
