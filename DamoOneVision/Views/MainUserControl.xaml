@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:DamoOneVision.ViewModels" 
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="400">
+             d:DesignHeight="700" d:DesignWidth="400">
     
     <Grid Grid.Column="1" Margin="10,0,10,0">
         <Grid.RowDefinitions>
@@ -122,20 +122,21 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                 <Button Content="▶" 
                                 FontSize="30"
-                                Margin="0,0,20,0"
+                                Margin="0,0,20,10"
                                 Command="{Binding MachineStartCommand}"
                                 Style="{DynamicResource MaterialDesignRaisedButton}" 
-                                Width="100" Height="70"/>
+                                Width="113" Height="70"/>
                 <Button Content="■" 
                                 FontSize="30"
-                                Margin="0,0,20,0"
+                                Margin="0,0,20,10"
                                 Command="{Binding MachineStopCommand}"
                                 Style="{DynamicResource MaterialDesignRaisedButton}" 
-                                Width="100" Height="70"/>
+                                Width="113" Height="70"/>
                 <Button Content="↺"
                                 FontSize="35"
+                                Margin="0,0,0,10"
                                 Style="{DynamicResource MaterialDesignRaisedButton}"
-                                Width="96" Height="70"
+                                Width="113" Height="70"
                                 />
             </StackPanel>
             <materialDesign:Card Background="#FF5EE31A"

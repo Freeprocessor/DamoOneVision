@@ -222,62 +222,62 @@ namespace DamoOneVision.Services
 					//Logger.WriteLine( $"Test2: {TectTime.ElapsedMilliseconds}ms" );
 
 
-					//try
-					//{
-					//	if (_infraredCameraImage != MIL.M_NULL && _sideCamera1Image != MIL.M_NULL && _sideCamera2Image != MIL.M_NULL && _sideCamera3Image != MIL.M_NULL)
-					//	{
-					//		// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
-					//		// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
-					//		// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-					//		bool isGood = true;
+					try
+					{
+						if (_infraredCamera.ReciveImage() != MIL.M_NULL)
+						{
+							// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
+							// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
+							// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
+							bool isGood = true;
 
-					//		if (_infraredCameraConversionImage == MIL.M_NULL) MIL.MbufFree( _infraredCameraConversionImage );
-					//		_infraredCameraConversionImage = MIL.M_NULL;
-					//		if (_sideCamera1ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera1ConversionImage );
-					//		_sideCamera1ConversionImage = MIL.M_NULL;
-					//		if (_sideCamera2ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera2ConversionImage );
-					//		_sideCamera2ConversionImage = MIL.M_NULL;
-					//		if (_sideCamera3ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera3ConversionImage );
-					//		_sideCamera3ConversionImage = MIL.M_NULL;
+							if (_infraredCamera.ReciveImage() == MIL.M_NULL) MIL.MbufFree( _infraredCamera.ReciveImage() );
+							_infraredCameraConversionImage = MIL.M_NULL;
+							if (_sideCamera1ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera1ConversionImage );
+							_sideCamera1ConversionImage = MIL.M_NULL;
+							if (_sideCamera2ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera2ConversionImage );
+							_sideCamera2ConversionImage = MIL.M_NULL;
+							if (_sideCamera3ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera3ConversionImage );
+							_sideCamera3ConversionImage = MIL.M_NULL;
 
 
 
-					//		//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
-					//		//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
+							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
+							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
 
-					//		//var tasks = new[]
-					//		//{
-					//		//	///Overlay Display  Image 어떻게 처리할 것인지?
-					//		//	///디스플레이 선언과 동시에 Overlay Image의 버퍼를 받아서 저장후에 
-					//		//	///필요할때마다 가져다가 쓰는 방식으로 해야할 것 같음
-					//		//	///
-					//		//	Conversion.SideCameraModel( _sideCamera1Image, _mainSideCamera1Display ),
-					//		//	Conversion.SideCameraModel( _sideCamera2Image, _mainSideCamera2Display ),
-					//		//	Conversion.SideCameraModel( _sideCamera3Image, _mainSideCamera3Display )
-					//		//};
-					//		//bool[] result = await Task.WhenAll( tasks );
+							//var tasks = new[]
+							//{
+							//	///Overlay Display  Image 어떻게 처리할 것인지?
+							//	///디스플레이 선언과 동시에 Overlay Image의 버퍼를 받아서 저장후에 
+							//	///필요할때마다 가져다가 쓰는 방식으로 해야할 것 같음
+							//	///
+							//	Conversion.SideCameraModel( _sideCamera1Image, _mainSideCamera1Display ),
+							//	Conversion.SideCameraModel( _sideCamera2Image, _mainSideCamera2Display ),
+							//	Conversion.SideCameraModel( _sideCamera3Image, _mainSideCamera3Display )
+							//};
+							//bool[] result = await Task.WhenAll( tasks );
 
-					//		//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-					//		//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
-					//		Logger.WriteLine( "이미지 처리 완료" );
+							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
+							//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
+							Logger.WriteLine( "이미지 처리 완료" );
 
-					//		///GOOD REJECT LAMP 바인딩
-					//		//if (!Dispatcher.CheckAccess())
-					//		//{
-					//		//	// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
-					//		//	Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
-					//		//}
-					//		//if (!isGood) EjectAction();
+							///GOOD REJECT LAMP 바인딩
+							//if (!Dispatcher.CheckAccess())
+							//{
+							//	// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
+							//	Dispatcher.Invoke( ( ) => GoodLamp( isGood ) );
+							//}
+							//if (!isGood) EjectAction();
 
-					//		//DisplayConversionImage( ConversionpixelData );
-					//	}
-					//}
-					//catch (Exception ex)
-					//{
-					//	Logger.WriteLine( $"이미지 처리 중 오류 발생: {ex.Message}" );
-					//	MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
+							//DisplayConversionImage( ConversionpixelData );
+						}
+					}
+					catch (Exception ex)
+					{
+						Logger.WriteLine( $"이미지 처리 중 오류 발생: {ex.Message}" );
+						MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
 
-					//}
+					}
 
 
 					_isCameraCapturing = false;

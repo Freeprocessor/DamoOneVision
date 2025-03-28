@@ -8,7 +8,7 @@
         <ResourceDictionary>
             <!-- 머티리얼 라이트/다크 테마, 기본 컬러 파렛트 -->
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Cyan" />
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="LightBlue" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
 
             </ResourceDictionary.MergedDictionaries>

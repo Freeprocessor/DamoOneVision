@@ -46,6 +46,7 @@
         Background="{DynamicResource PrimaryHueMidBrush}"
         Height="48"
         VerticalAlignment="Top">
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <!-- 왼쪽: 로고 -->
@@ -55,6 +56,7 @@
                     <!-- 오른쪽: 설정 메뉴 + 닫기 버튼 -->
                     <ColumnDefinition Width="400"/>
                 </Grid.ColumnDefinitions>
+
 
                 <!-- 로고 아이콘 (Column=0) -->
                 <Image Source="/Logo.png"
@@ -69,7 +71,7 @@
                    Foreground="Black"
                    VerticalAlignment="Center"
                    FontFamily="Bahnschrift SemiLight"
-                   Margin="10,0,1199,0" Grid.ColumnSpan="2" Height="24"/>
+                   Margin="10,0,0,0" Grid.ColumnSpan="2" Height="24"/>
 
                 <!-- 오른쪽 영역: 메뉴 + 닫기 버튼 (Column=2) -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" >
@@ -107,7 +109,14 @@
                 </StackPanel>
             </Grid>
         </Border>
-
+        <!-- (1-1) 수평선(가로줄): 제목바(Row=0)과 본문(Row=1) 사이 -->
+        <!-- Row=0 끝 위치(아래)에 1px 선을 그려서 구분할 수 있습니다 -->
+        <Border Grid.Row="0"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                BorderBrush="Gray"
+                BorderThickness="0,0,0,1" />
 
         <!-- ─────────────────────────────────────────────────────────────────────
              2) (선택) 상단 메뉴 영역 - 
@@ -157,7 +166,13 @@
                 </TabItem>
             </TabControl>
 
-
+            <!-- (2-1) 수직선(세로줄): 탭(Col=0)와 오른쪽(Col=1) 사이 -->
+            <!-- 여기서 Grid.Column="1", Width="1" 로 수직 1픽셀 선 -->
+            <Border Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    Width="1"
+                    Background="Gray"
+                    />
             <!-- (오른쪽) 정보 표시 영역 -->
 
             <Grid Grid.Column="1">
