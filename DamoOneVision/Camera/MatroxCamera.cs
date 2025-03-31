@@ -21,6 +21,7 @@ namespace DamoOneVision.Camera
 		private MIL_ID MilDigitizer = MIL.M_NULL;
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
+		private MIL_ID MilScaleImage = MIL.M_NULL;
 
 		private MIL_ID MilConversionImage = MIL.M_NULL;
 
@@ -140,6 +141,7 @@ namespace DamoOneVision.Camera
 				//Bayer 이미지일 경우 NbBand 확인
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
 				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
+				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilScaleImage );
 			}
 
 			if (CameraName == "InfraredCamera")
@@ -239,6 +241,11 @@ namespace DamoOneVision.Camera
 			return MilImage;
 		}
 
+		public MIL_ID ReciveScaleImage( )
+		{
+			return MilScaleImage;
+		}
+
 		private void InfraredCameraNoiseFilter( string filePath )
 		{
 			if (_infraredImageFilter == null)
@@ -317,7 +324,7 @@ namespace DamoOneVision.Camera
 
 					/// Scale된 이미지 데이터 Buffer에 전송
 					//MIL.MbufPut( MilImage, ushortScaleImageData );
-					MIL.MbufPut( MilImage, ushortScaleImageData );
+					MIL.MbufPut( MilScaleImage, ushortScaleImageData );
 				}
 				else if (this.DataType == 8 && this.NbBands == 1 && false)
 				{
@@ -336,9 +343,11 @@ namespace DamoOneVision.Camera
 			//Log.WriteLine( "Number of Bands (NbBands): " + nbBands );
 
 
-			SaveImage( MilImage , $"{CameraName}" );
+			SaveImage( MilScaleImage, $"{CameraName}" );
 		}
 
+
+		// 사진상의 최대,최소 픽셀값을 이용하여 이미지 데이터를 0~65535로 스케일링	
 		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
 		{
 			ushort [] ImageData = new ushort[ this.Width * this.Height ];
@@ -474,6 +483,11 @@ namespace DamoOneVision.Camera
 			if(MilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage );
+
+			}
+			if (MilScaleImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( MilScaleImage );
 			}
 		}
 	}

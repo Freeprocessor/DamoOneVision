@@ -219,6 +219,12 @@ namespace DamoOneVision.Camera
 		{
 
 		}
+
+		public MIL_ID ReciveScaleImage( )
+		{
+			return MIL.M_NULL;
+		}
+
 		public void ManualFocus( double focusValue )
 		{
 

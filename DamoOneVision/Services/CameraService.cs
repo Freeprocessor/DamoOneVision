@@ -1,5 +1,6 @@
 ﻿using DamoOneVision.Camera;
 using DamoOneVision.ViewModels;
+using DamoOneVision.ImageProcessing;
 using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+
 
 namespace DamoOneVision.Services
 {
@@ -215,7 +217,7 @@ namespace DamoOneVision.Services
 					}
 
 
-					MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveImage() );
+					MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveScaleImage() );
 					MIL.MdispSelect( _sideCamera1Display, _sideCamera1.ReciveImage() );
 					MIL.MdispSelect( _sideCamera2Display, _sideCamera2.ReciveImage() );
 					MIL.MdispSelect( _sideCamera3Display, _sideCamera3.ReciveImage() );
@@ -230,17 +232,6 @@ namespace DamoOneVision.Services
 							// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 							// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
 							bool isGood = true;
-
-							if (_infraredCamera.ReciveImage() == MIL.M_NULL) MIL.MbufFree( _infraredCamera.ReciveImage() );
-							_infraredCameraConversionImage = MIL.M_NULL;
-							if (_sideCamera1ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera1ConversionImage );
-							_sideCamera1ConversionImage = MIL.M_NULL;
-							if (_sideCamera2ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera2ConversionImage );
-							_sideCamera2ConversionImage = MIL.M_NULL;
-							if (_sideCamera3ConversionImage == MIL.M_NULL) MIL.MbufFree( _sideCamera3ConversionImage );
-							_sideCamera3ConversionImage = MIL.M_NULL;
-
-
 
 							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
 							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
@@ -258,7 +249,7 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							//MIL.MdispSelect( InfraredCameraConversionDisplay, InfraredCameraConversionImage );
+							await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay );
 							Logger.WriteLine( "이미지 처리 완료" );
 
 							///GOOD REJECT LAMP 바인딩
