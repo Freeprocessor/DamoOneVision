@@ -160,15 +160,19 @@ namespace DamoOneVision.ImageProcessing
 
 		public static async Task<bool> InfraredCameraModel( MIL_ID InfraredCameraImage, MIL_ID SideCameraDisplay )
 		{
-
+			Logger.WriteLine( "InfraredCameraModel 호출" );
 			bool isGood = false;
 			//MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
 			MIL_ID BlobContext = MIL.M_NULL;
 			MIL_ID GraphicsContext = MIL.M_NULL;
+			MIL_ID MeasMarker = MIL.M_NULL;
 			MIL_ID MilOverlayImage = MIL.M_NULL;
 			MIL_ID BinarizedImage = MIL.M_NULL;
 
+			double maxPixel = 0.0;
+			double ConvexHullArea = 0.0;
+			double Radius = 0.0;
 
 			if (BinarizedImage != MIL.M_NULL)
 			{
@@ -192,7 +196,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
 
 			/// 
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, 30000, MIL.M_NULL );
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, 32000, MIL.M_NULL );
 
 			///
 			/*
@@ -212,17 +216,25 @@ namespace DamoOneVision.ImageProcessing
 
 			*/
 			///
+
+			// 그래픽 컨텍스트 생성(디스플레이 오버레이)
 			MIL.MgraAlloc( MilSystem, ref GraphicsContext );
 
-			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
+			
 
 			MIL.MblobAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobContext );
+			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
 
 			MIL.MblobControl( BlobContext, MIL.M_BOX, MIL.M_ENABLE );
+			//면적이 큰 순서대로 Sort
+			MIL.MblobControl( BlobContext, MIL.M_SORT1, MIL.M_BOX_AREA );
 			MIL.MblobControl( BlobContext, MIL.M_NUMBER_OF_HOLES, MIL.M_ENABLE );
+			MIL.MblobControl( BlobContext, MIL.M_CONVEX_HULL, MIL.M_ENABLE );
 
 			MIL.MblobCalculate( BlobContext, BinarizedImage, MIL.M_NULL, BlobResult );
 
+
+			// 블롭 개수 가져오기
 			MIL_INT selectedBlobCount = 0;
 
 			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
@@ -231,25 +243,42 @@ namespace DamoOneVision.ImageProcessing
 			
 			for (MIL_INT i = 0; i < selectedBlobCount; i++)
 			{
-				MIL_INT BoxFillRatio = 0;
 
 				// M_BLOB_INDEX 속성 가져오기
-				// 블롭 인덱스는 보통 1부터 시작
-				//MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_NUMBER_OF_HOLES + MIL.M_TYPE_MIL_INT, ref blobIndex );
-				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BOX_FILL_RATIO + MIL.M_TYPE_MIL_DOUBLE, ref BoxFillRatio );
+				// 블롭 인덱스는 보통 0부터 시작
+				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_CONVEX_HULL_AREA + MIL.M_TYPE_MIL_DOUBLE, ref ConvexHullArea );
 
+				Logger.WriteLine( $"블롭 {i}의 ConvexHullArea: {ConvexHullArea}\n" );
 
-				Logger.WriteLine( $"블롭 {i}의 FillRatio: {BoxFillRatio}\n" );
-				if (BoxFillRatio > 0.5)
-				{
-					isGood = false;
-				}
-				else
-				{
-					isGood = true;
-				}
 			}
-			
+
+			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
+
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_CENTER, 320.0, 240.0 );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, 132.0, 240.0 );
+			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, MeasMarker, MIL.M_DEFAULT );
+
+			try
+			{
+				MIL.MmeasGetResult( MeasMarker, MIL.M_RADIUS + MIL.M_TYPE_MIL_DOUBLE, ref Radius, MIL.M_NULL );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
+			}
+			double Area = Math.PI * Radius * Radius;
+			double FillRatio = ConvexHullArea / Area;
+			Logger.WriteLine( $"FillRatio: {FillRatio}" );
+			if (FillRatio > 0.98)
+			{
+				isGood = true;
+			}
+			else
+			{
+				isGood = false;
+
+			}
 			/*
 
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius * 2 - 20 );
@@ -257,6 +286,8 @@ namespace DamoOneVision.ImageProcessing
 			*/
 
 
+
+			MIL.MmeasDraw( GraphicsContext, MeasMarker, MilOverlayImage, MIL.M_DRAW_EDGES, MIL.M_DEFAULT, MIL.M_DEFAULT );
 			MIL.MblobDraw( GraphicsContext, BlobResult, MilOverlayImage, MIL.M_DRAW_BOX, MIL.M_DEFAULT, MIL.M_DEFAULT );
 			/*
 			MIL.MblobGetResult( BlobResult, MIL.M_DEFAULT, MIL.M_NUMBER_OF_HOLES, ref holenumber );
@@ -295,7 +326,7 @@ namespace DamoOneVision.ImageProcessing
 
 			//BinarizedImage = MIL.M_NULL;
 			//MIL.MbufFree( CircleMeasMarker );
-
+			Logger.WriteLine( "InfraredCameraModel 종료" );
 			return isGood;
 		}
 

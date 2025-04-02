@@ -12,7 +12,7 @@ namespace DamoOneVision.Services
 {
 	public class DeviceControlService
 	{
-		public event Func<Task> TriggerDetected;
+		public event Func<Task<bool>> TriggerDetected;
 
 		const int X = 0;
 		//const uint Y = 1;
@@ -27,6 +27,8 @@ namespace DamoOneVision.Services
 		/// Trigger Reading OFF 요청
 		/// </summary>
 		private bool _triggerReadingStop = false;
+
+		private bool _isGood = false;
 
 		const int EMSTOPSW = 0x00;
 		const int INVERTERALARM = 0x03;
@@ -163,17 +165,6 @@ namespace DamoOneVision.Services
 			_advantechCard.WriteCoil[ EJECTOR ] = false;
 		}
 
-		public async void EjectActionAsync( )
-		{
-			await Task.Run( async ( ) =>
-			{
-				await Task.Delay( 3000 );
-				_advantechCard.WriteCoil[ EJECTOR ] = true;
-				await Task.Delay( 500 );
-				_advantechCard.WriteCoil[ EJECTOR ] = false;
-			} );
-		}
-
 		public void SetModel( MotionModel motionModel )
 		{
 			_motionService.SetModel( motionModel );
@@ -214,9 +205,11 @@ namespace DamoOneVision.Services
 					{
 						var sw = new Stopwatch();
 						sw.Start();
+						var ejector = new Ejector( _advantechCard, _motionService );
 
 						// Convyer Delay
 						//await Task.Delay( 350 );
+						ejector.EjectActionAsync();
 						Logger.WriteLine( "Trigger Detected" );
 						if (TriggerDetected != null)
 						{
@@ -225,7 +218,10 @@ namespace DamoOneVision.Services
 							Logger.WriteLine( $"Tracking Start : {sw.ElapsedMilliseconds} ms" );
 							//Logger.WriteLine( "{_motionService.CameraDelay}" );
 							await Task.Delay( _motionService.CameraDelay );
-							await TriggerDetected();
+							_isGood = await TriggerDetected();
+							ejector.IsGood = _isGood;
+
+
 							Logger.WriteLine( $"Capture Complete : {sw.ElapsedMilliseconds} ms" );
 							_motionService.XAxisStop();
 							Logger.WriteLine( $"Tracking Stop {sw.ElapsedMilliseconds} ms" );
@@ -300,6 +296,43 @@ namespace DamoOneVision.Services
 			Logger.WriteLine( "Machine Stop." );
 		}
 
+
+	}
+
+	public class Ejector:IDisposable
+	{
+		public bool IsGood;
+		AdvantechCardService _advantechCard;
+		MotionService _motionService;
+
+		const int EJECTOR = 0x03;
+
+		public Ejector( AdvantechCardService advantechCard, MotionService motionService )
+		{
+			_advantechCard = advantechCard;
+			_motionService = motionService;
+		}
+
+		public async void EjectActionAsync( )
+		{
+			await Task.Run( async ( ) =>
+			{
+				int ejectorDelay = 0;
+				int ejecttorDistance = 530;
+				ejectorDelay = (int) (ejecttorDistance / _motionService.ConveyorSpeed * 1000.00);
+				await Task.Delay( ejectorDelay );
+				if (IsGood)
+				{
+					return;
+				}
+				_advantechCard.WriteCoil[ EJECTOR ] = true;
+				await Task.Delay( 500 );
+				_advantechCard.WriteCoil[ EJECTOR ] = false;
+			} );
+		}
+		public void Dispose( ) 
+		{ 
+		}
 
 	}
 }

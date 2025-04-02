@@ -150,8 +150,10 @@
             <!-- (왼쪽) 카메라 디스플레이 탭 -->
             <TabControl>
                 <TabItem Header="Main" Height="50">
-                    <Grid>
-                        <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" />
+                    <Grid Margin="0">
+                        <Border BorderBrush="{Binding IsGoodColor}" BorderThickness="5">
+                            <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" />
+                        </Border>
                     </Grid>
                 </TabItem>
                 <TabItem Header="infraredCamera" Height="50">

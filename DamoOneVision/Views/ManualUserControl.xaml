@@ -410,7 +410,11 @@
                         <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" 
                                VerticalAlignment="Center"
                                Width="100" />
-
+                        <Button Content="Camera&#x0A;Auto Focus"
+                                Margin="20,0,0,0"
+                                Height="50" Width="110"
+                                Style="{DynamicResource MaterialDesignRaisedButton}"
+                                Command="{Binding AutoFocusCommand}"/>
                     </StackPanel>
                 </materialDesign:Card>
 
@@ -421,7 +425,7 @@
                                 Margin="0,0,0,0"
                                 Height="50" Width="120"
                                 Style="{DynamicResource MaterialDesignRaisedButton}"
-                                Command="{Binding AutoFocusCommand}"/>
+                                Command="{Binding ManualFocusCommand}"/>
                         
                         <Button Content="Camera&#x0A;Auto Focus"
                                 Margin="20,0,0,0"

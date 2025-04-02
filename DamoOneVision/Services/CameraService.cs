@@ -16,6 +16,8 @@ namespace DamoOneVision.Services
 {
 	public class CameraService : IDisposable
 	{
+
+		public event Func<Task> VisionResult;
 		/// <summary>
 		/// 열화상 Camera
 		/// </summary>
@@ -32,6 +34,8 @@ namespace DamoOneVision.Services
 		/// 측면	3 Camera	
 		/// </summary>
 		private readonly CameraManager _sideCamera3;
+
+		private readonly Lazy<MainViewModel> _mainViewModel;
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
@@ -69,12 +73,11 @@ namespace DamoOneVision.Services
 
 
 		public CameraService(CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
-			MIL_ID infraredCameraDisplay, MIL_ID sideCamera1Display, MIL_ID sideCamera2Display, MIL_ID sideCamera3Display )
+			MIL_ID infraredCameraDisplay, MIL_ID sideCamera1Display, MIL_ID sideCamera2Display, MIL_ID sideCamera3Display, Lazy<MainViewModel> mainViewModel )
 		{
 			MilSystem = MILContext.Instance.MilSystem;
 
-
-
+			_mainViewModel = mainViewModel;
 			_infraredCameraDisplay = infraredCameraDisplay;
 			_sideCamera1Display = sideCamera1Display;
 			_sideCamera2Display = sideCamera2Display;
@@ -184,8 +187,10 @@ namespace DamoOneVision.Services
 		}
 
 
-		public async Task VisionTrigger( )
+		public async Task<bool> VisionTrigger( )
 		{
+			bool isGood = true;
+
 			Stopwatch TectTime = new Stopwatch();
 			TectTime.Start();
 
@@ -231,7 +236,7 @@ namespace DamoOneVision.Services
 							// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 							// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 							// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-							bool isGood = true;
+							
 
 							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
 							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
@@ -249,10 +254,23 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay );
+							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay );
+
 							Logger.WriteLine( "이미지 처리 완료" );
 
 							///GOOD REJECT LAMP 바인딩
+							///
+							var vm = _mainViewModel.Value;
+							if (!isGood)
+							{
+								vm.IsGoodColor = "Red";
+								vm.IsGoodStatus = "Reject";
+							}
+							else
+							{
+								vm.IsGoodColor = "Green";
+								vm.IsGoodStatus = "Good";
+							}
 							//if (!Dispatcher.CheckAccess())
 							//{
 							//	// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출
@@ -266,7 +284,7 @@ namespace DamoOneVision.Services
 					catch (Exception ex)
 					{
 						Logger.WriteLine( $"이미지 처리 중 오류 발생: {ex.Message}" );
-						MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
+						//MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
 
 					}
 
@@ -278,6 +296,7 @@ namespace DamoOneVision.Services
 			} );
 			TectTime.Stop();
 			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
+			return isGood;
 
 		}
 		public void Dispose( )

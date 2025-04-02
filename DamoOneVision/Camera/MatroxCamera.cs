@@ -463,11 +463,15 @@ namespace DamoOneVision.Camera
 			return MilImage;
 		}
 
-		public void AutoFocus( )
+		public async void AutoFocus( )
 		{
 			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_EXECUTE, "AutoFocus", MIL.M_DEFAULT );
+			await Task.Delay( 1000 );
+
+			double currentFocus = 0.0;
+			MIL.MdigInquireFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance",  MIL.M_TYPE_DOUBLE, ref currentFocus );
 			//ManualFocus();
-			Logger.WriteLine( $"{CameraName} AutoFocus" );
+			Logger.WriteLine( $"{CameraName} AutoFocus : {currentFocus}" );
 		}
 
 		public void ManualFocus(double focusValue )

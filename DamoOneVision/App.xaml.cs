@@ -3,6 +3,7 @@ using DamoOneVision.Services;
 using DamoOneVision.ViewModels;
 using DamoOneVision.Views;
 using Matrox.MatroxImagingLibrary;
+using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -14,124 +15,125 @@ namespace DamoOneVision
 	/// </summary>
 	public partial class App : Application
 	{
-		/// <summary>
-		/// 열화상 Camera
-		/// </summary>
-		private CameraManager _infraredCamera;
-		/// <summary>
-		/// 측면 1 Camera
-		/// </summary>
-		private CameraManager _sideCamera1;
-		/// <summary>
-		/// 측면 2 Camera
-		/// </summary>
-		private CameraManager _sideCamera2;
-		/// <summary>
-		/// 측면	3 Camera	
-		/// </summary>
-		private CameraManager _sideCamera3;
-
-		/// <summary>
-		/// Modbus 서비스
-		/// </summary>
-		private ModbusService _modbus;
-
-		/// <summary>
-		/// Motion 서비스
-		/// </summary>
-		private MotionService _motionService;
-
-		/// <summary>
-		/// Advantech 카드 서비스
-		/// </summary>
-		private AdvantechCardService _advantechCard;
-
-		/// <summary>
-		/// Device Control Service
-		/// </summary>
-		private DeviceControlService _deviceControlService;
-
-		private CameraService _cameraService;
-
-
-		private MilSystemService _milSystemService;
-
-		private MainViewModel _mainViewModel;
-
-		private ManualViewModel _manualViewModel;
-
-		private MainWindow _mainWindow;
-
-		private MainUserControl _mainUserControl;
-
-		private ManualUserControl _manualUserControl;
-
+		// DI 컨테이너
+		public IServiceProvider ServiceProvider { get; private set; }
 
 
 		protected override void OnStartup( StartupEventArgs e )
 		{
 			base.OnStartup( e );
 
-			_infraredCamera = new CameraManager( "Matrox", "InfraredCamera" );
-			_sideCamera1 = new CameraManager( "Matrox", "SideCamera1" );
-			_sideCamera2 = new CameraManager( "Matrox", "SideCamera2" );
-			_sideCamera3 = new CameraManager( "Matrox", "SideCamera3" );
+			// DI 컨테이너 설정
+			var services = new ServiceCollection();
+			ConfigureServices( services );
+			ServiceProvider = services.BuildServiceProvider();
 
-			_modbus = new ModbusService( "192.168.2.100", 502 );
+			// MainWindow를 DI 컨테이너에서 resolve하고 표시
+			var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+			mainWindow.Show();
+		}
 
-			_motionService = new MotionService();
+		private void ConfigureServices( IServiceCollection services )
+		{
+			// 카메라 인스턴스(여러 카메라가 있으므로, 미리 생성하여 등록)
+			var infraredCamera = new CameraManager("Matrox", "InfraredCamera");
+			var sideCamera1 = new CameraManager("Matrox", "SideCamera1");
+			var sideCamera2 = new CameraManager("Matrox", "SideCamera2");
+			var sideCamera3 = new CameraManager("Matrox", "SideCamera3");
+			services.AddSingleton( infraredCamera );
+			services.AddSingleton( sideCamera1 );
+			services.AddSingleton( sideCamera2 );
+			services.AddSingleton( sideCamera3 );
 
-			_advantechCard = new AdvantechCardService( "192.168.2.20", 502 );
+			// 기타 서비스 등록
+			var modbus = new ModbusService("192.168.2.100", 502);
+			services.AddSingleton( modbus );
 
-			
+			var motionService = new MotionService();
+			services.AddSingleton( motionService );
 
-			_milSystemService = new MilSystemService();
+			var advantechCard = new AdvantechCardService("192.168.2.20", 502);
+			services.AddSingleton( advantechCard );
 
-			_cameraService = new CameraService( _infraredCamera, _sideCamera1, _sideCamera2, _sideCamera3,
-				_milSystemService.InfraredDisplay, _milSystemService.SideCam1Display, _milSystemService.SideCam2Display, _milSystemService.SideCam3Display );
-			// MainViewModel 초기화
+			// MilSystemService는 MIL 관련 초기화를 담당
+			var milSystemService = new MilSystemService();
+			services.AddSingleton( milSystemService );
 
-			_deviceControlService = new DeviceControlService( _modbus, _advantechCard, _motionService);
+			// CameraService: MIL display ID는 MilSystemService에서 가져옴
+			services.AddSingleton<CameraService>( sp => new CameraService(
+				infraredCamera,
+				sideCamera1,
+				sideCamera2,
+				sideCamera3,
+				milSystemService.InfraredDisplay,
+				milSystemService.SideCam1Display,
+				milSystemService.SideCam2Display,
+				milSystemService.SideCam3Display,
+				 new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>() )
+			) );
 
+			// DeviceControlService
+			services.AddSingleton<DeviceControlService>( sp => new DeviceControlService(
+				modbus, advantechCard, motionService
+			) );
 
-			/// ViewModel 생성
-			_mainViewModel = new MainViewModel( _deviceControlService, _cameraService);
-			_manualViewModel = new ManualViewModel( _deviceControlService, _motionService, _cameraService );
-			//// MainUserControl 초기화
-			//_mainUserControl = new MainUserControl( _mainViewModel );
-			//// ManualUserControl 초기화
-			//_manualUserControl = new ManualUserControl( _manualViewModel );
+			// ViewModel들
+			services.AddSingleton<MainViewModel>( sp => new MainViewModel(
+				sp.GetRequiredService<DeviceControlService>(),
+				sp.GetRequiredService<CameraService>()
+			) );
+			services.AddSingleton<ManualViewModel>( sp => new ManualViewModel(
+				sp.GetRequiredService<DeviceControlService>(),
+				motionService,
+				sp.GetRequiredService<CameraService>()
+			) );
 
-			// MainUserControl을 MainWindow에 등록
-			_mainWindow = new MainWindow( _mainViewModel, _manualViewModel, _milSystemService );
-			//MainWindow.Content = _mainUserControl;
-			MainWindow.Show();
+			// MainWindow: 생성자에 MainViewModel, ManualViewModel, MilSystemService 주입
+			services.AddSingleton<MainWindow>( sp => new MainWindow(
+				sp.GetRequiredService<MainViewModel>(),
+				sp.GetRequiredService<ManualViewModel>(),
+				milSystemService
+			) );
 		}
 
 		protected override async void OnExit( ExitEventArgs e )
 		{
 			base.OnExit( e );
-			_cameraService?.Dispose();
 
-			_motionService.ReleaseLibrary();
+			// DI 컨테이너에서 resolve한 서비스들로 Dispose 호출
 
-			var tasks = new[]
-				{
-					_infraredCamera.DisconnectAsync(),
-					_sideCamera1.DisconnectAsync(),
-					_sideCamera2.DisconnectAsync(),
-					_sideCamera3.DisconnectAsync()
-				};
+			// 카메라 서비스 Dispose
+			var cameraService = ServiceProvider.GetRequiredService<CameraService>();
+			cameraService?.Dispose();
 
-			await Task.WhenAll( tasks );
+			// MotionService: 해제 메서드 호출
+			var motionService = ServiceProvider.GetRequiredService<MotionService>();
+			motionService.ReleaseLibrary();
 
-			await _milSystemService.DisposeAsync();
+			// 각 카메라 DisconnectAsync (여기서는 카메라 인스턴스를 직접 resolve)
+			var infraredCamera = ServiceProvider.GetRequiredService<CameraManager>();
+			var sideCamera1 = ServiceProvider.GetRequiredService<CameraManager>(); // 첫 번째 CameraManager가 InfraredCamera이므로
+																				   // 만약 여러 카메라가 필요하다면, 별도로 관리할 수 있도록 타입을 분리하는 것이 좋습니다.
+																				   // 여기서는 간단히 예시로만 처리합니다.
+			await infraredCamera.DisconnectAsync();
+			await sideCamera1.DisconnectAsync();
+			// sideCamera2, sideCamera3 등도 필요하면 추가 호출
+
+			// MilSystemService 비동기 Dispose (IAsyncDisposable 구현)
+			var milSystemService = ServiceProvider.GetRequiredService<MilSystemService>();
+			if (milSystemService is IAsyncDisposable asyncDisposable)
+			{
+				await asyncDisposable.DisposeAsync();
+			}
 			MILContext.Instance.Dispose();
+
 			await Task.Delay( 100 );
 			Logger.Shutdown();
 
-			Application.Current.Shutdown();
+			// DI 컨테이너에 등록된 객체들이 모두 Dispose되도록 할 수 있다면,
+			// (서비스 컨테이너가 IDisposable를 구현하는 경우) ServiceProvider.Dispose();
 
+			Application.Current.Shutdown();
 		}
 	}
 }

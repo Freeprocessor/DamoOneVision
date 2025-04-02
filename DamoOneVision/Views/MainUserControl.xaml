@@ -139,14 +139,14 @@
                                 Width="113" Height="70"
                                 />
             </StackPanel>
-            <materialDesign:Card Background="#FF5EE31A"
+            <materialDesign:Card Background="{Binding IsGoodColor}"
                                      Height="60" Width="380">
 
-                <Label Content="GOOD"
+                <Label Content="{Binding IsGoodStatus}"
                            HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center"
                            FontSize="28"
-                           Foreground="#FF3A3A3A"
+                           Foreground="Black" 
                            FontFamily="Bahnschrift SemiLight"/>
             </materialDesign:Card>
         </StackPanel>

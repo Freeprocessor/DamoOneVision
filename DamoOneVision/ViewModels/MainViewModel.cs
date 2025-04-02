@@ -156,6 +156,34 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private string _isGoodStatus;
+		public string IsGoodStatus
+		{
+			get => _isGoodStatus;
+			set
+			{
+				if (_isGoodStatus != value)
+				{
+					_isGoodStatus = value;
+					OnPropertyChanged( nameof( IsGoodStatus ) );
+				}
+			}
+		}
+
+		private string _isGoodColor;
+		public string IsGoodColor
+		{
+			get => _isGoodColor;
+			set
+			{
+				if (_isGoodColor != value)
+				{
+					_isGoodColor = value;
+					OnPropertyChanged( nameof( IsGoodColor ) );
+				}
+			}
+		}
+
 
 		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
 		public bool CanConnect => !IsVisionConnected && !IsBusy;
@@ -213,7 +241,8 @@ namespace DamoOneVision.ViewModels
 			_deviceControlService.TriggerDetected += async ( ) =>
 			{
 				// Service가 "Trigger 발생"을 알리면 이 콜백이 실행됨
-				await _cameraService.VisionTrigger();
+				bool result = await _cameraService.VisionTrigger();
+				return result;
 			};
 
 			ConnectCommand = new AsyncRelayCommand(

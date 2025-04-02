@@ -85,7 +85,7 @@ namespace DamoOneVision.ViewModels
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
 
 			AutoFocusCommand = new RelayCommand( ( ) => AutoFocus() );
-
+			ManualFocusCommand = new RelayCommand( ( ) => ManualFocus() );
 
 			_positionTimer = new DispatcherTimer();
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
@@ -271,7 +271,7 @@ namespace DamoOneVision.ViewModels
 		public ICommand XAxisHomeCommand { get; }
 		public ICommand ZAxisHomeCommand { get; }
 		public ICommand AutoFocusCommand { get; }
-
+		public ICommand ManualFocusCommand { get; }
 
 
 		private bool XAxisCanMove( )

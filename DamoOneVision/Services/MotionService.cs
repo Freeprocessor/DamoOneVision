@@ -264,6 +264,7 @@ namespace DamoOneVision.Services
 		{
 			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, 0.05, 0.05 );
 			await XAxisWaitingStop();
+			//Logger.WriteLine( "XAxisMoveWaitPos" );
 		}
 
 		public async Task XAxisMoveEndPos( )
@@ -277,6 +278,7 @@ namespace DamoOneVision.Services
 		{
 			await ZAxisMoveToPosition( _motionModel.ZAxisWorkPostion, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
 			await ZAxisWaitingStop();
+			//Logger.WriteLine( "ZAxisMoveWorkPos" );
 		}
 
 		public async Task ZAxisMoveEndPos( )

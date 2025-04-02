@@ -179,7 +179,7 @@ namespace DamoOneVision.Camera
 			camera.AutoFocus();
 		}
 
-		public void ManualFocus( double focusValue = 0.21140 )
+		public void ManualFocus( double focusValue = 0.2013999968767166 )
 		{
 			camera.ManualFocus( focusValue );
 		}
