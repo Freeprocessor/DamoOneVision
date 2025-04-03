@@ -39,6 +39,7 @@ namespace DamoOneVision.Services
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
+
 		private MIL_ID _infraredCameraDisplay;
 		private MIL_ID _sideCamera1Display;
 		private MIL_ID _sideCamera2Display;
@@ -66,6 +67,8 @@ namespace DamoOneVision.Services
 		/// </summary>
 		private bool _isBusy;
 		public bool IsBusy => _isBusy;
+
+		public bool LoadImageUsed { get; set; } = false; // LoadImage 사용 여부
 
 		// 상태 변경을 알리기 위한 이벤트들
 		public event Action<bool> CameraConnectedChanged;
@@ -167,6 +170,25 @@ namespace DamoOneVision.Services
 			_infraredCamera.ManualFocus();
 		}
 
+		public async void InfraredCameraLoadImage( string filePath )
+		{
+			LoadImageUsed = true;
+			var vm = _mainViewModel.Value;
+			_infraredCamera.LoadImage( MilSystem, filePath );
+
+			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
+			if (await Conversion.InfraredCameraModel( _infraredCamera.ReciveLoadImage(), _infraredCameraDisplay , ImageData()))
+			{
+				vm.IsGoodColor = "Green";
+				vm.IsGoodStatus = "Good";
+			}
+			else
+			{
+				vm.IsGoodColor = "Red";
+				vm.IsGoodStatus = "Reject";
+			}
+		}
+
 
 
 		private void SetVisionConnected( bool connected )
@@ -186,9 +208,26 @@ namespace DamoOneVision.Services
 			}
 		}
 
+		public MIL_ID GetImage( )
+		{
+			return _infraredCamera.ReciveImage();
+		}
+
+		public ushort[ ] ImageData( )
+		{
+			if (LoadImageUsed)
+			{
+				return _infraredCamera.LoadImageData();
+			}
+			else
+				return _infraredCamera.CaptureImageData();
+
+		}
+
 
 		public async Task<bool> VisionTrigger( )
 		{
+			LoadImageUsed = false;
 			bool isGood = true;
 
 			Stopwatch TectTime = new Stopwatch();
@@ -254,7 +293,7 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay );
+							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay, ImageData() );
 
 							Logger.WriteLine( "이미지 처리 완료" );
 

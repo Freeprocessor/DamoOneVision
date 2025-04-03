@@ -22,6 +22,8 @@ namespace DamoOneVision.Camera
 		//private MIL_ID MilGrabImage = MIL.M_NULL;
 		private MIL_ID MilImage = MIL.M_NULL;
 		private MIL_ID MilScaleImage = MIL.M_NULL;
+		private MIL_ID LoadMilImage = MIL.M_NULL;
+		private MIL_ID LoadMilScaleImage = MIL.M_NULL;
 
 		private MIL_ID MilConversionImage = MIL.M_NULL;
 
@@ -225,7 +227,7 @@ namespace DamoOneVision.Camera
 
 			if (true)
 			{
-				InfraredCameraScaleImage( MilImage );
+				InfraredCameraScaleImage( MilImage, MilScaleImage );
 			}
 			//MIL.MdispFree( MilDisplay );
 			//Logger.WriteLine( CameraName + " CaptureImage Complete" );
@@ -244,6 +246,16 @@ namespace DamoOneVision.Camera
 		public MIL_ID ReciveScaleImage( )
 		{
 			return MilScaleImage;
+		}
+
+		public MIL_ID ReciveLoadImage( )
+		{
+			return LoadMilImage;
+		}
+
+		public MIL_ID ReciveLoadScaleImage( )
+		{
+			return LoadMilScaleImage;
 		}
 
 		private void InfraredCameraNoiseFilter( string filePath )
@@ -313,7 +325,7 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		private void InfraredCameraScaleImage( MIL_ID MilImage ) 
+		private void InfraredCameraScaleImage( MIL_ID MilImage, MIL_ID MilScaleImage ) 
 		{
 			/// 버퍼이미지를 Scale히여 16bit 이미지로 변환
 			if (true)
@@ -365,9 +377,11 @@ namespace DamoOneVision.Camera
 			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
 			//}
 
-			ushort MinPixelValue = ImageData.Min();
-			ushort MaxPixelValue = ImageData.Max();
+			ushort MinPixelValue = 30115;//28도
+			ushort MaxPixelValue = 36315;//90도
 
+			//MinPixelValue = ImageData.Min();
+			//MaxPixelValue = ImageData.Max();
 
 			// 30~50도 범위로 Scale
 			//double dMinPixelValue = (30.0 / 190.0) * 65535.0;
@@ -375,18 +389,22 @@ namespace DamoOneVision.Camera
 
 			//MinPixelValue = (ushort) dMinPixelValue;
 			//MaxPixelValue = (ushort) dMaxPixelValue;
-
+			int data=0;
 
 			for (int i = 0; i < ImageData.Length; i++)
 			{
-				ImageData[ i ] = (ushort) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
-				if (ImageData[ i ] > 65535)
+				data = (int) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
+				if (data > 65535)
 				{
 					ImageData[ i ] = 65535;
 				}
-				else if (ImageData[ i ] < 0)
+				else if (data < 0)
 				{
 					ImageData[ i ] = 0;
+				}
+				else
+				{
+					ImageData[ i ] = (ushort)data;
 				}
 			}
 
@@ -436,12 +454,12 @@ namespace DamoOneVision.Camera
 
 		public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
-			MIL_ID MilImage = MIL.M_NULL;
-
+			
 			if (File.Exists( filePath ))
 			{
 
-				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref MilImage );
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref LoadMilImage );
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilScaleImage );
 
 				// 이미지 속성 가져오기
 				MIL_INT width = 0;
@@ -449,10 +467,10 @@ namespace DamoOneVision.Camera
 				MIL_INT nbBands = 0;
 				MIL_INT dataType = 0;
 
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_X, ref width );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_Y, ref height );
-				MIL.MbufInquire( MilImage, MIL.M_SIZE_BAND, ref nbBands );
-				MIL.MbufInquire( MilImage, MIL.M_TYPE, ref dataType );
+				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_X, ref width );
+				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_Y, ref height );
+				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_BAND, ref nbBands );
+				MIL.MbufInquire( LoadMilImage, MIL.M_TYPE, ref dataType );
 
 				this.Width = width;
 				this.Height = height;
@@ -460,7 +478,9 @@ namespace DamoOneVision.Camera
 				this.DataType = dataType;
 
 			}
-			return MilImage;
+			InfraredCameraScaleImage( LoadMilImage, LoadMilScaleImage );
+
+			return LoadMilImage;
 		}
 
 		public async void AutoFocus( )
@@ -479,6 +499,30 @@ namespace DamoOneVision.Camera
 			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance", MIL.M_TYPE_DOUBLE, ref focusValue );
 
 			Logger.WriteLine( $"{CameraName} ManualFocus" );
+		}
+
+		public ushort[ ] LoadImageData( )
+		{
+			if (LoadMilImage == MIL.M_NULL)
+			{
+				//Logger.WriteLine( $"{CameraName} ImageData is NULL" );
+				return null;
+			}
+			ushort[] imageData = new ushort[ this.Width * this.Height ];
+			MIL.MbufGet( LoadMilImage, imageData );
+			return imageData;
+		}
+
+		public ushort[ ] CaptureImageData( )
+		{
+			if (MilImage == MIL.M_NULL)
+			{
+				//Logger.WriteLine( $"{CameraName} ImageData is NULL" );
+				return null;
+			}
+			ushort[] imageData = new ushort[ this.Width * this.Height ];
+			MIL.MbufGet( MilImage, imageData );
+			return imageData;
 		}
 
 		public void Dispose( )

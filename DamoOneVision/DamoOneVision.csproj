@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ColorMap\JETColorMap.mim" />
     <None Remove="Logo.png" />
   </ItemGroup>
 
@@ -30,6 +31,8 @@
     <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.10.0.20241108" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+    <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="ColorMap\JETColorMap.mim" />
     <Resource Include="Logo.png" />
   </ItemGroup>
 

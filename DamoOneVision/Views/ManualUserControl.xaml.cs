@@ -35,5 +35,7 @@ namespace DamoOneVision.Views
 		{
 			GoMainRequested?.Invoke( this, EventArgs.Empty );
 		}
+
+
 	}
 }

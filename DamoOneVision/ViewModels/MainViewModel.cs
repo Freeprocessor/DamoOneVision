@@ -15,10 +15,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using System.Windows.Forms;  // WinForms 네임스페이스 추가 (참조 필요)
 using DamoOneVision.ImageProcessing;
 using Newtonsoft.Json;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace DamoOneVision.ViewModels
 {
@@ -185,6 +187,36 @@ namespace DamoOneVision.ViewModels
 		}
 
 
+		private string _selectedImage;
+		public string SelectedImage
+		{
+			get => _selectedImage;
+			set
+			{
+				if (_selectedImage != value)
+				{
+					_selectedImage = value;
+					OnPropertyChanged( nameof( SelectedImage ) );
+					// 이미지가 선택되었을 때 자동으로 실행할 로직을 여기에 넣거나 커맨드를 실행할 수 있음.
+				}
+			}
+		}
+
+		private string _currentTemperature;
+		public string CurrentTemperature
+		{
+			get => _currentTemperature;
+			set
+			{
+				if (_currentTemperature != value)
+				{
+					_currentTemperature = value;
+					OnPropertyChanged( nameof( CurrentTemperature ) );
+				}
+			}
+		}
+
+
 		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
 		public bool CanConnect => !IsVisionConnected && !IsBusy;
 
@@ -202,7 +234,8 @@ namespace DamoOneVision.ViewModels
 		public ICommand MachineStartCommand { get; }
 		public ICommand MachineStopCommand { get; }
 		public ICommand VisionTriggerCommand { get; }
-		public ICommand ListBoxSelectionChangedCommand { get; }
+		public ICommand LoadImagesCommand { get; }
+		public ICommand ImageSelectedCommand { get; }
 
 
 
@@ -286,6 +319,9 @@ namespace DamoOneVision.ViewModels
 			//ListBoxSelectionChangedCommand = new RelayCommand(
 			//	_ => ListBox_SelectionChanged()
 			//);
+			LoadImagesCommand = new AsyncRelayCommand( _ => LoadAllImages());
+
+			ImageSelectedCommand = new RelayCommand<string>( OnImageSelected );
 
 
 			settingManager = new SettingManager( deviceControlService );
@@ -318,6 +354,10 @@ namespace DamoOneVision.ViewModels
 			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
 			imageFolder = System.IO.Path.Combine( appFolder, "Images" );
+			/// 임시 추가. 추후에 날짜별로 정리해서 불러올 수 있도록 수정
+			imageFolder = System.IO.Path.Combine( imageFolder, "InfraredCamera" );
+			imageFolder = System.IO.Path.Combine( imageFolder, "RAWInfraredCamera" );
+			//imageFolder = System.IO.Path.Combine( imageFolder, "2025-04-2" );
 			modelfolder = System.IO.Path.Combine( appFolder, "Model" );
 			modelfile = System.IO.Path.Combine( modelfolder, "Models.model" );
 			if (!Directory.Exists( appFolder ))
@@ -334,21 +374,38 @@ namespace DamoOneVision.ViewModels
 		/// 이미지 로드버튼 클릭 이벤트 핸들러 
 		/// 이미지 폴더 내의 모든 BMP 파일 로드
 		/// </summary>
-		private void LoadAllImages( )
+		public async Task LoadAllImages( )
 		{
-			// Images 폴더 내의 모든 BMP 파일 로드
-			ImagePaths.Clear(); // 기존 리스트 비우기(원하는 경우 생략)
-								//이미지가 있는지 확인, 없으면 만들기
-
-			string[] files = Directory.GetFiles(imageFolder, "*.bmp");
-
-			foreach (var file in files)
+			var dialog = new CommonOpenFileDialog
 			{
-				ImagePaths.Add( file );
-			}
+				IsFolderPicker = true,
+				Title = "이미지가 있는 폴더를 선택하세요.",
+				InitialDirectory = imageFolder // 기본 경로 설정
+			};
 
-			MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
-			Logger.WriteLine( $"{files.Length}개의 이미지가 로드되었습니다." );
+			if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+			{
+				string selectedFolder = dialog.FileName;
+				ImagePaths.Clear();
+				string[] files = Directory.GetFiles(selectedFolder, "*.bmp");
+
+				foreach (var file in files)
+				{
+					ImagePaths.Add( file );
+				}
+
+				MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
+				Logger.WriteLine( $"{files.Length}개의 이미지가 로드되었습니다." );
+			}
+		}
+
+
+		private void OnImageSelected( string imagePath )
+		{
+			if (!string.IsNullOrEmpty( imagePath ) && File.Exists( imagePath ))
+			{
+				_cameraService.InfraredCameraLoadImage( imagePath );
+			}
 		}
 
 		/// <summary>
@@ -416,7 +473,7 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		
+
 
 
 		//private void ListBox_SelectionChanged( )

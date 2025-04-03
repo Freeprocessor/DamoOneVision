@@ -19,6 +19,14 @@ namespace DamoOneVision.Camera
 
 		MIL_ID ReciveScaleImage( );
 
+		MIL_ID ReciveLoadImage( );
+
+		MIL_ID ReciveLoadScaleImage( );
+
+		ushort[ ] LoadImageData();
+
+		ushort[ ] CaptureImageData( );
+
 		void AutoFocus( );
 
 		void ManualFocus( double focusValue );

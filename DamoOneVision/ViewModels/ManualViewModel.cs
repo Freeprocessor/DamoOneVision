@@ -80,6 +80,9 @@ namespace DamoOneVision.ViewModels
 			MainCVOnCommand = new RelayCommand( ( ) => MainCVOn() );
 			MainCVOffCommand = new RelayCommand( ( ) => MainCVOff() );
 
+			SideCVOnCommand = new RelayCommand( ( ) => SideCVOn() );
+			SideCVOffCommand = new RelayCommand( ( ) => SideCVOff() );
+
 			TowerLampStartCommand = new RelayCommand( ( ) => TowerLampStart() );
 			TowerLampStopCommand = new RelayCommand( ( ) => TowerLampStop() );
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
@@ -243,7 +246,8 @@ namespace DamoOneVision.ViewModels
 		public ICommand EjectOFFCommand { get; }
 		public ICommand MainCVOnCommand { get; }
 		public ICommand MainCVOffCommand { get; }
-
+		public ICommand SideCVOnCommand { get; }
+		public ICommand SideCVOffCommand { get; }
 		public ICommand TowerLampStartCommand { get; }
 		public ICommand TowerLampStopCommand { get; }
 		public ICommand TowerLampErrorCommand { get; }
@@ -318,6 +322,16 @@ namespace DamoOneVision.ViewModels
 		private void MainCVOff( )
 		{
 			_deviceControlService.MainCVOff();
+		}
+
+		private void SideCVOn( )
+		{
+			_deviceControlService.SideCVOn();
+		}
+
+		private void SideCVOff( )
+		{
+			_deviceControlService.SideCVOff();
 		}
 
 		private void XAxisJogPStart( )

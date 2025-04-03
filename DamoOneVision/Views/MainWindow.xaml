@@ -46,7 +46,7 @@
         Background="{DynamicResource PrimaryHueMidBrush}"
         Height="48"
         VerticalAlignment="Top">
-            
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <!-- 왼쪽: 로고 -->
@@ -107,6 +107,7 @@
 
                     <!-- (2) 닫기 버튼 -->
                 </StackPanel>
+                <Label Grid.Column="2" Content="{Binding CurrentTemperature}" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Center" Height="22" Width="67"/>
             </Grid>
         </Border>
         <!-- (1-1) 수평선(가로줄): 제목바(Row=0)과 본문(Row=1) 사이 -->
@@ -143,16 +144,20 @@
              ───────────────────────────────────────────────────────────────────── -->
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
+                <ColumnDefinition  />
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="400"/>
             </Grid.ColumnDefinitions>
 
             <!-- (왼쪽) 카메라 디스플레이 탭 -->
-            <TabControl>
+            <TabControl Margin="0,0,0,0">
                 <TabItem Header="Main" Height="50">
                     <Grid Margin="0">
                         <Border BorderBrush="{Binding IsGoodColor}" BorderThickness="5">
-                            <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay" />
+                            <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay"
+                                  MouseMove="MILWPFDisplay_MouseMove"
+                                  IsManipulationEnabled="False"
+                                  Focusable="False" />
                         </Border>
                     </Grid>
                 </TabItem>
@@ -168,16 +173,22 @@
                 </TabItem>
             </TabControl>
 
+            <Image x:Name="image" Grid.Column="1" Margin="2,55,2,5" Stretch="Fill" >
+                <Image.Source>
+                    <BitmapImage UriSource="pack://application:,,,/ColorMap/JETColorMap.mim" Rotation="Rotate270" />
+                </Image.Source>
+            </Image>
+
             <!-- (2-1) 수직선(세로줄): 탭(Col=0)와 오른쪽(Col=1) 사이 -->
             <!-- 여기서 Grid.Column="1", Width="1" 로 수직 1픽셀 선 -->
-            <Border Grid.Column="1"
+            <Border Grid.Column="2"
                     HorizontalAlignment="Left"
                     Width="1"
                     Background="Gray"
                     />
             <!-- (오른쪽) 정보 표시 영역 -->
 
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="2">
                 <ContentControl x:Name="MainContent" />
             </Grid>
         </Grid>

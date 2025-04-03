@@ -158,10 +158,15 @@ namespace DamoOneVision.ImageProcessing
 
 
 
-		public static async Task<bool> InfraredCameraModel( MIL_ID InfraredCameraImage, MIL_ID SideCameraDisplay )
+		public static async Task<bool> InfraredCameraModel( MIL_ID InfraredCameraImage, MIL_ID SideCameraDisplay, ushort[ ] ImageData )
 		{
-			Logger.WriteLine( "InfraredCameraModel 호출" );
+			//Logger.WriteLine( "InfraredCameraModel 호출" );
+			bool blobGood = false;
+			bool circleGood = false;
+			bool moonCutGood = false;
 			bool isGood = false;
+			bool temperatureGood = false;
+
 			//MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
 			MIL_ID BlobContext = MIL.M_NULL;
@@ -172,7 +177,13 @@ namespace DamoOneVision.ImageProcessing
 
 			double maxPixel = 0.0;
 			double ConvexHullArea = 0.0;
+			double BlobTouchingImageBorders = 0.0;
+			double Area = 0.0;
 			double Radius = 0.0;
+			double FillRatio = 0;
+
+
+			int binarizedValue=32500;
 
 			if (BinarizedImage != MIL.M_NULL)
 			{
@@ -196,7 +207,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
 
 			/// 
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, 32000, MIL.M_NULL );
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, binarizedValue, MIL.M_NULL );
 
 			///
 			/*
@@ -239,46 +250,116 @@ namespace DamoOneVision.ImageProcessing
 
 			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
 
-			Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
-			
+			//Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
+			int SelectBlob = 0;
+			double LastConvexHullArea = 0.0;
+			double LastBlobTouchingImageBorders = 0.0;
 			for (MIL_INT i = 0; i < selectedBlobCount; i++)
 			{
 
 				// M_BLOB_INDEX 속성 가져오기
 				// 블롭 인덱스는 보통 0부터 시작
 				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_CONVEX_HULL_AREA + MIL.M_TYPE_MIL_DOUBLE, ref ConvexHullArea );
+				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
+
+				if (LastConvexHullArea <= ConvexHullArea)
+				{
+					LastConvexHullArea = ConvexHullArea;
+					LastBlobTouchingImageBorders = BlobTouchingImageBorders;
+					SelectBlob = (int)i;
+				}
+
 
 				Logger.WriteLine( $"블롭 {i}의 ConvexHullArea: {ConvexHullArea}\n" );
 
+			}
+
+			if ( selectedBlobCount != 0 && BlobTouchingImageBorders == 0 )
+			{
+				blobGood = true;
+			}
+			else
+			{
+				Logger.WriteLine( "selectedBlobCount가 0입니다." );
+				blobGood = false;
 			}
 
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
 
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_CENTER, 320.0, 240.0 );
-			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, 132.0, 240.0 );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, 137.0, 240.0 );
 			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, MeasMarker, MIL.M_DEFAULT );
 
 			try
 			{
 				MIL.MmeasGetResult( MeasMarker, MIL.M_RADIUS + MIL.M_TYPE_MIL_DOUBLE, ref Radius, MIL.M_NULL );
+				Logger.WriteLine( $"Radius: {Radius}" );
 			}
 			catch (Exception ex)
 			{
 				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
 			}
-			double Area = Math.PI * Radius * Radius;
-			double FillRatio = ConvexHullArea / Area;
-			Logger.WriteLine( $"FillRatio: {FillRatio}" );
-			if (FillRatio > 0.98)
+
+			
+
+			if (Radius == 0 || Radius < 137.0)
 			{
-				isGood = true;
+				Logger.WriteLine( "Radius가 0입니다." );
+				circleGood = false;
 			}
 			else
 			{
-				isGood = false;
-
+				Area = Math.PI * Radius * Radius;
+				FillRatio = ConvexHullArea / Area;
+				Logger.WriteLine( $"FillRatio: {FillRatio}" );
+				circleGood = true;
 			}
+
+
+			if ( FillRatio > 0.97 && FillRatio < 1.5 )
+			{
+				moonCutGood = true;
+			}
+			else
+			{
+				moonCutGood = false;
+			}
+
+
+			double sum = 0;
+			int divnum = 0;
+			int avg = 0;
+			for (int i = 0; i < ImageData.Length; i++)
+			{
+				if (ImageData[ i ] >= binarizedValue)
+				{
+					sum += ImageData[ i ];
+					divnum++;
+				}
+			}
+			if (divnum != 0)
+			{
+				avg = (int)(sum / divnum);
+			}
+
+
+			if ( avg > 33000 && avg < 35000 )
+			{
+				temperatureGood = true;
+			}
+			else
+			{
+				temperatureGood = false;
+				Logger.WriteLine("평균온도 이상");
+			}
+
+			Logger.WriteLine( $"avg: {avg}" );
+
+
+
+
+			isGood = blobGood && circleGood && moonCutGood && temperatureGood;
 			/*
 
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius * 2 - 20 );
@@ -326,7 +407,7 @@ namespace DamoOneVision.ImageProcessing
 
 			//BinarizedImage = MIL.M_NULL;
 			//MIL.MbufFree( CircleMeasMarker );
-			Logger.WriteLine( "InfraredCameraModel 종료" );
+			//Logger.WriteLine( "InfraredCameraModel 종료" );
 			return isGood;
 		}
 

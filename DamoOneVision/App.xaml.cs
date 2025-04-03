@@ -92,7 +92,8 @@ namespace DamoOneVision
 			services.AddSingleton<MainWindow>( sp => new MainWindow(
 				sp.GetRequiredService<MainViewModel>(),
 				sp.GetRequiredService<ManualViewModel>(),
-				milSystemService
+				milSystemService,
+				sp.GetRequiredService<CameraService>()
 			) );
 		}
 

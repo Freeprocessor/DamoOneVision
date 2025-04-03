@@ -30,6 +30,30 @@ namespace DamoOneVision.Camera
 		{
 			this._cameraName = CameraName;
 			this._library = Library;
+			CameraInit();
+
+
+		}
+
+		private void CameraInit( )
+		{
+			if (_library == "Matrox")
+			{
+				camera = new MatroxCamera( _cameraName );
+			}
+			else if (_library == "Spinnaker")
+			{
+				camera = new SpinnakerCamera( _cameraName );
+			}
+			else if (_library == "USB")
+			{
+				//camera = new USBCamera();
+			}
+			else
+			{
+				Logger.WriteLine( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
+				throw new Exception( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
+			}
 		}
 
 		public async Task ConnectAsync( )
@@ -37,23 +61,7 @@ namespace DamoOneVision.Camera
 
 			await Task.Run( async ( ) =>
 			{
-				if (_library == "Matrox")
-				{
-					camera = new MatroxCamera( _cameraName );
-				}
-				else if (_library == "Spinnaker")
-				{
-					camera = new SpinnakerCamera( _cameraName );
-				}
-				else if (_library == "USB")
-				{
-					//camera = new USBCamera();
-				}
-				else
-				{
-					Logger.WriteLine( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
-					throw new Exception( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
-				}
+
 
 				if (camera.Connect())
 				{
@@ -151,6 +159,26 @@ namespace DamoOneVision.Camera
 
 		}
 
+		public MIL_ID ReciveLoadImage( )
+		{
+			if (camera != null)
+			{
+				return camera.ReciveLoadImage(); ;
+			}
+			return MIL.M_NULL;
+
+		}
+
+		public MIL_ID ReciveLoadScaleImage( )
+		{
+			if (camera != null)
+			{
+				return camera.ReciveLoadScaleImage(); ;
+			}
+			return MIL.M_NULL;
+
+		}
+
 		public MIL_INT Width( )
 		{
 			return camera.Width;
@@ -172,6 +200,24 @@ namespace DamoOneVision.Camera
 		public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
 			return camera.LoadImage( MilSystem, filePath );
+		}
+
+		public ushort[ ] LoadImageData( )
+		{
+			if (camera != null)
+			{
+				return camera.LoadImageData();
+			}
+			return null;
+		}
+
+		public ushort[ ] CaptureImageData( )
+		{
+			if (camera != null)
+			{
+				return camera.CaptureImageData();
+			}
+			return null;
 		}
 
 		public void AutoFocus( )

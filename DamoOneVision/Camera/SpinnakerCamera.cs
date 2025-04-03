@@ -230,6 +230,35 @@ namespace DamoOneVision.Camera
 
 		}
 
+		public ushort[ ] LoadImageData( )
+		{
+			ushort[ ] imageData = new ushort[ Width * Height ];
+			if (MilImage != MIL.M_NULL)
+			{
+				MIL.MbufGet( MilImage, imageData );
+			}
+			return imageData;
+		}
+
+		public ushort[ ] CaptureImageData( )
+		{
+			ushort[ ] imageData = new ushort[ Width * Height ];
+			if (MilImage != MIL.M_NULL)
+			{
+				MIL.MbufGet( MilImage, imageData );
+			}
+			return imageData;
+		}
+
+		public MIL_ID ReciveLoadImage( )
+		{
+			return MIL.M_NULL;
+		}
+		public MIL_ID ReciveLoadScaleImage( )
+		{
+			return MIL.M_NULL;
+		}
+
 
 	}
 }

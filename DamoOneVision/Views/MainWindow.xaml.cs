@@ -25,6 +25,7 @@ using Newtonsoft.Json.Linq;
 using DamoOneVision.ImageProcessing;
 using DamoOneVision.Models;
 using DamoOneVision.Views;
+using System.Windows.Input;
 
 
 namespace DamoOneVision
@@ -62,10 +63,12 @@ namespace DamoOneVision
 
 		private readonly MilSystemService _milSystemService;
 
+		private CameraService _cameraService;
 
 
 
-		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, MilSystemService milSystemService )
+
+		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, MilSystemService milSystemService, CameraService cameraService )
 		{
 			InitializeComponent();
 
@@ -77,6 +80,8 @@ namespace DamoOneVision
 			this.DataContext = _mainViewModel;
 
 			_milSystemService = milSystemService;
+
+			_cameraService = cameraService;
 
 
 			InitMILDisplay();
@@ -151,6 +156,65 @@ namespace DamoOneVision
 			//mainSideCamera3Display.DisplayId = _sideCamera3Display;
 			//mainSideCamera3ConversionDisplay.DisplayId = MainSideCamera3ConversionDisplay;
 
+		}
+
+		private void MILWPFDisplay_MouseMove( object sender, MouseEventArgs e )
+		{
+			const int imageWidth = 640;
+			const int imageHeight = 480;
+			// 컨트롤 내 마우스 위치 가져오기
+			var pos = e.GetPosition(mainInfraredCameraDisplay);
+			double mouseX = pos.X;
+			double mouseY = pos.Y;
+
+			// 디스플레이 크기
+			double displayWidth = mainInfraredCameraDisplay.ActualWidth;
+			double displayHeight = mainInfraredCameraDisplay.ActualHeight;
+
+			// 종횡비 계산
+			double imageAspect = (double)imageWidth / imageHeight;
+			double displayAspect = displayWidth / displayHeight;
+
+			double scale, offsetX = 0, offsetY = 0;
+			if (displayAspect > imageAspect)
+			{
+				scale = displayHeight / imageHeight;
+				double scaledImageWidth = imageWidth * scale;
+				offsetX = (displayWidth - scaledImageWidth) / 2.0;
+			}
+			else
+			{
+				scale = displayWidth / imageWidth;
+				double scaledImageHeight = imageHeight * scale;
+				offsetY = (displayHeight - scaledImageHeight) / 2.0;
+			}
+
+			// 실제 이미지 좌표 계산 (반올림 적용)
+			int ix = (int)Math.Round((mouseX - offsetX) / scale);
+			int iy = (int)Math.Round((mouseY - offsetY) / scale);
+
+			// 경계 체크 (0 <= ix < imageWidth, 0 <= iy < imageHeight)
+			if (ix < 0) ix = 0;
+			else if (ix >= imageWidth) ix = imageWidth - 1;
+			if (iy < 0) iy = 0;
+			else if (iy >= imageHeight) iy = imageHeight - 1;
+
+			//Logger.WriteLine( $"마우스: ({mouseX:F1}, {mouseY:F1}) => 이미지 좌표: ({ix}, {iy})" );
+
+			// 이미지 데이터가 ushort[] 배열이라고 가정
+			ushort[] imageData = _cameraService.ImageData();
+			if (imageData != null && imageData.Length >= imageWidth * imageHeight)
+			{
+				int index = iy * imageWidth + ix;
+				ushort pixelValue = imageData[index];
+				//Logger.WriteLine( $"온도 값: {(double)(pixelValue-27315)/100}" );
+				_mainViewModel.CurrentTemperature = $"{(double) (pixelValue - 27315) / 100}°C";
+
+			}
+			else
+			{
+				//Logger.WriteLine( "ImageData가 null이거나 크기가 올바르지 않습니다." );
+			}
 		}
 
 

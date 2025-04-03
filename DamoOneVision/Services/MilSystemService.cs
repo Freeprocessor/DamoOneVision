@@ -67,6 +67,7 @@ namespace DamoOneVision.Services
 			MIL.MdispControl( displayId, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
 			MIL.MdispControl( displayId, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
 			MIL.MdispControl( displayId, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
+			MIL.MdispControl( displayId, MIL.M_MOUSE_USE, MIL.M_DISABLE );
 
 			if (isInfrared)
 			{

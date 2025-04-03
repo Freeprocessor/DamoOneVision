@@ -39,6 +39,7 @@ namespace DamoOneVision.Services
 		const int TOWERLAMP_YELLOW = 0x01;
 		const int TOWERLAMP_GREEN = 0x02;
 		const int EJECTOR = 0x03;
+		const int SIDECV = 0x04;
 		const int MAINCV = 0x06;
 
 
@@ -123,6 +124,16 @@ namespace DamoOneVision.Services
 		public void MainCVOff( )
 		{
 			_advantechCard.WriteCoil[ MAINCV ] = false;
+		}
+
+		public void SideCVOn( )
+		{
+			_advantechCard.WriteCoil[ SIDECV ] = true;
+		}
+
+		public void SideCVOff( )
+		{
+			_advantechCard.WriteCoil[ SIDECV ] = false;
 		}
 
 		//public async void Vision1LampONAsync( )
@@ -279,6 +290,7 @@ namespace DamoOneVision.Services
 			await _motionService.XAxisMoveWaitPos();
 			await _motionService.ZAxisMoveWorkPos();
 			MainCVOn();
+			SideCVOn();
 			//Logger.WriteLine( "Trigger Reading Start." );
 			TriggerReadingStartAsync();
 			TowerLampAsync( "START" );
@@ -291,6 +303,7 @@ namespace DamoOneVision.Services
 			await TriggerReadingStopAsync();
 			//Logger.WriteLine( "Trigger Reading Stop." );
 			MainCVOff();
+			SideCVOff();
 			//Logger.WriteLine( "C/V OFF" );
 			TowerLampAsync( "STOP" );
 			Logger.WriteLine( "Machine Stop." );

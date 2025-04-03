@@ -68,14 +68,16 @@
 
             <!-- ImageLoad & Log Tab -->
             <TabControl Margin="0,0,0,10">
-                <TabItem Header="ImageLoad" Height="50">
-                    <Grid Height="200">
+                <TabItem Header="ImageLoad" Height="50" >
+                    <Grid Height="200" PreviewMouseWheel="ImageListBox_PreviewMouseWheel">
                         <ScrollViewer Margin="10,10,10,40" 
                                               VerticalScrollBarVisibility="Auto" 
                                               HorizontalScrollBarVisibility="Disabled">
                             <ListBox ItemsSource="{Binding ImagePaths}"
-                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                     SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      >
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Orientation="Horizontal"/>
@@ -88,6 +90,13 @@
                                         </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
+                                <!-- 이벤트 트리거를 통해 SelectionChanged 시 커맨드 실행 -->
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding ImageSelectedCommand}"
+                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                             </ListBox>
                         </ScrollViewer>
                         <Button Content="Load File" 
@@ -96,6 +105,7 @@
                                         HorizontalAlignment="Right"
                                         Height="25"
                                         Width="68"
+                                        Command="{Binding LoadImagesCommand}"
                                         Style="{DynamicResource MaterialDesignRaisedButton}"/>
                     </Grid>
                 </TabItem>
