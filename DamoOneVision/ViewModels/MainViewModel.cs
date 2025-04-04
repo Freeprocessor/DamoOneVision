@@ -240,17 +240,17 @@ namespace DamoOneVision.ViewModels
 
 
 
-		SettingManager settingManager;
+		private readonly SettingManager _settingManager;
 		//public MainViewModel()
 		//{
 
 		//}
 
-		public MainViewModel( DeviceControlService deviceControlService, CameraService cameraService)
+		public MainViewModel( DeviceControlService deviceControlService, CameraService cameraService, SettingManager settingManager)
 		{
 			_deviceControlService = deviceControlService;
 			_cameraService = cameraService;
-
+			_settingManager = settingManager;
 
 			InitLocalAppFolder();
 			_jsonHandler = new JsonHandler( modelfile );
@@ -324,7 +324,7 @@ namespace DamoOneVision.ViewModels
 			ImageSelectedCommand = new RelayCommand<string>( OnImageSelected );
 
 
-			settingManager = new SettingManager( deviceControlService );
+
 		}
 
 		private void OnCameraConnectedChanged( bool connected )
@@ -359,7 +359,7 @@ namespace DamoOneVision.ViewModels
 			imageFolder = System.IO.Path.Combine( imageFolder, "RAWInfraredCamera" );
 			//imageFolder = System.IO.Path.Combine( imageFolder, "2025-04-2" );
 			modelfolder = System.IO.Path.Combine( appFolder, "Model" );
-			modelfile = System.IO.Path.Combine( modelfolder, "Models.model" );
+			modelfile = System.IO.Path.Combine( modelfolder, "Models.json" );
 			if (!Directory.Exists( appFolder ))
 			{
 				Directory.CreateDirectory( appFolder );

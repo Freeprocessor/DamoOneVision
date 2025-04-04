@@ -91,7 +91,7 @@
                             <MenuItem Header="Manual" IsCheckable="False" Click="ManualButton_Click"/>
 
                             <Separator/>
-                            <MenuItem Header="Model Load"/>
+                            <MenuItem Header="Model" IsCheckable="False" Click="ModelButton_Click"/>
                             <MenuItem Header="About"/>
                         </MenuItem>
                     </Menu>

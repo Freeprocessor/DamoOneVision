@@ -26,6 +26,7 @@ using DamoOneVision.ImageProcessing;
 using DamoOneVision.Models;
 using DamoOneVision.Views;
 using System.Windows.Input;
+using System.Runtime.CompilerServices;
 
 
 namespace DamoOneVision
@@ -57,9 +58,14 @@ namespace DamoOneVision
 
 		private ManualViewModel _manualViewModel;
 
+		private SettingViewModel _settingViewModel;
+
+
 		private MainUserControl _mainUserControl;
 
 		private ManualUserControl _manualUserControl;
+
+		private SettingUserControl _settingUserControl;
 
 		private readonly MilSystemService _milSystemService;
 
@@ -68,13 +74,14 @@ namespace DamoOneVision
 
 
 
-		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, MilSystemService milSystemService, CameraService cameraService )
+		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, SettingViewModel settingViewModel, MilSystemService milSystemService, CameraService cameraService )
 		{
 			InitializeComponent();
 
 
 			_mainViewModel = mainViewModel;
 			_manualViewModel = manualViewModel;
+			_settingViewModel = settingViewModel;
 
 			/// ViewModel을 DataContext로 설정
 			this.DataContext = _mainViewModel;
@@ -91,6 +98,8 @@ namespace DamoOneVision
 
 			_manualUserControl = new ManualUserControl( _manualViewModel );
 
+			_settingUserControl = new SettingUserControl( _settingViewModel );
+
 			MainContent.Content = _mainUserControl;
 
 			// ManualUserControl에서 이벤트 구독 (예: "돌아가기" 신호)
@@ -98,6 +107,11 @@ namespace DamoOneVision
 			{
 				MainContent.Content = _mainUserControl;
 				_manualViewModel.PositionReadStop();
+			};
+
+			_settingUserControl.GoMainRequested += ( s, e ) =>
+			{
+				MainContent.Content = _mainUserControl;
 			};
 
 
@@ -226,28 +240,20 @@ namespace DamoOneVision
 
 		}
 
+
+		private void ModelButton_Click( object sender, RoutedEventArgs e )
+		{
+			// Manual 화면으로 전환
+			MainContent.Content = _settingUserControl;
+
+		}
+
 		private void Click( object sender, RoutedEventArgs e )
 		{
 			MessageBox.Show( "버튼이 클릭되었습니다." );
 			Logger.WriteLine( "버튼이 클릭되었습니다." );
 		}
 
-		private void GoodLamp( bool isGood )
-		{
-			if (!isGood)
-			{
-				Logger.WriteLine( "Reject" );
-
-				//GoodRejectLamp.Background = System.Windows.Media.Brushes.Red;
-				//GoodRejectText.Content = "Reject";
-			}
-			else
-			{
-				Logger.WriteLine( "Good" );
-				//GoodRejectLamp.Background = System.Windows.Media.Brushes.Green;
-				//GoodRejectText.Content = "Good";
-			}
-		}
 
 
 

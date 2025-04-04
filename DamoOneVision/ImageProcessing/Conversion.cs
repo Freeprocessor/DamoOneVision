@@ -158,7 +158,7 @@ namespace DamoOneVision.ImageProcessing
 
 
 
-		public static async Task<bool> InfraredCameraModel( MIL_ID InfraredCameraImage, MIL_ID SideCameraDisplay, ushort[ ] ImageData )
+		public static async Task<bool> InfraredCameraModel( MIL_ID InfraredCameraImage, MIL_ID SideCameraDisplay, InfraredCameraModel infraredCameraModel, ushort[ ] ImageData )
 		{
 			//Logger.WriteLine( "InfraredCameraModel 호출" );
 			bool blobGood = false;
@@ -175,15 +175,11 @@ namespace DamoOneVision.ImageProcessing
 			MIL_ID MilOverlayImage = MIL.M_NULL;
 			MIL_ID BinarizedImage = MIL.M_NULL;
 
-			double maxPixel = 0.0;
 			double ConvexHullArea = 0.0;
 			double BlobTouchingImageBorders = 0.0;
 			double Area = 0.0;
 			double Radius = 0.0;
 			double FillRatio = 0;
-
-
-			int binarizedValue=32500;
 
 			if (BinarizedImage != MIL.M_NULL)
 			{
@@ -207,7 +203,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
 
 			/// 
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, binarizedValue, MIL.M_NULL );
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, infraredCameraModel.BinarizedThreshold, MIL.M_NULL );
 
 			///
 			/*
@@ -269,10 +265,8 @@ namespace DamoOneVision.ImageProcessing
 					SelectBlob = (int)i;
 				}
 
-
-				Logger.WriteLine( $"블롭 {i}의 ConvexHullArea: {ConvexHullArea}\n" );
-
 			}
+			Logger.WriteLine( $"블롭 {SelectBlob}의 ConvexHullArea: {ConvexHullArea}\n" );
 
 			if ( selectedBlobCount != 0 && BlobTouchingImageBorders == 0 )
 			{
@@ -287,8 +281,8 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
 
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
-			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_CENTER, 320.0, 240.0 );
-			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, 137.0, 240.0 );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_CENTER, infraredCameraModel.CircleCenterX, infraredCameraModel.CircleCenterY );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, infraredCameraModel.CircleMinRadius, infraredCameraModel.CircleMaxRadius );
 			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, MeasMarker, MIL.M_DEFAULT );
 
 			try
@@ -303,9 +297,9 @@ namespace DamoOneVision.ImageProcessing
 
 			
 
-			if (Radius == 0 || Radius < 137.0)
+			if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
 			{
-				Logger.WriteLine( "Radius가 0입니다." );
+				Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
 				circleGood = false;
 			}
 			else
@@ -317,7 +311,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			if ( FillRatio > 0.97 && FillRatio < 1.5 )
+			if ( FillRatio > infraredCameraModel.CircleMinAreaRatio && FillRatio < infraredCameraModel.CircleMaxAreaRatio )
 			{
 				moonCutGood = true;
 			}
@@ -332,7 +326,7 @@ namespace DamoOneVision.ImageProcessing
 			int avg = 0;
 			for (int i = 0; i < ImageData.Length; i++)
 			{
-				if (ImageData[ i ] >= binarizedValue)
+				if (ImageData[ i ] >= infraredCameraModel.BinarizedThreshold)
 				{
 					sum += ImageData[ i ];
 					divnum++;
@@ -344,7 +338,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			if ( avg > 33000 && avg < 35000 )
+			if ( avg > infraredCameraModel.AvgTemperatureMin && avg < infraredCameraModel.AvgTemperatureMax )
 			{
 				temperatureGood = true;
 			}

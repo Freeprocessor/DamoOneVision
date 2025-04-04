@@ -15,8 +15,10 @@ namespace DamoOneVision.Models
 		public double XAxisEndPostion { get; set; }
 		public double XAxisTrackingSpeed { get; set; }
 		public double XAxisReturnSpeed { get; set; }
-		public double XAxisAcceleration { get; set; }
-		public double XAxisDeceleration { get; set; }
+		public double XAxisMoveAcceleration { get; set; }
+		public double XAxisMoveDeceleration { get; set; }
+		public double XAxisReturnAcceleration { get; set; }
+		public double XAxisReturnDeceleration { get; set; }
 		public double XAxisJogSpeed { get; set; }
 		public double XAxisJogAcceleration { get; set; }
 		public double XAxisJogDeceleration { get; set; }

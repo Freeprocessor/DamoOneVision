@@ -1,4 +1,5 @@
 ﻿using DamoOneVision.Camera;
+using DamoOneVision.Data;
 using DamoOneVision.Services;
 using DamoOneVision.ViewModels;
 using DamoOneVision.Views;
@@ -35,6 +36,8 @@ namespace DamoOneVision
 
 		private void ConfigureServices( IServiceCollection services )
 		{
+
+
 			// 카메라 인스턴스(여러 카메라가 있으므로, 미리 생성하여 등록)
 			var infraredCamera = new CameraManager("Matrox", "InfraredCamera");
 			var sideCamera1 = new CameraManager("Matrox", "SideCamera1");
@@ -77,10 +80,16 @@ namespace DamoOneVision
 				modbus, advantechCard, motionService
 			) );
 
+			services.AddSingleton<SettingManager>( sp => new SettingManager(
+				sp.GetRequiredService<DeviceControlService>(),
+				sp.GetRequiredService<CameraService>()
+			) );
+
 			// ViewModel들
 			services.AddSingleton<MainViewModel>( sp => new MainViewModel(
 				sp.GetRequiredService<DeviceControlService>(),
-				sp.GetRequiredService<CameraService>()
+				sp.GetRequiredService<CameraService>(),
+				sp.GetRequiredService<SettingManager>()
 			) );
 			services.AddSingleton<ManualViewModel>( sp => new ManualViewModel(
 				sp.GetRequiredService<DeviceControlService>(),
@@ -88,10 +97,16 @@ namespace DamoOneVision
 				sp.GetRequiredService<CameraService>()
 			) );
 
+			services.AddSingleton<SettingViewModel>( sp => new SettingViewModel(
+				sp.GetRequiredService<SettingManager>()
+			) );
+
+
 			// MainWindow: 생성자에 MainViewModel, ManualViewModel, MilSystemService 주입
 			services.AddSingleton<MainWindow>( sp => new MainWindow(
 				sp.GetRequiredService<MainViewModel>(),
 				sp.GetRequiredService<ManualViewModel>(),
+				sp.GetRequiredService<SettingViewModel>(),
 				milSystemService,
 				sp.GetRequiredService<CameraService>()
 			) );

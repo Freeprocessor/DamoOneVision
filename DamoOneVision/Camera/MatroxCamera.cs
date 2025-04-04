@@ -81,7 +81,7 @@ namespace DamoOneVision.Camera
 		}
 
 
-		public bool Connect(  )
+		public bool Connect( )
 		{
 
 			// MILContext에서 MilSystem 가져오기

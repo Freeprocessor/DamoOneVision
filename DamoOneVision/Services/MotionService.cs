@@ -33,6 +33,9 @@ namespace DamoOneVision.Services
 		const int ALARMRESET = 1;
 		const int SERVOBREAK = 2;
 
+		bool isXAxisHome = false;
+		bool isZAxisHome = false;
+
 		public int CameraDelay { get; set; }
 
 		private double _lastPosition = 0;
@@ -80,7 +83,7 @@ namespace DamoOneVision.Services
 		{
 			_motionModel = motionModel;
 
-			CameraDelay = (int) (_motionModel.XAxisAcceleration * 1000.0 * 5 );
+			CameraDelay = (int) (_motionModel.XAxisMoveAcceleration * 1000.0 * 5 );
 			XAxisServoOn();
 			ZAxisServoOn();
 
@@ -168,6 +171,8 @@ namespace DamoOneVision.Services
 		/// </summary>
 		public async Task XAxisMoveToPosition( double position, double velocity, double acceleration, double deceleration )
 		{
+			if (!isXAxisHome)
+				return;
 			if (!_isInitialized)
 			{
 				MessageBox.Show( "모션 라이브러리가 초기화되지 않았습니다!", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
@@ -189,6 +194,8 @@ namespace DamoOneVision.Services
 
 		public async Task ZAxisMoveToPosition( double position, double velocity, double acceleration, double deceleration )
 		{
+			if (!isZAxisHome)
+				return;
 			if (!_isInitialized)
 			{
 				MessageBox.Show( "모션 라이브러리가 초기화되지 않았습니다!", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
@@ -210,6 +217,8 @@ namespace DamoOneVision.Services
 
 		public void XAxisHome( )
 		{
+			if (isXAxisHome)
+				return;
 			Logger.WriteLine( "X-Axis Home" );
 			uint duRetCode = 0;
 			// 지정축의 원점 검색 파라미터를 설정합니다.
@@ -233,10 +242,13 @@ namespace DamoOneVision.Services
 			}
 
 			Logger.WriteLine( "X-Axis Home End" );
+			isXAxisHome = true;
 		}
 
 		public void ZAxisHome( )
 		{
+			if (isZAxisHome)
+				return;
 			Logger.WriteLine( "Z-Axis Home" );
 			uint duRetCode = 0;
 			// 지정축의 원점 검색 파라미터를 설정합니다.
@@ -258,18 +270,19 @@ namespace DamoOneVision.Services
 			}
 
 			Logger.WriteLine( "Z-Axis Home End" );
+			isZAxisHome = true;
 		}
 
 		public async Task XAxisMoveWaitPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, 0.05, 0.05 );
+			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, _motionModel.XAxisReturnAcceleration, _motionModel.XAxisReturnDeceleration );
 			await XAxisWaitingStop();
 			//Logger.WriteLine( "XAxisMoveWaitPos" );
 		}
 
 		public async Task XAxisMoveEndPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisEndPostion, ConveyorSpeed*1000, _motionModel.XAxisAcceleration, _motionModel.XAxisDeceleration );
+			await XAxisMoveToPosition( _motionModel.XAxisEndPostion, ConveyorSpeed*1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
 			Logger.WriteLine( $"Conveyor Speed : {ConveyorSpeed} mm/s" );
 			//await XAxisWaitingStop();
 		}
@@ -391,6 +404,7 @@ namespace DamoOneVision.Services
 			//++ 지정한 축의 서보온을 설정합니다.
 
 			CAXM.AxmSignalWriteOutputBit( X, SERVOON, 0 );
+			isXAxisHome = false;
 		}
 		public void ZAxisServoOn( )
 		{
@@ -406,6 +420,7 @@ namespace DamoOneVision.Services
 
 			CAXM.AxmSignalWriteOutputBit( Z, SERVOON, 0 );
 			XAxisBreakOn();
+			isXAxisHome = false;
 		}
 
 

@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
+using DamoOneVision.Models;
+
 
 namespace DamoOneVision.Services
 {
@@ -36,6 +38,8 @@ namespace DamoOneVision.Services
 		private readonly CameraManager _sideCamera3;
 
 		private readonly Lazy<MainViewModel> _mainViewModel;
+
+		private InfraredCameraModel _infraredCameraModel;
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
@@ -90,6 +94,11 @@ namespace DamoOneVision.Services
 			_sideCamera1 = sideCamera1;
 			_sideCamera2 = sideCamera2;
 			_sideCamera3 = sideCamera3;
+		}
+
+		public async void SetModel( InfraredCameraModel infraredCameraModel )
+		{
+			_infraredCameraModel = infraredCameraModel;
 		}
 
 		public async Task ConnectAction( )
@@ -177,7 +186,7 @@ namespace DamoOneVision.Services
 			_infraredCamera.LoadImage( MilSystem, filePath );
 
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
-			if (await Conversion.InfraredCameraModel( _infraredCamera.ReciveLoadImage(), _infraredCameraDisplay , ImageData()))
+			if (await Conversion.InfraredCameraModel( _infraredCamera.ReciveLoadImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData()))
 			{
 				vm.IsGoodColor = "Green";
 				vm.IsGoodStatus = "Good";
@@ -293,7 +302,7 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay, ImageData() );
+							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay, _infraredCameraModel, ImageData() );
 
 							Logger.WriteLine( "이미지 처리 완료" );
 

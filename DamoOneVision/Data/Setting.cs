@@ -1,11 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SQLite;
-
 using System.Text.Json;
 using DamoOneVision.Models;
 using DamoOneVision.Services;
@@ -17,7 +12,7 @@ namespace DamoOneVision.Data
 		public string InfraredCameraSerial { get; set; }
 		public string SideCamera1Serial { get; set; }
 		public string SideCamera2Serial { get; set; }
-		public string SideCamera3Serial { get; set; }	
+		public string SideCamera3Serial { get; set; }
 		public string LastOpenedModel { get; set; }
 
 		public static AppSettings Load( string filePath )
@@ -31,22 +26,24 @@ namespace DamoOneVision.Data
 		}
 	}
 
-
-
-
-
-	internal class SettingManager
+	public class SettingManager
 	{
 		string localAppData;
 		string appFolder;
 		string modelPath;
 		string settingPath;
 		private DeviceControlService _deviceControlService;
+		private CameraService _cameraService;
 		public AppSettings Settings { get; private set; }
 
-		public SettingManager( DeviceControlService deviceControlService)
+		public string AppFolder => appFolder;
+		public string ModelFolder => modelPath;
+		public string SettingPath => settingPath;
+
+		public SettingManager( DeviceControlService deviceControlService, CameraService cameraService )
 		{
-			_deviceControlService = deviceControlService; 
+			_deviceControlService = deviceControlService;
+			_cameraService = cameraService;
 			localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = Path.Combine( localAppData, "DamoOneVision" );
 			modelPath = Path.Combine( appFolder, "Model" );
@@ -56,20 +53,15 @@ namespace DamoOneVision.Data
 			LoadSettings();
 		}
 
-		private void InitializeSetting(  )
+		private void InitializeSetting( )
 		{
-			string ModelPath = Path.Combine(modelPath, "Models.model");
-
-			if (!File.Exists( appFolder ))
-			{
+			// 폴더 생성
+			if (!Directory.Exists( appFolder ))
 				Directory.CreateDirectory( appFolder );
-			}
-
-			if (!File.Exists( modelPath ))
-			{
+			if (!Directory.Exists( modelPath ))
 				Directory.CreateDirectory( modelPath );
-			}
 
+			// 설정 파일 생성
 			if (!File.Exists( settingPath ))
 			{
 				AppSettings settings = new AppSettings
@@ -86,46 +78,52 @@ namespace DamoOneVision.Data
 				File.WriteAllText( settingPath, json );
 			}
 
-			if (!File.Exists( ModelPath ))
+			// 모델 파일 생성
+			string defaultModelFile = Path.Combine(modelPath, "Models.json");
+			if (!Directory.Exists( defaultModelFile ))
 			{
-				InfraredCameraModel infraredCameraModels = new InfraredCameraModel
+
+
+				InfraredCameraModel defaultCameraModel = new InfraredCameraModel
 				{
 					Name = "Default",
-					CircleCenterX = 219.0,
-					CircleCenterY = 184.0,
-					CircleMinRadius = 115.0,
-					CircleMaxRadius = 183.5,
-					BinarizedThreshold = 12500
+					BinarizedThreshold = 32000,
+					CircleCenterX = 320.0,
+					CircleCenterY = 240.0,
+					CircleMinRadius = 137.0,
+					CircleMaxRadius = 240.0,
+					CircleMinAreaRatio = 0.97,
+					CircleMaxAreaRatio = 1.5,
+					AvgTemperatureMin = 33000,
+					AvgTemperatureMax = 35000
 				};
 
-				MotionModel motionModel = new MotionModel
+				MotionModel defaultMotionModel = new MotionModel
 				{
 					Name = "Default",
 					XAxisWaitingPostion = 1000.0,
 					XAxisEndPostion = 200000.0,
 					XAxisTrackingSpeed = 10000.0,
-					XAxisReturnSpeed = 50000.0,
-					XAxisAcceleration = 0.1,
-					XAxisDeceleration = 0.1,
+					XAxisReturnSpeed = 850000,
+					XAxisMoveAcceleration = 0.015,
+					XAxisMoveDeceleration = 0.015,
+					XAxisReturnAcceleration = 0.05,
+					XAxisReturnDeceleration = 0.05,
 					XAxisJogSpeed = 10000.0,
 					XAxisJogAcceleration = 0.1,
 					XAxisJogDeceleration = 0.1,
-
 					XAxisOriginDirection = 0,
 					XAxisOriginSensor = 1,
 					XAxisOriginUseZPhase = 0,
 					XAxisOriginDelay = 1000.0,
 					XAxisOriginOffset = 2000.0,
-
 					XAxisOriginSpeed1 = 10000.0,
 					XAxisOriginSpeed2 = 5000.0,
 					XAxisOriginCreepSpeed = 1000.0,
 					XAxisOriginZPhaseSpeed = 500.0,
 					XAxisOriginAcceleration = 0.1,
 					XAxisOriginDeceleration = 0.1,
-
-
-					ZAxisWorkPostion = 43000.0,
+					ZAxisWorkPostion = 47000.0,
 					ZAxisEndPostion = 130000.0,
 					ZAxisSpeed = 20000.0,
 					ZAxisAcceleration = 0.1,
@@ -133,13 +131,11 @@ namespace DamoOneVision.Data
 					ZAxisJogSpeed = 10000.0,
 					ZAxisJogAcceleration = 0.1,
 					ZAxisJogDeceleration = 0.1,
-
 					ZAxisOriginDirection = 0,
 					ZAxisOriginSensor = 1,
 					ZAxisOriginUseZPhase = 1,
 					ZAxisOriginDelay = 1000.0,
 					ZAxisOriginOffset = 0.0,
-
 					ZAxisOriginSpeed1 = 10000.0,
 					ZAxisOriginSpeed2 = 5000.0,
 					ZAxisOriginCreepSpeed = 1000.0,
@@ -148,48 +144,70 @@ namespace DamoOneVision.Data
 					ZAxisOriginDeceleration = 0.1,
 				};
 
-
-				ModelData ModelData = new ModelData();
-				ModelData.InfraredCameraModels.Add( infraredCameraModels );
-				ModelData.MotionModels.Add( motionModel );
+				ModelData modelData = new ModelData();
+				modelData.InfraredCameraModels.Add( defaultCameraModel );
+				modelData.MotionModels.Add( defaultMotionModel );
 
 				var options = new JsonSerializerOptions { WriteIndented = true };
-				string json = JsonSerializer.Serialize(ModelData, options);
-				File.WriteAllText( ModelPath, json );
+				string json = JsonSerializer.Serialize(modelData, options);
+				File.WriteAllText( defaultModelFile, json );
 			}
-
 		}
-		private void LoadSettings( )
+
+		public void LoadSettings( )
 		{
 			Settings = AppSettings.Load( settingPath );
 			LoadModel( Settings.LastOpenedModel );
 		}
 
-		private void LoadModel( string modelName )
+		// Load ModelData from the Models.json file.
+		public ModelData LoadModelData( )
 		{
-			//Logger.WriteLine( $"Loading model {modelName}" );
-			string modelFilePath = Path.Combine(modelPath, "Models.model");
-			if (File.Exists( modelFilePath ))
+			string defaultModelFile = Path.Combine(modelPath, "Models.json");
+			if (File.Exists( defaultModelFile ))
 			{
-				string json = File.ReadAllText(modelFilePath);
+				string json = File.ReadAllText(defaultModelFile);
+				return JsonSerializer.Deserialize<ModelData>( json );
+			}
+			return new ModelData();
+		}
+
+		// Load a specific model by name.
+		public void LoadModel( string modelName )
+		{
+			string defaultModelFile = Path.Combine(modelPath, "Models.json");
+
+			if (File.Exists( defaultModelFile ))
+			{
+				string json = File.ReadAllText(defaultModelFile);
 				ModelData modelData = JsonSerializer.Deserialize<ModelData>(json);
 
-				// 원하는 이름의 모델을 검색
 				var targetMotionModel = modelData.MotionModels.FirstOrDefault(m => m.Name == modelName);
 				var targetCameraModel = modelData.InfraredCameraModels.FirstOrDefault(m => m.Name == modelName);
 
 				if (targetMotionModel != null)
 				{
 					_deviceControlService.SetModel( targetMotionModel );
-					Logger.WriteLine( $"Model : '{modelName}' loaded" );
+					Logger.WriteLine( $"Motion Model : '{modelName}' loaded" );
 				}
 
 				if (targetCameraModel != null)
 				{
-					// TODO: 이 모델을 어디에 적용할지에 따라 값을 설정
+					_cameraService.SetModel( targetCameraModel );
+					Logger.WriteLine( $"Camera Model : '{modelName}' loaded" );
 				}
 			}
+			else
+			{
+				Logger.WriteLine( "모델 파일이 존재하지 않습니다." );
+			}
+		}
+
+		// Expose the model file path for saving.
+		public string GetModelFilePath( )
+		{
+			string defaultModelFile = Path.Combine(modelPath, "Models.json");
+			return defaultModelFile;
 		}
 	}
-
 }
