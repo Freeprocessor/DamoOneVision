@@ -179,6 +179,15 @@ namespace DamoOneVision.Camera
 
 		}
 
+		public MIL_ID ReciveBinarizedImage( )
+		{
+			if (camera != null)
+			{
+				return camera.ReciveBinarizedImage(); ;
+			}
+			return MIL.M_NULL;
+		}
+
 		public MIL_INT Width( )
 		{
 			return camera.Width;

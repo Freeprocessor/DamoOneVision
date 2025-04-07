@@ -146,10 +146,10 @@ namespace DamoOneVision
 		private void InitMILDisplay()
 		{
 
-			infraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
-			infraredCameraConversionDisplay.DisplayId = _milSystemService.InfraredConversionDisplay;
+			InfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
+			InfraredCameraConversionDisplay.DisplayId = _milSystemService.InfraredConversionDisplay;
 
-			mainInfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
+			//mainInfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
 			//mainInfraredCameraConversionDisplay.DisplayId = MainInfraredCameraConversionDisplay;
 
 			//sideCamera1Display.DisplayId = _sideCamera1Display;
@@ -177,13 +177,13 @@ namespace DamoOneVision
 			const int imageWidth = 640;
 			const int imageHeight = 480;
 			// 컨트롤 내 마우스 위치 가져오기
-			var pos = e.GetPosition(mainInfraredCameraDisplay);
+			var pos = e.GetPosition(InfraredCameraDisplay);
 			double mouseX = pos.X;
 			double mouseY = pos.Y;
 
 			// 디스플레이 크기
-			double displayWidth = mainInfraredCameraDisplay.ActualWidth;
-			double displayHeight = mainInfraredCameraDisplay.ActualHeight;
+			double displayWidth = InfraredCameraDisplay.ActualWidth;
+			double displayHeight = InfraredCameraDisplay.ActualHeight;
 
 			// 종횡비 계산
 			double imageAspect = (double)imageWidth / imageHeight;
@@ -245,6 +245,7 @@ namespace DamoOneVision
 		{
 			// Manual 화면으로 전환
 			MainContent.Content = _settingUserControl;
+			_settingViewModel.UpdateCameraSettings();
 
 		}
 
@@ -253,9 +254,6 @@ namespace DamoOneVision
 			MessageBox.Show( "버튼이 클릭되었습니다." );
 			Logger.WriteLine( "버튼이 클릭되었습니다." );
 		}
-
-
-
 
 
 		protected override void OnClosed( EventArgs e )
@@ -274,20 +272,12 @@ namespace DamoOneVision
 		}
 
 
-
-
-
-
-
 		//private void Show3DButton_Click( object sender, RoutedEventArgs e )
 		//{
 		//	// 별도의 윈도우를 띄워서 3D 표시
 		//	_3DView _3dview = new _3DView( (byte[])RawPixelData.Clone());
 		//	_3dview.Show();
 		//}
-
-
-
 
 	}
 }

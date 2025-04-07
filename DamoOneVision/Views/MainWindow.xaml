@@ -154,7 +154,7 @@
                 <TabItem Header="Main" Height="50">
                     <Grid Margin="0">
                         <Border BorderBrush="{Binding IsGoodColor}" BorderThickness="5">
-                            <milwpf:MILWPFDisplay x:Name="mainInfraredCameraDisplay"
+                            <milwpf:MILWPFDisplay x:Name="InfraredCameraDisplay"
                                   MouseMove="MILWPFDisplay_MouseMove"
                                   IsManipulationEnabled="False"
                                   Focusable="False" />
@@ -165,10 +165,8 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <milwpf:MILWPFDisplay x:Name="infraredCameraDisplay" />
-                        <milwpf:MILWPFDisplay x:Name="infraredCameraConversionDisplay" Grid.Column="1" />
+                        <milwpf:MILWPFDisplay x:Name="InfraredCameraConversionDisplay" Grid.Column="1" />
                     </Grid>
                 </TabItem>
             </TabControl>

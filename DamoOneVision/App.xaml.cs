@@ -68,10 +68,7 @@ namespace DamoOneVision
 				sideCamera1,
 				sideCamera2,
 				sideCamera3,
-				milSystemService.InfraredDisplay,
-				milSystemService.SideCam1Display,
-				milSystemService.SideCam2Display,
-				milSystemService.SideCam3Display,
+				milSystemService,
 				 new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>() )
 			) );
 
@@ -98,7 +95,8 @@ namespace DamoOneVision
 			) );
 
 			services.AddSingleton<SettingViewModel>( sp => new SettingViewModel(
-				sp.GetRequiredService<SettingManager>()
+				sp.GetRequiredService<SettingManager>(),
+				sp.GetRequiredService<CameraService>()
 			) );
 
 

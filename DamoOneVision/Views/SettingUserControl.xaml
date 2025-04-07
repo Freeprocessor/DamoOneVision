@@ -60,156 +60,218 @@
                                    Margin="10"/>
 
                             <ComboBox Grid.Row="0" 
-                      ItemsSource="{Binding InfraredCameraModels}"
-                      SelectedItem="{Binding SelectedModel, Mode=TwoWay}"
-                      DisplayMemberPath="Name"
-                      Margin="10"/>
+                              ItemsSource="{Binding InfraredCameraModels}"
+                              SelectedItem="{Binding SelectedModel, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Margin="10"/>
                         </StackPanel>
                     </materialDesign:Card>
                     <materialDesign:Card>
                         <!-- 편집 패널: 각 항목을 3열 Grid로 배치 -->
-                        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10" >
+                        <Grid Margin="5" IsEnabled="True" IsHitTestVisible="True">
 
-                            <!-- 추가 항목들을 같은 형식으로 배치 가능 -->
-                            <!-- Binarized Threshold -->
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Binarized Threshold:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="65535"
-                                Value="{Binding SelectedModel.BinarizedThreshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                            <!-- Circle Center X -->
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Center X:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="640"
-                                Value="{Binding SelectedModel.CircleCenterX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleCenterX}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10" >
 
-                            <!-- Circle Center Y -->
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Center Y:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="480"
-                                Value="{Binding SelectedModel.CircleCenterY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleCenterY}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
-                            <!-- Circle Center Y -->
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Min Radius:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="480"
-                                Value="{Binding SelectedModel.CircleMinRadius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleMinRadius}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                <!-- 추가 항목들을 같은 형식으로 배치 가능 -->
+                                <Grid Margin="5,5,5,5">
+                                    <TextBlock Text="열화상 카메라 설정" FontSize="18" />
 
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Max Radius:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="480"
-                                Value="{Binding SelectedModel.CircleMaxRadius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                </Grid>
+                                <!-- Binarized Threshold -->
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Binarized Threshold:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="BinarizedThreshold"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
 
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Min Area Ratio:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="2"
-                                Value="{Binding SelectedModel.CircleMinAreaRatio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="0.01"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleMinAreaRatio}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                <!-- Circle Center X -->
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Center X:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleCenterX"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleCenterX}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
 
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Circle Max Area Ratio:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="2"
-                                Value="{Binding SelectedModel.CircleMaxAreaRatio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="0.01"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                <!-- Circle Center Y -->
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Center Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleCenterY"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleCenterY}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+                                
+                                <!-- Circle Center Y -->
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Min Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleMinRadius"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleMinRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
 
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Avg Temperature Min:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="65535"
-                                Value="{Binding SelectedModel.AvgTemperatureMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.AvgTemperatureMin}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Max Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleMaxRadius"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
 
-                            <Grid Margin="5,5,5,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Avg Temperature Max:" VerticalAlignment="Center" Grid.Column="0"/>
-                                <Slider Minimum="0" Maximum="65535"
-                                Value="{Binding SelectedModel.AvgTemperatureMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TickFrequency="1"
-                                IsSnapToTickEnabled="True"
-                                Grid.Column="1" Margin="5,0"/>
-                                <TextBox Text="{Binding SelectedModel.AvgTemperatureMax}" VerticalAlignment="Center" Grid.Column="2" Margin="5,0" HorizontalAlignment="Center"/>
-                            </Grid>
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Min Area Ratio:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0" Margin="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleMinAreaRatio"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleMinAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
 
-                        </StackPanel>
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Max Area Ratio:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleMaxAreaRatio"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Avg Temperature Min:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="AvgTemperatureMin"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.AvgTemperatureMin}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Avg Temperature Max:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="AvgTemperatureMax"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedModel.AvgTemperatureMax}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                            </StackPanel>
+                            <!-- (2) 슬라이더 & 텍스트 박스 (ActiveValue 바인딩) -->
+                            <StackPanel Orientation="Vertical" Margin="0,0,0,0" Grid.Column="1" >
+
+                                <!-- (3) 선택된 속성 이름 표시 (선택사항) -->
+                                <TextBlock Grid.Row="2" Text="{Binding ActivePropertyName}" 
+                                FontStyle="Italic" Foreground="Gray" Margin="10"/>
+                                
+                                <Slider Minimum="{Binding ActiveValueMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding ActiveValueMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        TickFrequency="{Binding ActiveValueTick, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="40,10,10,10"
+                                        IsSnapToTickEnabled="True"
+                                        Value="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="20" Orientation="Vertical" Height="258" HorizontalAlignment="Left"/>
+                                <TextBox Text="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="80"
+                                        Margin="10"
+                                        HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
+                            </StackPanel>
+
+
+                        </Grid>
+
                     </materialDesign:Card>
                 </StackPanel>
             </ScrollViewer>
@@ -222,7 +284,7 @@
                 Command="{Binding SaveCommand}"
                 HorizontalAlignment="Right" 
                 Width="100" 
-                Margin="0,10,10,10"
+                Margin="10"
                 Style="{DynamicResource MaterialDesignRaisedButton}"/>
     </Grid>
 </UserControl>

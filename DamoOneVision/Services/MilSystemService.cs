@@ -167,14 +167,14 @@ namespace DamoOneVision.Services
 			{
 				MIL.MdispFree( InfraredDisplay );
 				InfraredDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_infraredCameraDisplay 해제 완료." );
+				Logger.WriteLine( "InfraredDisplay 해제 완료." );
 			}
 			Logger.WriteLine( $"{InfraredDisplay}" );
 			if (InfraredConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( InfraredConversionDisplay );
 				InfraredConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_infraredCameraConversionDisplay 해제 완료." );
+				Logger.WriteLine( "InfraredConversionDisplay 해제 완료." );
 			}
 
 			if (SideCam1Display != MIL.M_NULL)

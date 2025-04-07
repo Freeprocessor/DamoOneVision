@@ -44,10 +44,14 @@ namespace DamoOneVision.Services
 		private MIL_ID MilSystem = MIL.M_NULL;
 
 
-		private MIL_ID _infraredCameraDisplay;
-		private MIL_ID _sideCamera1Display;
-		private MIL_ID _sideCamera2Display;
-		private MIL_ID _sideCamera3Display;
+		public MIL_ID _infraredCameraDisplay;
+		public MIL_ID _sideCamera1Display;
+		public MIL_ID _sideCamera2Display;
+		public MIL_ID _sideCamera3Display;
+		public MIL_ID _infraredCameraConversionDisplay;
+		public MIL_ID _sideCamera1ConversionDisplay;
+		public MIL_ID _sideCamera2ConversionDisplay;
+		public MIL_ID _sideCamera3ConversionDisplay;
 
 		/// <summary>
 		/// 카메라 연속 촬영 모드
@@ -80,15 +84,20 @@ namespace DamoOneVision.Services
 
 
 		public CameraService(CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
-			MIL_ID infraredCameraDisplay, MIL_ID sideCamera1Display, MIL_ID sideCamera2Display, MIL_ID sideCamera3Display, Lazy<MainViewModel> mainViewModel )
+			MilSystemService milSystemService, Lazy<MainViewModel> mainViewModel )
 		{
 			MilSystem = MILContext.Instance.MilSystem;
 
 			_mainViewModel = mainViewModel;
-			_infraredCameraDisplay = infraredCameraDisplay;
-			_sideCamera1Display = sideCamera1Display;
-			_sideCamera2Display = sideCamera2Display;
-			_sideCamera3Display = sideCamera3Display;
+			_infraredCameraDisplay = milSystemService.InfraredDisplay;
+			_sideCamera1Display = milSystemService.SideCam1Display;
+			_sideCamera2Display = milSystemService.SideCam2Display;
+			_sideCamera3Display = milSystemService.SideCam3Display;
+
+			_infraredCameraConversionDisplay = milSystemService.InfraredConversionDisplay;
+			_sideCamera1ConversionDisplay = milSystemService.SideCam1ConversionDisplay;
+			_sideCamera2ConversionDisplay = milSystemService.SideCam2ConversionDisplay;
+			_sideCamera3ConversionDisplay = milSystemService.SideCam3ConversionDisplay;
 
 			_infraredCamera = infraredCamera;
 			_sideCamera1 = sideCamera1;
@@ -186,7 +195,7 @@ namespace DamoOneVision.Services
 			_infraredCamera.LoadImage( MilSystem, filePath );
 
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
-			if (await Conversion.InfraredCameraModel( _infraredCamera.ReciveLoadImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData()))
+			if (await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData()))
 			{
 				vm.IsGoodColor = "Green";
 				vm.IsGoodStatus = "Good";
@@ -219,7 +228,31 @@ namespace DamoOneVision.Services
 
 		public MIL_ID GetImage( )
 		{
-			return _infraredCamera.ReciveImage();
+			if (LoadImageUsed)
+			{
+				return _infraredCamera.ReciveLoadImage();
+			}
+			else
+			{
+				return _infraredCamera.ReciveImage();
+			}
+		}
+
+		public MIL_ID GetBinarizedImage( )
+		{
+			return _infraredCamera.ReciveBinarizedImage();
+		}
+
+		public MIL_ID GetScaleImage( )
+		{
+			if (LoadImageUsed)
+			{
+				return _infraredCamera.ReciveLoadScaleImage();
+			}
+			else
+			{
+				return _infraredCamera.ReciveScaleImage();
+			}
 		}
 
 		public ushort[ ] ImageData( )
@@ -229,8 +262,9 @@ namespace DamoOneVision.Services
 				return _infraredCamera.LoadImageData();
 			}
 			else
+			{
 				return _infraredCamera.CaptureImageData();
-
+			}
 		}
 
 
@@ -302,7 +336,7 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							isGood = await Conversion.InfraredCameraModel( _infraredCamera.ReciveImage(),  _infraredCameraDisplay, _infraredCameraModel, ImageData() );
+							isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData() );
 
 							Logger.WriteLine( "이미지 처리 완료" );
 
@@ -347,6 +381,7 @@ namespace DamoOneVision.Services
 			return isGood;
 
 		}
+
 		public void Dispose( )
 		{
 			// 관리하는 모든 CameraManager의 Dispose를 호출합니다.

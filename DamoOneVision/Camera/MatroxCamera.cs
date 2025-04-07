@@ -25,7 +25,7 @@ namespace DamoOneVision.Camera
 		private MIL_ID LoadMilImage = MIL.M_NULL;
 		private MIL_ID LoadMilScaleImage = MIL.M_NULL;
 
-		private MIL_ID MilConversionImage = MIL.M_NULL;
+		private MIL_ID MilBinarizedImage = MIL.M_NULL;
 
 		private int[] _infraredImageFilter;
 
@@ -256,6 +256,11 @@ namespace DamoOneVision.Camera
 		public MIL_ID ReciveLoadScaleImage( )
 		{
 			return LoadMilScaleImage;
+		}
+
+		public MIL_ID ReciveBinarizedImage( )
+		{
+			return MilBinarizedImage;
 		}
 
 		private void InfraredCameraNoiseFilter( string filePath )
@@ -537,6 +542,25 @@ namespace DamoOneVision.Camera
 			{
 				MIL.MbufFree( MilScaleImage );
 			}
+			if (MilBinarizedImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( MilBinarizedImage );
+			}
+			if (LoadMilImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( LoadMilImage );
+			}
+			if (LoadMilScaleImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( LoadMilScaleImage );
+			}
+			if (MilDigitizer != MIL.M_NULL)
+			{
+				MIL.MdigFree( MilDigitizer );
+			}
+
+
+
 		}
 	}
 }

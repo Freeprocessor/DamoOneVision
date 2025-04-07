@@ -175,7 +175,7 @@ namespace DamoOneVision.Services
 				return;
 			if (!_isInitialized)
 			{
-				MessageBox.Show( "모션 라이브러리가 초기화되지 않았습니다!", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!");
 				return;
 			}
 
@@ -188,7 +188,7 @@ namespace DamoOneVision.Services
 
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmMoveStartPos return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmMoveStartPos return error[Code:{duRetCode}]" );
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace DamoOneVision.Services
 				return;
 			if (!_isInitialized)
 			{
-				MessageBox.Show( "모션 라이브러리가 초기화되지 않았습니다!", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!" );
 				return;
 			}
 
@@ -211,7 +211,7 @@ namespace DamoOneVision.Services
 
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmMoveStartPos return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmMoveStartPos return error[Code:{duRetCode}]" );
 			}
 		}
 
@@ -225,20 +225,20 @@ namespace DamoOneVision.Services
 			duRetCode = CAXM.AxmHomeSetMethod( X, _motionModel.XAxisOriginDirection, _motionModel.XAxisOriginSensor, _motionModel.XAxisOriginUseZPhase, _motionModel.XAxisOriginDelay, _motionModel.XAxisOriginOffset );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeSetStart return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeSetStart return error[Code:{duRetCode}]" );
 			}
 			// 지정축의 원점 검색 속도 파라이터를 설정합니다.
 			duRetCode = CAXM.AxmHomeSetVel( X, _motionModel.XAxisOriginSpeed1, _motionModel.XAxisOriginSpeed2, _motionModel.XAxisOriginCreepSpeed, _motionModel.XAxisOriginZPhaseSpeed, _motionModel.XAxisOriginAcceleration, _motionModel.XAxisOriginAcceleration );
 			Logger.WriteLine($"{_motionModel.XAxisOriginSpeed1},{_motionModel.XAxisOriginSpeed2}");
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeGetResult return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 			// 원점 검색을 실행합니다.
 			duRetCode = CAXM.AxmHomeSetStart( X );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeGetResult return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 
 			Logger.WriteLine( "X-Axis Home End" );
@@ -255,18 +255,18 @@ namespace DamoOneVision.Services
 			duRetCode = CAXM.AxmHomeSetMethod( Z, _motionModel.ZAxisOriginDirection, _motionModel.ZAxisOriginSensor, _motionModel.ZAxisOriginUseZPhase, _motionModel.ZAxisOriginDelay, _motionModel.ZAxisOriginOffset );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeSetStart return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeSetStart return error[Code:{duRetCode}]" );
 			}
 			// 지정축의 원점 검색을 시작합니다.
 			duRetCode = CAXM.AxmHomeSetVel( Z, _motionModel.ZAxisOriginSpeed1, _motionModel.ZAxisOriginSpeed2, _motionModel.ZAxisOriginCreepSpeed, _motionModel.ZAxisOriginZPhaseSpeed, _motionModel.ZAxisOriginAcceleration, _motionModel.ZAxisOriginAcceleration );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeGetResult return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 			duRetCode = CAXM.AxmHomeSetStart( Z );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				MessageBox.Show( $"AxmHomeGetResult return error[Code:{duRetCode}]", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 
 			Logger.WriteLine( "Z-Axis Home End" );
@@ -454,7 +454,7 @@ namespace DamoOneVision.Services
 			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
 			duRetCode = CAXM.AxmMoveVel( axisNum, dVelocity * dir, dAccel, dDecel );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				MessageBox.Show( String.Format( "AxmMoveVel return error[Code:{0:d}]", duRetCode ) );
+				Logger.WriteLine( $"AxmMoveVel return error[Code:{0:duRetCode}]" );
 
 			//Logger.WriteLine( "Jog Start" );
 

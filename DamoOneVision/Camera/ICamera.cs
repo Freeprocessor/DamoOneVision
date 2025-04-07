@@ -23,6 +23,8 @@ namespace DamoOneVision.Camera
 
 		MIL_ID ReciveLoadScaleImage( );
 
+		MIL_ID ReciveBinarizedImage( );
+
 		ushort[ ] LoadImageData();
 
 		ushort[ ] CaptureImageData( );

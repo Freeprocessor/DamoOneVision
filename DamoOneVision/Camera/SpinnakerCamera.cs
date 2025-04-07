@@ -259,6 +259,11 @@ namespace DamoOneVision.Camera
 			return MIL.M_NULL;
 		}
 
+		public MIL_ID ReciveBinarizedImage( )
+		{
+			return MIL.M_NULL;
+		}
+
 
 	}
 }
