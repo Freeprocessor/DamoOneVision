@@ -125,7 +125,7 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		private async void SaveImage( MIL_ID MilImage, string name )
+		public async Task SaveImage( MIL_ID MilImage, string name )
 		{
 			await Task.Run( ( ) =>
 			{
@@ -263,6 +263,7 @@ namespace DamoOneVision.Camera
 		{
 			return MIL.M_NULL;
 		}
+
 
 
 	}

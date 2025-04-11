@@ -221,26 +221,26 @@ namespace DamoOneVision.Services
 						// Convyer Delay
 						//await Task.Delay( 350 );
 						ejector.EjectActionAsync();
-						Logger.WriteLine( "Trigger Detected" );
+						//Logger.WriteLine( "Trigger Detected" );
 						if (TriggerDetected != null)
 						{
 							await _motionService.XAxisMoveWaitPos();
 							_ = _motionService.XAxisMoveEndPos();
-							Logger.WriteLine( $"Tracking Start : {sw.ElapsedMilliseconds} ms" );
+							//Logger.WriteLine( $"Tracking Start : {sw.ElapsedMilliseconds} ms" );
 							//Logger.WriteLine( "{_motionService.CameraDelay}" );
 							await Task.Delay( _motionService.CameraDelay );
 							_isGood = await TriggerDetected();
 							ejector.IsGood = _isGood;
+							//_isGood = await TriggerDetected();
 
-
-							Logger.WriteLine( $"Capture Complete : {sw.ElapsedMilliseconds} ms" );
+							//Logger.WriteLine( $"Capture Complete : {sw.ElapsedMilliseconds} ms" );
 							_motionService.XAxisStop();
-							Logger.WriteLine( $"Tracking Stop {sw.ElapsedMilliseconds} ms" );
+							//Logger.WriteLine( $"Tracking Stop {sw.ElapsedMilliseconds} ms" );
 							await _motionService.XAxisWaitingStop();
-							Logger.WriteLine( $"Tracking Stop Complete {sw.ElapsedMilliseconds} ms" );
+							//Logger.WriteLine( $"Tracking Stop Complete {sw.ElapsedMilliseconds} ms" );
 							Logger.WriteLine( $"Current Position {_motionService.XAxisGetCommandPosition()} pulse)" );
 							await _motionService.XAxisMoveWaitPos();
-							Logger.WriteLine( $"Wait Move Complete : {sw.ElapsedMilliseconds} ms" );
+							//Logger.WriteLine( $"Wait Move Complete : {sw.ElapsedMilliseconds} ms" );
 						}
 						//modbus.WriteSingleCoil( 0, 0x06, false );
 						//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;

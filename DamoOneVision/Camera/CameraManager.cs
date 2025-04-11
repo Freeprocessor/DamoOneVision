@@ -234,9 +234,14 @@ namespace DamoOneVision.Camera
 			camera.AutoFocus();
 		}
 
-		public void ManualFocus( double focusValue = 0.2013999968767166 )
+		public void ManualFocus( double focusValue = 0.2614000141620636 )
 		{
 			camera.ManualFocus( focusValue );
+		}
+
+		public async Task SaveImage( MIL_ID MilImage, string name )
+		{
+			camera.SaveImage( MilImage, name );
 		}
 
 		public void Dispose( )

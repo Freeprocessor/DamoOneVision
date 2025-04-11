@@ -171,13 +171,13 @@ namespace DamoOneVision.Camera
 		}
 
 
-		private async void SaveImage( MIL_ID MilImage, string name )
+		public async Task SaveImage( MIL_ID MilImage, string name )
 		{
 			await Task.Run( ( ) =>
 			{
 
 				// 현재 시간과 날짜 가져오기
-				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+				string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_f");
 				// 파일 이름 생성
 				string fileName = $"{name}_{timeStamp}.bmp";
 
@@ -385,8 +385,8 @@ namespace DamoOneVision.Camera
 			ushort MinPixelValue = 30115;//28도
 			ushort MaxPixelValue = 36315;//90도
 
-			//MinPixelValue = ImageData.Min();
-			//MaxPixelValue = ImageData.Max();
+			MinPixelValue = ImageData.Min();
+			MaxPixelValue = ImageData.Max();
 
 			// 30~50도 범위로 Scale
 			//double dMinPixelValue = (30.0 / 190.0) * 65535.0;

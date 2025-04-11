@@ -33,6 +33,8 @@ namespace DamoOneVision.Camera
 
 		void ManualFocus( double focusValue );
 
+		Task SaveImage( MIL_ID MilImage, string name );
+
 		MIL_INT Width { get; set; }
 
 		MIL_INT Height { get; set; }

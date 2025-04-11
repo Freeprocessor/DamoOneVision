@@ -129,6 +129,7 @@ namespace DamoOneVision.ViewModels
 		public SettingViewModel( SettingManager settingManager, CameraService cameraService )
 		{
 			_settingManager = settingManager;
+
 			_cameraService = cameraService;
 
 			LoadModels();
@@ -151,7 +152,6 @@ namespace DamoOneVision.ViewModels
 				SelectedModel = InfraredCameraModels.First();
 			}
 		}
-
 		private void SaveModels( )
 		{
 			// 1. 기존 파일 읽어오기

@@ -284,25 +284,43 @@ namespace DamoOneVision.Services
 
 					// 카메라에서 이미지 캡처
 					/// SideCamera 제거 후 InfraredCamera만 사용
-					try
+					/// 
+
+					for(int i=0; i<1;  i++)
 					{
-						var tasks = new []
+						try
+						{
+							var tasks = new []
 						{
 							_infraredCamera.CaptureSingleImageAsync(),
 							//_sideCamera1.CaptureSingleImageAsync(),
 							//_sideCamera2.CaptureSingleImageAsync(),
 							//_sideCamera3.CaptureSingleImageAsync()
 						};
-						await Task.WhenAll( tasks );
-						Logger.WriteLine( "카메라 이미지 캡처 완료" );
-						//Logger.WriteLine( $"Test: {TectTime.ElapsedMilliseconds}ms" );
-					}
-					catch (Exception ex)
-					{
-						Logger.WriteLine( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
-						MessageBox.Show( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
-					}
+							await Task.WhenAll( tasks );
+							Logger.WriteLine( "카메라 이미지 캡처 완료" );
+							//Logger.WriteLine( $"Test: {TectTime.ElapsedMilliseconds}ms" );
+						}
+						catch (Exception ex)
+						{
+							Logger.WriteLine( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
+							//MessageBox.Show( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
+						}
 
+						await Task.Delay( 400 );
+
+					}
+					
+					//ushort[] imagedata2 = ImageData();
+					//ushort[] imagedata = new ushort[imagedata1.Length];
+
+					//for ( int i = 0; imagedata1.Length > i; i++ )
+					//{
+					//	imagedata[i] = (ushort)Math.Abs( imagedata1[ i ] - imagedata2[ i ]);
+					//}
+					//MIL_ID MilImage = MIL.M_NULL;
+					//MIL.MbufAllocColor( MilSystem, _infraredCamera.NbBands(), _infraredCamera.Width(), _infraredCamera.Height(), _infraredCamera.DataType(), MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
+					//MIL.MbufPut( MilImage, imagedata );
 
 					MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveScaleImage() );
 					MIL.MdispSelect( _sideCamera1Display, _sideCamera1.ReciveImage() );
@@ -336,7 +354,7 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData() );
+							//isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData() );
 
 							Logger.WriteLine( "이미지 처리 완료" );
 
