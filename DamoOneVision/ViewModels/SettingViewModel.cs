@@ -303,6 +303,7 @@ namespace DamoOneVision.ViewModels
 					// CircleMinRadius, CircleMaxRadius, etc...
 			}
 			//Logger.WriteLine( $"Updated {ActivePropertyName}: {ActiveValue}" );
+			ConversionImage();
 		}
 
 		public async void UpdateCameraSettings( )
@@ -337,6 +338,11 @@ namespace DamoOneVision.ViewModels
 		public void UpdateCameraSettingsStop( )
 		{
 			_isImageDisplay = false;
+		}
+
+		public async void ConversionImage( )
+		{
+			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedModel, _cameraService.ImageData() );
 		}
 	}
 }

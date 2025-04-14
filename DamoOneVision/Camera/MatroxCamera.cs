@@ -26,6 +26,7 @@ namespace DamoOneVision.Camera
 		private MIL_ID LoadMilScaleImage = MIL.M_NULL;
 
 		private MIL_ID MilBinarizedImage = MIL.M_NULL;
+		private MIL_ID MilLoadBinarizedImage = MIL.M_NULL;
 
 		private int[] _infraredImageFilter;
 
@@ -144,6 +145,7 @@ namespace DamoOneVision.Camera
 				//MIL.MbufAlloc2d( MilSystem, MILContext.Width, MILContext.Height, MILContext.DataType, MIL.M_IMAGE + MIL.M_GRAB , ref MilImage );
 				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilImage );
 				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilScaleImage );
+				MIL.MbufAllocColor( MilSystem, this.NbBands, this.Width, this.Height, this.DataType, MIL.M_IMAGE + MIL.M_GRAB + MIL.M_DISP + MIL.M_PROC, ref MilBinarizedImage );
 			}
 
 			if (CameraName == "InfraredCamera")
@@ -261,6 +263,11 @@ namespace DamoOneVision.Camera
 		public MIL_ID ReciveBinarizedImage( )
 		{
 			return MilBinarizedImage;
+		}
+
+		public MIL_ID ReciveLoadBinarizedImage( )
+		{
+			return MilLoadBinarizedImage;
 		}
 
 		private void InfraredCameraNoiseFilter( string filePath )
@@ -462,9 +469,25 @@ namespace DamoOneVision.Camera
 			
 			if (File.Exists( filePath ))
 			{
+				if (LoadMilImage != MIL.M_NULL)
+				{
+					MIL.MbufFree( LoadMilImage );
+					Logger.WriteLine( "LoadMilImage 해제" );
+				}
+				if (LoadMilScaleImage != MIL.M_NULL)
+				{
+					MIL.MbufFree( LoadMilScaleImage );
+					Logger.WriteLine( "LoadMilScaleImage 해제" );
+				}
+				if (MilLoadBinarizedImage != MIL.M_NULL)
+				{
+					MIL.MbufFree( MilLoadBinarizedImage );
+					Logger.WriteLine( "MilLoadBinarizedImage 해제" );
+				}
 
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref LoadMilImage );
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilScaleImage );
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref MilLoadBinarizedImage );
 
 				// 이미지 속성 가져오기
 				MIL_INT width = 0;
@@ -536,27 +559,37 @@ namespace DamoOneVision.Camera
 			if(MilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage );
-
+				Logger.WriteLine( "MilImage 해제" );
 			}
 			if (MilScaleImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilScaleImage );
+				Logger.WriteLine( "MilScaleImage 해제" );
 			}
 			if (MilBinarizedImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilBinarizedImage );
+				Logger.WriteLine( "MilBinarizedImage 해제" );
 			}
 			if (LoadMilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( LoadMilImage );
+				Logger.WriteLine( "LoadMilImage 해제" );
 			}
 			if (LoadMilScaleImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( LoadMilScaleImage );
+				Logger.WriteLine( "LoadMilScaleImage 해제" );
+			}
+			if (MilLoadBinarizedImage != MIL.M_NULL)
+			{
+				MIL.MbufFree( MilLoadBinarizedImage );
+				Logger.WriteLine( "MilLoadBinarizedImage 해제" );
 			}
 			if (MilDigitizer != MIL.M_NULL)
 			{
 				MIL.MdigFree( MilDigitizer );
+				Logger.WriteLine( "MilDigitizer 해제" );
 			}
 
 

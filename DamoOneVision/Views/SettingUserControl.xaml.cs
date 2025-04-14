@@ -17,7 +17,7 @@ namespace DamoOneVision.Views
 
 		private void GoMain_Click( object sender, System.Windows.RoutedEventArgs e )
 		{
-			_viewModel.UpdateCameraSettingsStop();
+			//_viewModel.UpdateCameraSettingsStop();
 			GoMainRequested?.Invoke( this, EventArgs.Empty );
 		}
 	}

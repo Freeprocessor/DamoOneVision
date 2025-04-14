@@ -68,7 +68,11 @@ namespace DamoOneVision.Camera
 					//cts = new CancellationTokenSource();
 					//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
 					await Task.Delay( 1000 );
-					camera.ManualFocus( 0.21140 );
+					if(_cameraName == "InfraredCamera")
+					{
+						camera.ManualFocus( 0.21140 );
+					}
+
 					IsConnected = true;
 
 				}
@@ -188,6 +192,15 @@ namespace DamoOneVision.Camera
 			return MIL.M_NULL;
 		}
 
+		public MIL_ID ReciveLoadBinarizedImage( )
+		{
+			if (camera != null)
+			{
+				return camera.ReciveLoadBinarizedImage(); ;
+			}
+			return MIL.M_NULL;
+		}
+
 		public MIL_INT Width( )
 		{
 			return camera.Width;
@@ -231,12 +244,18 @@ namespace DamoOneVision.Camera
 
 		public void AutoFocus( )
 		{
-			camera.AutoFocus();
+			if (this.IsConnected == true)
+			{
+				camera.AutoFocus();
+			}
 		}
 
 		public void ManualFocus( double focusValue = 0.2614000141620636 )
 		{
-			camera.ManualFocus( focusValue );
+			if (this.IsConnected == true)
+			{
+				camera.ManualFocus( focusValue );
+			}
 		}
 
 		public async Task SaveImage( MIL_ID MilImage, string name )

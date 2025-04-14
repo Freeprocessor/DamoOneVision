@@ -240,7 +240,14 @@ namespace DamoOneVision.Services
 
 		public MIL_ID GetBinarizedImage( )
 		{
-			return _infraredCamera.ReciveBinarizedImage();
+			if (LoadImageUsed)
+			{
+				return _infraredCamera.ReciveLoadBinarizedImage();
+			}
+			else
+			{
+				return _infraredCamera.ReciveBinarizedImage();
+			}
 		}
 
 		public MIL_ID GetScaleImage( )
@@ -307,10 +314,10 @@ namespace DamoOneVision.Services
 							//MessageBox.Show( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
 						}
 
-						await Task.Delay( 400 );
+						//await Task.Delay( 400 );
 
 					}
-					
+
 					//ushort[] imagedata2 = ImageData();
 					//ushort[] imagedata = new ushort[imagedata1.Length];
 

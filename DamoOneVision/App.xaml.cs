@@ -7,6 +7,7 @@ using Matrox.MatroxImagingLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Windows;
 
 namespace DamoOneVision
@@ -18,7 +19,7 @@ namespace DamoOneVision
 	{
 		// DI 컨테이너
 		public IServiceProvider ServiceProvider { get; private set; }
-
+		private static MILContext _milContextRef = MILContext.Instance;
 
 		protected override void OnStartup( StartupEventArgs e )
 		{
@@ -114,40 +115,26 @@ namespace DamoOneVision
 		{
 			base.OnExit( e );
 
-			// DI 컨테이너에서 resolve한 서비스들로 Dispose 호출
-
-			// 카메라 서비스 Dispose
-			var cameraService = ServiceProvider.GetRequiredService<CameraService>();
-			cameraService?.Dispose();
-
-			// MotionService: 해제 메서드 호출
-			var motionService = ServiceProvider.GetRequiredService<MotionService>();
-			motionService.ReleaseLibrary();
-
-			// 각 카메라 DisconnectAsync (여기서는 카메라 인스턴스를 직접 resolve)
-			var infraredCamera = ServiceProvider.GetRequiredService<CameraManager>();
-			var sideCamera1 = ServiceProvider.GetRequiredService<CameraManager>(); // 첫 번째 CameraManager가 InfraredCamera이므로
-																				   // 만약 여러 카메라가 필요하다면, 별도로 관리할 수 있도록 타입을 분리하는 것이 좋습니다.
-																				   // 여기서는 간단히 예시로만 처리합니다.
-			await infraredCamera.DisconnectAsync();
-			await sideCamera1.DisconnectAsync();
-			// sideCamera2, sideCamera3 등도 필요하면 추가 호출
-
-			// MilSystemService 비동기 Dispose (IAsyncDisposable 구현)
-			var milSystemService = ServiceProvider.GetRequiredService<MilSystemService>();
-			if (milSystemService is IAsyncDisposable asyncDisposable)
+			try
 			{
-				await asyncDisposable.DisposeAsync();
+				Debug.WriteLine( "[App] OnExit 시작" );
+
+				ServiceProvider.GetRequiredService<CameraService>()?.Dispose();
+				ServiceProvider.GetRequiredService<MotionService>()?.ReleaseLibrary();
+
+				var milSystemService = ServiceProvider.GetRequiredService<MilSystemService>();
+				await milSystemService.DisposeAsync();
+
+				MILContext.Instance.Dispose();
+
+				Logger.Shutdown();
+				Debug.WriteLine( "[App] OnExit 종료" );
 			}
-			MILContext.Instance.Dispose();
-
-			await Task.Delay( 100 );
-			Logger.Shutdown();
-
-			// DI 컨테이너에 등록된 객체들이 모두 Dispose되도록 할 수 있다면,
-			// (서비스 컨테이너가 IDisposable를 구현하는 경우) ServiceProvider.Dispose();
-
-			Application.Current.Shutdown();
+			catch (Exception ex)
+			{
+				Debug.WriteLine( "[OnExit 예외] " + ex.Message );
+				Debug.WriteLine( ex.StackTrace );
+			}
 		}
 	}
 }

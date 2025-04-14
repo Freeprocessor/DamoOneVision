@@ -1,6 +1,8 @@
-﻿using Matrox.MatroxImagingLibrary;
+﻿using DamoOneVision.Services;
+using Matrox.MatroxImagingLibrary;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +17,8 @@ namespace DamoOneVision.Camera
 	{
 		private static MILContext? instance;
 
+		private bool isDisposed = false;
+
 		public static MILContext Instance
 		{
 			get
@@ -23,8 +27,13 @@ namespace DamoOneVision.Camera
 				{
 					instance = new MILContext();
 				}
+				GC.KeepAlive( instance );
 				return instance;
 			}
+		}
+		~MILContext( )
+		{
+			Logger.WriteLine( "[MILContext] Finalizer 호출됨! GC가 Dispose보다 먼저 호출했을 수 있음" );
 		}
 
 		//public static MIL_INT Width;
@@ -71,11 +80,19 @@ namespace DamoOneVision.Camera
 
 		public void Dispose( )
 		{
+			Debug.WriteLine( "[MILContext] Dispose 시작" );
+			if (isDisposed)
+			{
+				Debug.WriteLine( "[MILContext] Dispose 이미 완료 됨" );
+				return;
+			}
+
 			// MilSystem 해제
 			if (MilSystem != MIL.M_NULL)
 			{
 				MIL.MsysFree( MilSystem );
 				MilSystem = MIL.M_NULL;
+				Debug.WriteLine( "[MILContext] MsysFree 호출" );
 			}
 
 			// MilApplication 해제
@@ -83,9 +100,12 @@ namespace DamoOneVision.Camera
 			{
 				MIL.MappFree( MilApplication );
 				MilApplication = MIL.M_NULL;
+				Debug.WriteLine( "[MILContext] MappFree 호출" );
 			}
 
+			isDisposed = true;
 			instance = null;
+			Debug.WriteLine( "[MILContext] Dispose 완료" );
 		}
 	}
 }

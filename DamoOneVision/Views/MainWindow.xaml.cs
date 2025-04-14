@@ -243,10 +243,13 @@ namespace DamoOneVision
 
 		private void ModelButton_Click( object sender, RoutedEventArgs e )
 		{
-			// Manual 화면으로 전환
-			MainContent.Content = _settingUserControl;
-			_settingViewModel.UpdateCameraSettings();
+			///TODO : Button Disable로 변경
+			///
 
+			MainContent.Content = _settingUserControl;
+			_settingViewModel.ConversionImage();
+			//_settingViewModel.UpdateCameraSettings();
+			// Manual 화면으로 전환
 		}
 
 		private void Click( object sender, RoutedEventArgs e )

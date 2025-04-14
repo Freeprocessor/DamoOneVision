@@ -169,7 +169,7 @@ namespace DamoOneVision.Services
 				InfraredDisplay = MIL.M_NULL;
 				Logger.WriteLine( "InfraredDisplay 해제 완료." );
 			}
-			Logger.WriteLine( $"{InfraredDisplay}" );
+
 			if (InfraredConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( InfraredConversionDisplay );
@@ -181,42 +181,42 @@ namespace DamoOneVision.Services
 			{
 				MIL.MdispFree( SideCam1Display );
 				SideCam1Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera1Display 해제 완료." );
+				Logger.WriteLine( "SideCam1Display 해제 완료." );
 			}
 
 			if (SideCam1ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam1ConversionDisplay );
 				SideCam1ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera1ConversionDisplay 해제 완료." );
+				Logger.WriteLine( "SideCam1ConversionDisplay 해제 완료." );
 			}
 
 			if (SideCam2Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam2Display );
 				SideCam2Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera2Display 해제 완료." );
+				Logger.WriteLine( "SideCam2Display 해제 완료." );
 			}
 
 			if (SideCam2ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam2ConversionDisplay );
 				SideCam2ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera2ConversionDisplay 해제 완료." );
+				Logger.WriteLine( "SideCam2ConversionDisplay 해제 완료." );
 			}
 
 			if (SideCam3Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam3Display );
 				SideCam3Display = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera3Display 해제 완료." );
+				Logger.WriteLine( "SideCam3Display 해제 완료." );
 			}
 
 			if (SideCam3ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam3ConversionDisplay );
 				SideCam3ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "_sideCamera3ConversionDisplay 해제 완료." );
+				Logger.WriteLine( "SideCam3ConversionDisplay 해제 완료." );
 			}
 
 			/// 어떻게 이미지를 해제할 것인지?
@@ -277,7 +277,7 @@ namespace DamoOneVision.Services
 			//	_sideCamera3ConversionImage = MIL.M_NULL;
 			//	Logger.WriteLine( "_sideCamera3ConversionImage 해제 완료." );
 			//}
-			await Task.Delay( 100 );
+			//await Task.Delay( 100 );
 		}
 
 	}

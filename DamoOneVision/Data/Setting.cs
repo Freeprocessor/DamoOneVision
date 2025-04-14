@@ -80,7 +80,7 @@ namespace DamoOneVision.Data
 
 			// 모델 파일 생성
 			string defaultModelFile = Path.Combine(modelPath, "Models.json");
-			if (!Directory.Exists( defaultModelFile ))
+			if (!File.Exists( defaultModelFile ))
 			{
 
 

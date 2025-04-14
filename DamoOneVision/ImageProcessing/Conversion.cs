@@ -156,10 +156,19 @@ namespace DamoOneVision.ImageProcessing
 			//return SideCameraImage;
 		}
 
+		public static async Task<bool> ColorDetectionModel( )
+		{
+			bool isGood = false;
+
+			return isGood;
+		}
+
 
 
 		public static async Task<bool> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel, ushort[ ] ImageData )
 		{
+
+			//return true;
 			//Logger.WriteLine( "InfraredCameraModel 호출" );
 			bool blobGood = false;
 			bool circleGood = false;
@@ -171,22 +180,19 @@ namespace DamoOneVision.ImageProcessing
 			MIL_ID BlobResult = MIL.M_NULL;
 			MIL_ID BlobContext = MIL.M_NULL;
 			MIL_ID GraphicsContext = MIL.M_NULL;
+			MIL_ID AnnulusContext = MIL.M_NULL;
 			MIL_ID SettingGraphicsContext = MIL.M_NULL;
 			MIL_ID MeasMarker = MIL.M_NULL;
 			MIL_ID MilOverlayImage = MIL.M_NULL;
+			MIL_ID MilAnnulusImage = MIL.M_NULL;
+			MIL_ID AnnulusAndBinarized = MIL.M_NULL;
+			MIL_ID AnnulusAndImage = MIL.M_NULL;
 
-			double ConvexHullArea = 0.0;
-			double BlobTouchingImageBorders = 0.0;
-			double Area = 0.0;
+			double ReferenceArea = 0.0;
 			double Radius = 0.0;
 			double FillRatio = 0;
-
-			if (BinarizedImage != MIL.M_NULL)
-			{
-				MIL.MbufFree( BinarizedImage );
-				BinarizedImage = MIL.M_NULL;
-			}
-
+			double DetectCirclrCenterX = 0.0;
+			double DetectCirclrCenterY = 0.0;
 
 			/*
 			double Radius = 0;
@@ -196,13 +202,22 @@ namespace DamoOneVision.ImageProcessing
 
 			int holenumber = 0;
 			*/
+			//if (BinarizedImage != MIL.M_NULL)
+			//	MIL.MbufFree( BinarizedImage );
+			// 
 			MIL.MdispInquire( InfraredDisplay, MIL.M_OVERLAY_ID, ref MilOverlayImage );
 
 
 
-			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
+			//MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
+			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MilAnnulusImage );
+			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndBinarized );
+			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndImage );
 
-			/// 
+			MIL.MbufClear( MilAnnulusImage, MIL.M_COLOR_BLACK );
+			MIL.MbufClear( AnnulusAndBinarized, MIL.M_COLOR_BLACK );
+			MIL.MbufClear( AnnulusAndImage, MIL.M_COLOR_BLACK );
+
 			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, infraredCameraModel.BinarizedThreshold, MIL.M_NULL );
 
 			///
@@ -226,58 +241,11 @@ namespace DamoOneVision.ImageProcessing
 
 			// 그래픽 컨텍스트 생성(디스플레이 오버레이)
 			MIL.MgraAlloc( MilSystem, ref GraphicsContext );
+			MIL.MgraAlloc( MilSystem, ref AnnulusContext );
 			MIL.MgraAlloc( MilSystem, ref SettingGraphicsContext );
 
 
-			MIL.MblobAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobContext );
-			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
-
-			MIL.MblobControl( BlobContext, MIL.M_BOX, MIL.M_ENABLE );
-			//면적이 큰 순서대로 Sort
-			MIL.MblobControl( BlobContext, MIL.M_SORT1, MIL.M_BOX_AREA );
-			MIL.MblobControl( BlobContext, MIL.M_NUMBER_OF_HOLES, MIL.M_ENABLE );
-			MIL.MblobControl( BlobContext, MIL.M_CONVEX_HULL, MIL.M_ENABLE );
-
-			MIL.MblobCalculate( BlobContext, BinarizedImage, MIL.M_NULL, BlobResult );
-
-
-			// 블롭 개수 가져오기
-			MIL_INT selectedBlobCount = 0;
-
-			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
-
-			//Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
-			int SelectBlob = 0;
-			double LastConvexHullArea = 0.0;
-			double LastBlobTouchingImageBorders = 0.0;
-			for (MIL_INT i = 0; i < selectedBlobCount; i++)
-			{
-
-				// M_BLOB_INDEX 속성 가져오기
-				// 블롭 인덱스는 보통 0부터 시작
-				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_CONVEX_HULL_AREA + MIL.M_TYPE_MIL_DOUBLE, ref ConvexHullArea );
-				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
-
-				if (LastConvexHullArea <= ConvexHullArea)
-				{
-					LastConvexHullArea = ConvexHullArea;
-					LastBlobTouchingImageBorders = BlobTouchingImageBorders;
-					SelectBlob = (int)i;
-				}
-
-			}
-			Logger.WriteLine( $"블롭 {SelectBlob}의 ConvexHullArea: {ConvexHullArea}\n" );
-
-			if ( selectedBlobCount != 0 && BlobTouchingImageBorders == 0 )
-			{
-				blobGood = true;
-			}
-			else
-			{
-				Logger.WriteLine( "selectedBlobCount가 0입니다." );
-				blobGood = false;
-			}
-
+			// 원찾기 
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
 
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
@@ -288,12 +256,74 @@ namespace DamoOneVision.ImageProcessing
 			try
 			{
 				MIL.MmeasGetResult( MeasMarker, MIL.M_RADIUS + MIL.M_TYPE_MIL_DOUBLE, ref Radius, MIL.M_NULL );
-				Logger.WriteLine( $"Radius: {Radius}" );
+				MIL.MmeasGetResultSingle( MeasMarker, MIL.M_POSITION + MIL.M_TYPE_MIL_DOUBLE, ref DetectCirclrCenterX, ref DetectCirclrCenterY, 0 );
+
+				Logger.WriteLine( $"Radius: {Radius}, Circle X : {DetectCirclrCenterX}, Circle Y : {DetectCirclrCenterY}" );
 			}
 			catch (Exception ex)
 			{
 				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
 			}
+
+			double smallRadius = Radius - 60;
+			// 도넛모양 도형 생성
+			MIL.MgraColor( AnnulusContext, MIL.M_COLOR_WHITE );
+			MIL.MgraArcFill( AnnulusContext, MilAnnulusImage, DetectCirclrCenterX, DetectCirclrCenterY, Radius, Radius, -360.0, 360.0 );
+			MIL.MgraColor( AnnulusContext, MIL.M_COLOR_BLACK );
+			MIL.MgraArcFill( AnnulusContext, MilAnnulusImage, DetectCirclrCenterX, DetectCirclrCenterY, smallRadius, smallRadius, -360.0, 360.0 );
+
+			MIL.MimArith( MilAnnulusImage, BinarizedImage, AnnulusAndBinarized, MIL.M_AND );
+			MIL.MimArith( MilAnnulusImage, InfraredCameraImage, AnnulusAndImage, MIL.M_AND );
+
+			///
+			//MIL.MdispSelect( InfraredDisplay, AnnulusAndBinarized );
+
+
+			MIL.MblobAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobContext );
+			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
+
+			MIL.MblobControl( BlobContext, MIL.M_BOX, MIL.M_ENABLE );
+			//면적이 큰 순서대로 Sort
+			MIL.MblobControl( BlobContext, MIL.M_SORT1, MIL.M_BOX_AREA );
+			MIL.MblobControl( BlobContext, MIL.M_NUMBER_OF_HOLES, MIL.M_ENABLE );
+			//MIL.MblobControl( BlobContext, MIL.M_CONVEX_HULL, MIL.M_ENABLE );
+
+			MIL.MblobCalculate( BlobContext, AnnulusAndBinarized, MIL.M_NULL, BlobResult );
+
+
+			// 블롭 개수 가져오기
+			MIL_INT selectedBlobCount = 0;
+
+			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
+
+			//Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
+			int SelectBlob = 0;
+			double AreaSum = 0.0;
+			double Area = 0.0;
+			//double LastBlobTouchingImageBorders = 0.0;
+			for (MIL_INT i = 0; i < selectedBlobCount; i++)
+			{
+
+				// M_BLOB_INDEX 속성 가져오기
+				// 블롭 인덱스는 보통 0부터 시작
+				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_AREA + MIL.M_TYPE_MIL_DOUBLE, ref Area );
+				//MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
+				AreaSum = Area + AreaSum;
+
+			}
+			Logger.WriteLine( $"블롭의 전체 면적 : {AreaSum}\n" );
+
+			if ( selectedBlobCount != 0 )
+			{
+				blobGood = true;
+			}
+			else
+			{
+				Logger.WriteLine( "selectedBlobCount가 0입니다." );
+				blobGood = false;
+			}
+
+			
 
 			
 
@@ -304,8 +334,8 @@ namespace DamoOneVision.ImageProcessing
 			}
 			else
 			{
-				Area = Math.PI * Radius * Radius;
-				FillRatio = ConvexHullArea / Area;
+				ReferenceArea = (Math.PI * Radius * Radius) - (Math.PI * smallRadius * smallRadius);
+				FillRatio = AreaSum / ReferenceArea;
 				Logger.WriteLine( $"FillRatio: {FillRatio}" );
 				circleGood = true;
 			}
@@ -379,7 +409,7 @@ namespace DamoOneVision.ImageProcessing
 				MIL.MdispSelect( InfraredDisplay, InfraredCameraScaleImage );
 			}
 
-
+			MIL.MgraArc( GraphicsContext, MilOverlayImage, DetectCirclrCenterX, DetectCirclrCenterY, smallRadius, smallRadius, 0.0, 360.0 );
 			MIL.MmeasDraw( GraphicsContext, MeasMarker, MilOverlayImage, MIL.M_DRAW_EDGES, MIL.M_DEFAULT, MIL.M_DEFAULT );
 			MIL.MblobDraw( GraphicsContext, BlobResult, MilOverlayImage, MIL.M_DRAW_BOX, MIL.M_DEFAULT, MIL.M_DEFAULT );
 			/*
@@ -411,11 +441,25 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClone( BinarizedImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref InfraredCameraConversionImage );
 			MIL.MmeasFree( CircleMeasMarker );
 			*/
+
+
+
 			MIL.MblobFree( BlobResult );
 			MIL.MblobFree( BlobContext );
 			MIL.MgraFree( GraphicsContext );
 			MIL.MgraFree( SettingGraphicsContext );
-			//MIL.MbufFree( BinarizedImage );
+			MIL.MgraFree( AnnulusContext );
+			MIL.MmeasFree( MeasMarker );
+
+			MIL.MbufFree( AnnulusAndBinarized );
+			MIL.MbufFree( AnnulusAndImage );
+			MIL.MbufFree( MilAnnulusImage );
+			//MIL.MbufFree( MilOverlayImage );
+			//if (BinarizedImage != MIL.M_NULL)
+			//{
+			//	MIL.MbufFree( BinarizedImage );
+			//	BinarizedImage = MIL.M_NULL;
+			//}
 
 			//BinarizedImage = MIL.M_NULL;
 
