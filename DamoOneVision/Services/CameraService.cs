@@ -378,6 +378,7 @@ namespace DamoOneVision.Services
 								vm.IsGoodColor = "Green";
 								vm.IsGoodStatus = "Good";
 							}
+							vm.OnProductDetected( isGood );
 							//if (!Dispatcher.CheckAccess())
 							//{
 							//	// UI 스레드에서 실행되도록 Dispatcher를 사용하여 호출

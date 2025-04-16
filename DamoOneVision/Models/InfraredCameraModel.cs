@@ -10,20 +10,6 @@ namespace DamoOneVision.Models
 		private void OnPropertyChanged( string propertyName )
 			=> PropertyChanged?.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
 
-		private string _name;
-		public string Name
-		{
-			get => _name;
-			set
-			{
-				if (_name != value)
-				{
-					_name = value;
-					OnPropertyChanged( nameof( Name ) );
-				}
-			}
-		}
-
 		private double _binarizedThreshold;
 		public double BinarizedThreshold
 		{

@@ -275,28 +275,28 @@ namespace DamoOneVision.Services
 
 		public async Task XAxisMoveWaitPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisWaitingPostion, _motionModel.XAxisReturnSpeed, _motionModel.XAxisReturnAcceleration, _motionModel.XAxisReturnDeceleration );
+			await XAxisMoveToPosition( _motionModel.XAxisWaitingPosition, _motionModel.XAxisReturnSpeed, _motionModel.XAxisReturnAcceleration, _motionModel.XAxisReturnDeceleration );
 			await XAxisWaitingStop();
 			//Logger.WriteLine( "XAxisMoveWaitPos" );
 		}
 
 		public async Task XAxisMoveEndPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisEndPostion, ConveyorSpeed*1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
+			await XAxisMoveToPosition( _motionModel.XAxisEndPosition, ConveyorSpeed*1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
 			Logger.WriteLine( $"Conveyor Speed : {ConveyorSpeed} mm/s" );
 			//await XAxisWaitingStop();
 		}
 
 		public async Task ZAxisMoveWorkPos( )
 		{
-			await ZAxisMoveToPosition( _motionModel.ZAxisWorkPostion, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
+			await ZAxisMoveToPosition( _motionModel.ZAxisWorkPosition, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
 			await ZAxisWaitingStop();
 			//Logger.WriteLine( "ZAxisMoveWorkPos" );
 		}
 
 		public async Task ZAxisMoveEndPos( )
 		{
-			await ZAxisMoveToPosition( _motionModel.ZAxisEndPostion, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
+			await ZAxisMoveToPosition( _motionModel.ZAxisEndPosition, _motionModel.ZAxisSpeed, _motionModel.ZAxisAcceleration, _motionModel.ZAxisDeceleration );
 			await ZAxisWaitingStop();
 		}
 

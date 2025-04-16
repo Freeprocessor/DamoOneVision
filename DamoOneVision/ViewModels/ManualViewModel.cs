@@ -8,6 +8,8 @@ using System.Windows.Threading;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using DamoOneVision.Services;
+using DamoOneVision.Data;
+using DamoOneVision.Models;
 
 namespace DamoOneVision.ViewModels
 {
@@ -18,6 +20,11 @@ namespace DamoOneVision.ViewModels
 		private MotionService _motionService;
 		private DeviceControlService _deviceControlService;
 		private CameraService _cameraService;
+
+		
+		private SettingManager _settingManager;
+		public InfraredCameraModel _infraredCameraModel { get; set; }
+		public MotionModel motionModel { get; set; }
 
 		private double _xAxisWaitingPosition;
 		private double _xAxisEndPosition;
@@ -47,11 +54,13 @@ namespace DamoOneVision.ViewModels
 
 
 
-		public ManualViewModel( DeviceControlService deviceControlService, MotionService motionService, CameraService cameraService )
+		public ManualViewModel( DeviceControlService deviceControlService, MotionService motionService, CameraService cameraService, SettingManager settingManager )
 		{
 			_deviceControlService = deviceControlService;
 			_motionService = motionService;
 			_cameraService = cameraService;
+
+			_settingManager = settingManager;
 
 			XAxisJogPStartCommand = new RelayCommand( ( ) => XAxisJogPStart() );
 			XAxisJogNStartCommand = new RelayCommand( ( ) => XAxisJogNStart() );
@@ -93,10 +102,20 @@ namespace DamoOneVision.ViewModels
 			_positionTimer = new DispatcherTimer();
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
 			_positionTimer.Tick += PositionTimer_Tick;
-			
 
+
+			setModel();
+		}
+
+		private void setModel( )
+		{
+			var modeldata = _settingManager.LoadModelData( _settingManager.LastOpenedModel());
+			_infraredCameraModel = modeldata.InfraredCameraModels.First();
+			motionModel = modeldata.MotionModels.First();
 
 		}
+
+
 
 		public void PositionReadStart( )
 		{

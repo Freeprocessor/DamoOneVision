@@ -167,7 +167,11 @@ namespace DamoOneVision.ImageProcessing
 
 		public static async Task<bool> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel, ushort[ ] ImageData )
 		{
-
+			if (InfraredCameraImage == MIL.M_NULL)
+			{
+				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
+				return false;
+			}
 			//return true;
 			//Logger.WriteLine( "InfraredCameraModel 호출" );
 			bool blobGood = false;

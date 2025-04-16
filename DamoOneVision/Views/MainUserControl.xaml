@@ -35,7 +35,7 @@
                                            Width="125"
                                            FontSize="20"
                                            HorizontalAlignment="Right"/>
-                        <TextBlock Text="True Seal" FontSize="20" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding ModelName}" FontSize="20" Margin="10,0,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,5">
                         <TextBlock Text="Rate"
@@ -43,7 +43,7 @@
                                            Width="125"
                                            FontSize="20"
                                            HorizontalAlignment="Right"/>
-                        <TextBlock Text="100 bpm" FontSize="20" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding RateDisplay}" FontSize="20" Margin="10,0,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,5">
                         <TextBlock Text="Good"
@@ -51,8 +51,8 @@
                                            Width="125"
                                            FontSize="20"
                                            HorizontalAlignment="Right"/>
-                        <TextBlock Text="123456789 pcs" FontSize="20" Margin="10,0,0,0"/>
-                        <TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding GoodDisplay}" FontSize="20" Margin="10,0,0,0"/>
+                        <!--<TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>-->
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,5">
                         <TextBlock Text="Reject"
@@ -60,8 +60,8 @@
                                            Width="125"
                                            FontSize="20"
                                            HorizontalAlignment="Right"/>
-                        <TextBlock Text="123456789 pcs" FontSize="20" Margin="10,0,0,0"/>
-                        <TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding RejectDisplay}" FontSize="20" Margin="10,0,0,0"/>
+                        <!--<TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>-->
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>

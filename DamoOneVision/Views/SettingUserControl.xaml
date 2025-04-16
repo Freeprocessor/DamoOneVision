@@ -51,22 +51,26 @@
 
                 <!-- 모델 선택 ComboBox -->
                 <StackPanel Orientation="Vertical" Margin="0,0,0,10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                    <materialDesign:Card Margin="0,0,0,10">
-                        <StackPanel Orientation="Vertical" Margin="10,10,0,0">
-                            <TextBlock Text="Select Model:" 
-                                   VerticalAlignment="Center"
+                    <materialDesign:Card Margin="0,10,0,10">
+                        <StackPanel Orientation="Vertical" Margin="10,0,10,0">
+
+                            <Grid>
+                                <TextBlock Text="Select Model:"
                                    FontSize="16"
                                    Foreground="Gray"
-                                   Margin="10"/>
+                                   Margin="10,10,0,10" Width="100" HorizontalAlignment="Left"/>
+                                <TextBox FontSize="16" TextWrapping="Wrap" Text="{Binding NewModelName, Mode=TwoWay}" Margin="120,0,30,0"/>
+                            </Grid>
+
 
                             <ComboBox Grid.Row="0" 
-                              ItemsSource="{Binding InfraredCameraModels}"
-                              SelectedItem="{Binding SelectedModel, Mode=TwoWay}"
-                              DisplayMemberPath="Name"
+                              ItemsSource="{Binding AvailableModelNames}"
+                              SelectedItem="{Binding SelectedModelName, Mode=TwoWay}"
+                              FontSize="16"
                               Margin="10"/>
                         </StackPanel>
                     </materialDesign:Card>
-                    <materialDesign:Card>
+                    <materialDesign:Card Margin="0,0,0,10">
                         <!-- 편집 패널: 각 항목을 3열 Grid로 배치 -->
                         <Grid Margin="5" IsEnabled="True" IsHitTestVisible="True">
 
@@ -79,7 +83,7 @@
                             <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10" >
 
                                 <!-- 추가 항목들을 같은 형식으로 배치 가능 -->
-                                <Grid Margin="5,5,5,5">
+                                <Grid Margin="5,5,20,5">
                                     <TextBlock Text="열화상 카메라 설정" FontSize="18" />
 
                                 </Grid>
@@ -99,7 +103,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <!-- Circle Center X -->
@@ -118,7 +122,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleCenterX}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterX}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <!-- Circle Center Y -->
@@ -137,9 +141,9 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleCenterY}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterY}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
-                                
+
                                 <!-- Circle Center Y -->
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
@@ -156,7 +160,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleMinRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -174,7 +178,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -192,7 +196,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleMinAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -210,7 +214,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -228,7 +232,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.AvgTemperatureMin}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMin}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -246,7 +250,7 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBox Text="{Binding SelectedModel.AvgTemperatureMax}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMax}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                             </StackPanel>
@@ -256,7 +260,7 @@
                                 <!-- (3) 선택된 속성 이름 표시 (선택사항) -->
                                 <TextBlock Grid.Row="2" Text="{Binding ActivePropertyName}" 
                                 FontStyle="Italic" Foreground="Gray" Margin="10"/>
-                                
+
                                 <Slider Minimum="{Binding ActiveValueMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding ActiveValueMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         TickFrequency="{Binding ActiveValueTick, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Margin="40,10,10,10"
@@ -273,6 +277,152 @@
                         </Grid>
 
                     </materialDesign:Card>
+                    <materialDesign:Card Margin="0,0,0,5">
+                        <Grid Margin="5">
+                            <StackPanel  Orientation="Vertical" Margin="0,0,0,0" HorizontalAlignment="Left">
+
+                                <Grid Margin="5,5,20,5">
+                                    <TextBlock Text="서보 설정" FontSize="18" />
+
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisWaitingPosition:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisWaitingPosition}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisEndPosition:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisEndPosition}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisTrackingSpeed:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisTrackingSpeed}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisReturnSpeed:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisReturnSpeed}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisMoveAcceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisMoveAcceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisMoveDeceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisMoveDeceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisReturnAcceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisReturnAcceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="XAxisReturnDeceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.XAxisReturnDeceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ZAxisWorkPosition:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.ZAxisWorkPosition}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ZAxisEndPosition:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.ZAxisEndPosition}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ZAxisSpeed:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.ZAxisSpeed}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ZAxisAcceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.ZAxisAcceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Height="25" Width="230" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ZAxisDeceleration:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"/>
+                                    <TextBox Text="{Binding SelectedMotionModel.ZAxisDeceleration}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+
+
+                            </StackPanel>
+                        </Grid>
+
+
+                    </materialDesign:Card>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -281,10 +431,19 @@
         <!-- Save 버튼 -->
         <Button Grid.Row="3" 
                 Content="Save" 
-                Command="{Binding SaveCommand}"
+                Command="{Binding SaveWithNameCommand}"
                 HorizontalAlignment="Right" 
                 Width="100" 
                 Margin="10"
                 Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <Button Grid.Row="3" 
+            Content="Delete" 
+            Command="{Binding DeleteModelCommand}"
+            HorizontalAlignment="Left" 
+            Width="100" 
+            Margin="10,10,0,10"
+            Background="#D32F2F"
+            Foreground="White"
+            Style="{DynamicResource MaterialDesignRaisedButton}"/>
     </Grid>
 </UserControl>

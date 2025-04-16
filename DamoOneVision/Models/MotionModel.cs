@@ -9,10 +9,8 @@ namespace DamoOneVision.Models
 {
 	public class MotionModel
 	{
-		public required string Name { get; set; }
-
-		public double XAxisWaitingPostion { get; set; }
-		public double XAxisEndPostion { get; set; }
+		public double XAxisWaitingPosition { get; set; }
+		public double XAxisEndPosition { get; set; }
 		public double XAxisTrackingSpeed { get; set; }
 		public double XAxisReturnSpeed { get; set; }
 		public double XAxisMoveAcceleration { get; set; }
@@ -37,8 +35,8 @@ namespace DamoOneVision.Models
 		public double XAxisOriginDeceleration { get; set; }
 
 
-		public double ZAxisWorkPostion { get; set; }
-		public double ZAxisEndPostion { get; set; }
+		public double ZAxisWorkPosition { get; set; }
+		public double ZAxisEndPosition { get; set; }
 		public double ZAxisSpeed { get; set; }
 		public double ZAxisAcceleration { get; set; }
 		public double ZAxisDeceleration { get; set; }

@@ -157,6 +157,10 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+
                                 <!-- Servo ON/OFF/Jog -->
                             </Grid.RowDefinitions>
 
@@ -181,7 +185,7 @@
                             <Label Content="Waiting Pos"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -195,7 +199,7 @@
                             <Label Content="End Pos"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -206,33 +210,56 @@
                                     Style="{DynamicResource MaterialDesignRaisedButton}" />
 
                             <!-- Acc / Dec -->
-                            <Label Content="Acc"
+                            <Label Content="Move Acc"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisDeceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.XAxisMoveAcceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="4" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
-                            <Label Content="Dec"
+                            <Label Content="Move Dec"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisAcceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.XAxisMoveDeceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="5" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-
-                            <!-- Speed -->
-                            <Label Content="Speed"
+                            
+                            <Label Content="Return Acc"
                                    Grid.Row="6" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisVelocity, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.XAxisReturnAcceleration, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="6" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
+                            <Label Content="Return Dec"
+                                   Grid.Row="7" Grid.Column="0"
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
+                            <TextBox Text="{Binding motionModel.XAxisReturnDeceleration, UpdateSourceTrigger=PropertyChanged}"
+                                     Grid.Row="7" Grid.Column="1"
+                                     Margin="5,5,5,5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+                            <!-- Speed -->
+                            <Label Content="Tracking Spd"
+                                   Grid.Row="8" Grid.Column="0"
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
+                            <TextBox Text="{Binding motionModel.XAxisTrackingSpeed , UpdateSourceTrigger=PropertyChanged}"
+                                     Grid.Row="8" Grid.Column="1"
+                                     Margin="5,5,5,5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            <Label Content="Return Spd"
+                                   Grid.Row="9" Grid.Column="0"
+                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
+                            <TextBox Text="{Binding motionModel.XAxisReturnSpeed , UpdateSourceTrigger=PropertyChanged}"
+                                     Grid.Row="9" Grid.Column="1"
+                                     Margin="5,5,5,5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}" Cursor=""/>
+
                             <!-- Servo ON/OFF, Jog +, -, Home -->
-                            <StackPanel Orientation="Vertical" Grid.Row="7" Grid.ColumnSpan="3" Margin="5,5,5,5">
+                            <StackPanel Orientation="Vertical" Grid.Row="10" Grid.ColumnSpan="3" Margin="5,5,5,5">
                                 <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                                     <Button Content="Servo ON"
                                         Command="{Binding XAxisServoONCommand}"
@@ -249,7 +276,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                                     <Button Content="Jog +"
-                                        Width="60"
+                                        Width="80"
                                         Margin="0,0,5,0"
                                         Style="{DynamicResource MaterialDesignRaisedButton}">
                                         <i:Interaction.Triggers>
@@ -262,7 +289,7 @@
                                         </i:Interaction.Triggers>
                                     </Button>
                                     <Button Content="Jog -"
-                                        Width="60"
+                                        Width="80"
                                         Margin="0,0,5,0"
                                         Style="{DynamicResource MaterialDesignRaisedButton}">
                                         <i:Interaction.Triggers>
@@ -330,7 +357,7 @@
                             <Label Content="Work Pos"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -345,7 +372,7 @@
                             <Label Content="Acc"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisDeceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.ZAxisAcceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -353,7 +380,7 @@
                             <Label Content="Dec"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisAcceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.ZAxisDeceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="4" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -362,7 +389,7 @@
                             <Label Content="Speed"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisVelocity, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding motionModel.ZAxisSpeed , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="5" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -385,7 +412,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                                     <Button Content="Jog +"
-                                        Width="60"
+                                        Width="80"
                                         Margin="0,0,5,0"
                                         Style="{DynamicResource MaterialDesignRaisedButton}">
                                         <i:Interaction.Triggers>
@@ -398,7 +425,7 @@
                                         </i:Interaction.Triggers>
                                     </Button>
                                     <Button Content="Jog -"
-                                        Width="60"
+                                        Width="80"
                                         Margin="0,0,5,0"
                                         Style="{DynamicResource MaterialDesignRaisedButton}">
                                         <i:Interaction.Triggers>
@@ -425,11 +452,7 @@
                         <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" 
                                VerticalAlignment="Center"
                                Width="100" />
-                        <Button Content="Camera&#x0A;Auto Focus"
-                                Margin="20,0,0,0"
-                                Height="50" Width="110"
-                                Style="{DynamicResource MaterialDesignRaisedButton}"
-                                Command="{Binding AutoFocusCommand}"/>
+
                     </StackPanel>
                 </materialDesign:Card>
 

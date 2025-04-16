@@ -92,12 +92,14 @@ namespace DamoOneVision
 			services.AddSingleton<ManualViewModel>( sp => new ManualViewModel(
 				sp.GetRequiredService<DeviceControlService>(),
 				motionService,
-				sp.GetRequiredService<CameraService>()
+				sp.GetRequiredService<CameraService>(),
+				sp.GetRequiredService<SettingManager>()
 			) );
 
 			services.AddSingleton<SettingViewModel>( sp => new SettingViewModel(
 				sp.GetRequiredService<SettingManager>(),
-				sp.GetRequiredService<CameraService>()
+				sp.GetRequiredService<CameraService>(),
+				sp.GetRequiredService<MainViewModel>()
 			) );
 
 

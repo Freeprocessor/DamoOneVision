@@ -241,7 +241,7 @@ namespace DamoOneVision
 		}
 
 
-		private void ModelButton_Click( object sender, RoutedEventArgs e )
+		private void SettingButton_Click( object sender, RoutedEventArgs e )
 		{
 			///TODO : Button Disable로 변경
 			///

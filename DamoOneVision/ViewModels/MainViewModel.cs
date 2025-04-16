@@ -98,6 +98,7 @@ namespace DamoOneVision.ViewModels
 		/// </summary>
 		private bool _stopClock;
 
+		private DateTime? _lastProductTime = null;
 
 		/// <summary>
 		/// 현재 시간 내부 변수
@@ -216,6 +217,56 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private int _goodCount;
+		public int GoodCount
+		{
+			get => _goodCount;
+			set
+			{
+				if (_goodCount != value)
+				{
+					_goodCount = value;
+					_settingManager.Settings.GoodCount = value;
+					_settingManager.SaveSettings(); // ✅ 저장!
+					OnPropertyChanged( nameof( GoodCount ) );
+					OnPropertyChanged( nameof( GoodDisplay ) );
+				}
+			}
+		}
+
+		private int _rejectCount;
+		public int RejectCount
+		{
+			get => _rejectCount;
+			set
+			{
+				if (_rejectCount != value)
+				{
+					_rejectCount = value;
+					_settingManager.Settings.RejectCount = value;
+					_settingManager.SaveSettings(); // ✅ 저장!
+					OnPropertyChanged( nameof( RejectCount ) );
+					OnPropertyChanged( nameof( RejectDisplay ) );
+				}
+			}
+		}
+
+		private double _rate;
+		public string RateDisplay => $"{_rate:F0} bpm";
+
+		public string GoodDisplay => $"{GoodCount:N0} pcs ({GoodPercent}%)";
+		public string RejectDisplay => $"{RejectCount:N0} pcs ({RejectPercent}%)";
+
+		private string _modelName = "True Seal";
+		public string ModelName
+		{
+			get => _modelName;
+			set { _modelName = value; OnPropertyChanged( nameof( ModelName ) ); }
+		}
+
+		private int GoodPercent => (GoodCount + RejectCount) > 0 ? GoodCount * 100 / (GoodCount + RejectCount) : 0;
+		private int RejectPercent => (GoodCount + RejectCount) > 0 ? RejectCount * 100 / (GoodCount + RejectCount) : 0;
+
 
 		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
 		public bool CanConnect => !IsVisionConnected && !IsBusy;
@@ -236,6 +287,11 @@ namespace DamoOneVision.ViewModels
 		public ICommand VisionTriggerCommand { get; }
 		public ICommand LoadImagesCommand { get; }
 		public ICommand ImageSelectedCommand { get; }
+
+
+
+		public ICommand TestGoodCommand { get; }
+		public ICommand TestRejectCommand { get; }
 
 
 
@@ -324,6 +380,16 @@ namespace DamoOneVision.ViewModels
 			ImageSelectedCommand = new RelayCommand<string>( OnImageSelected );
 
 
+			///
+			TestGoodCommand = new RelayCommand( ( ) => OnProductDetected( true ) );
+			TestRejectCommand = new RelayCommand( ( ) => OnProductDetected( false ) );
+
+
+			///
+			ModelName = _settingManager.CurrentModel;
+
+			GoodCount = _settingManager.Settings.GoodCount;
+			RejectCount = _settingManager.Settings.RejectCount;
 
 		}
 
@@ -433,48 +499,6 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		/// <summary>
-		/// 모델 수정 버튼 클릭 이벤트 핸들러
-		/// </summary>
-		private void EditModel( )
-		{
-			if (true)
-			{
-				// 선택된 모델의 복사본 생성 (원본 변경을 방지)
-				var modelCopy = new InfraredCameraModel
-				{
-					Name = currentInfraredCameraModel.Name,
-					CircleCenterX = currentInfraredCameraModel.CircleCenterX,
-					CircleCenterY = currentInfraredCameraModel.CircleCenterY,
-					CircleMinRadius = currentInfraredCameraModel.CircleMinRadius,
-					CircleMaxRadius = currentInfraredCameraModel.CircleMaxRadius,
-					BinarizedThreshold = currentInfraredCameraModel.BinarizedThreshold
-				};
-
-				/// TODO : 수정할 모델을 설정하는 창 생성
-				//var saveWindow = new SettingWindow(modelCopy);
-				//if (saveWindow.ShowDialog() == true)
-				//{
-				//	// 원본 모델 업데이트
-				//	currentInfraredCameraModel.Name = saveWindow.Model.Name;
-				//	currentInfraredCameraModel.CircleCenterX = saveWindow.Model.CircleCenterX;
-				//	currentInfraredCameraModel.CircleCenterY = saveWindow.Model.CircleCenterY;
-				//	currentInfraredCameraModel.CircleMinRadius = saveWindow.Model.CircleMinRadius;
-				//	currentInfraredCameraModel.CircleMaxRadius = saveWindow.Model.CircleMaxRadius;
-				//	currentInfraredCameraModel.BinarizedThreshold = saveWindow.Model.BinarizedThreshold;
-
-				//	SaveModelsAsync(); // 자동 저장
-				//}
-			}
-			//else
-			//{
-			//	MessageBox.Show( "수정할 모델을 선택하세요.", "선택 오류", MessageBoxButton.OK, MessageBoxImage.Warning );
-			//}
-		}
-
-
-
-
 
 		//private void ListBox_SelectionChanged( )
 		//{
@@ -498,21 +522,43 @@ namespace DamoOneVision.ViewModels
 		//	}
 		//}
 
-		private void LoadModel( string modelData )
+		//private void LoadModel( string modelData )
+		//{
+		//	// 여기에 모델 로딩 로직을 구현하세요
+		//	DeserializeModelData( modelData );
+		//	MessageBox.Show( "모델이 로드되었습니다 : {modelData}" );
+		//	Logger.WriteLine( "모델이 로드되었습니다 : {modelData}" );
+
+
+		//	// 예를 들어, modelData를 역직렬화하여 애플리케이션의 상태나 설정에 적용할 수 있습니다.
+		//}
+
+
+		//private void DeserializeModelData( string serializedData )
+		//{
+		//	var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
+		//}
+
+		public void OnProductDetected( bool isGood )
 		{
-			// 여기에 모델 로딩 로직을 구현하세요
-			DeserializeModelData( modelData );
-			MessageBox.Show( "모델이 로드되었습니다 : {modelData}" );
-			Logger.WriteLine( "모델이 로드되었습니다 : {modelData}" );
+			var now = DateTime.Now;
 
+			if (_lastProductTime != null)
+			{
+				var diff = now - _lastProductTime.Value;
+				if (diff.TotalSeconds > 0)
+				{
+					_rate = 60.0 / diff.TotalSeconds;
+					OnPropertyChanged( nameof( RateDisplay ) );
+				}
+			}
+			_lastProductTime = now;
 
-			// 예를 들어, modelData를 역직렬화하여 애플리케이션의 상태나 설정에 적용할 수 있습니다.
-		}
+			if (isGood) GoodCount++;
+			else RejectCount++;
 
-
-		private void DeserializeModelData( string serializedData )
-		{
-			var items = JsonConvert.DeserializeObject<List<ComboBoxItemViewModel>>(serializedData);
+			OnPropertyChanged( nameof( GoodDisplay ) );
+			OnPropertyChanged( nameof( RejectDisplay ) );
 		}
 
 
@@ -525,19 +571,20 @@ namespace DamoOneVision.ViewModels
 		/// </summary>
 		public async void StartClockAsync( )
 		{
-			//시계 중지 플래그 초기화
 			_stopClock = false;
 
 			await Task.Run( ( ) =>
 			{
 				while (!_stopClock)
 				{
-					CurrentTime = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" );
+					Application.Current.Dispatcher.Invoke( ( ) =>
+					{
+						CurrentTime = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" );
+					} );
 
-					System.Threading.Thread.Sleep( 1000 );
+					Thread.Sleep( 1000 );
 				}
 			} );
-
 		}
 
 		public void StopClock( )

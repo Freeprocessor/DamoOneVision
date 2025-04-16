@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;  // CommunityToolkit.Mvvm 또는 다른 RelayCommand 구현 사용
 using DamoOneVision.Data;
@@ -22,16 +23,64 @@ namespace DamoOneVision.ViewModels
 
 		public ObservableCollection<InfraredCameraModel> InfraredCameraModels { get; set; } = new ObservableCollection<InfraredCameraModel>();
 
-		private InfraredCameraModel? _selectedModel;
-		public InfraredCameraModel? SelectedModel
+		public ObservableCollection<MotionModel> MotionModels { get; set; } = new ObservableCollection<MotionModel>();
+
+		public ObservableCollection<string> AvailableModelNames { get; } = new();
+
+
+
+		private string _selectedModelName = "";
+		public string SelectedModelName
 		{
-			get => _selectedModel;
+			get => _selectedModelName;
 			set
 			{
-				if (_selectedModel != value)
+				if (_selectedModelName != value)
 				{
-					_selectedModel = value;
-					OnPropertyChanged( nameof( SelectedModel ) );
+					_selectedModelName = value;
+					OnPropertyChanged( nameof( SelectedModelName ) );
+					LoadModel( _selectedModelName ); // 선택 즉시 모델 불러오기
+				}
+			}
+		}
+
+		private string _newModelName = "";
+		public string NewModelName
+		{
+			get => _newModelName;
+			set
+			{
+				_newModelName = value;
+				OnPropertyChanged( nameof( NewModelName ) );
+			}
+		}
+
+
+
+		private InfraredCameraModel? _selectedInfraredCameraModel;
+		public InfraredCameraModel? SelectedInfraredCameraModel
+		{
+			get => _selectedInfraredCameraModel;
+			set
+			{
+				if (_selectedInfraredCameraModel != value)
+				{
+					_selectedInfraredCameraModel = value;
+					OnPropertyChanged( nameof( SelectedInfraredCameraModel ) );
+				}
+			}
+		}
+
+		private MotionModel? _selectedMotionModel;
+		public MotionModel? SelectedMotionModel
+		{
+			get => _selectedMotionModel;
+			set
+			{
+				if (_selectedMotionModel != value)
+				{
+					_selectedMotionModel = value;
+					OnPropertyChanged( nameof( SelectedMotionModel ) );
 				}
 			}
 		}
@@ -118,67 +167,163 @@ namespace DamoOneVision.ViewModels
 
 		// 커맨드: 어떤 속성을 선택할지
 		public ICommand SelectPropertyCommand { get; }
-		public ICommand SaveCommand { get; }
+		public ICommand SaveWithNameCommand { get; }
+		public ICommand DeleteModelCommand { get; }
 
 		private readonly SettingManager _settingManager;
 		private readonly CameraService _cameraService;
+		private readonly MainViewModel _mainViewModel;
 
 		private bool _isImageDisplay = false;
 		private bool _isBinarized = false;
 
-		public SettingViewModel( SettingManager settingManager, CameraService cameraService )
+		public SettingViewModel( SettingManager settingManager, CameraService cameraService, MainViewModel mainViewModel )
 		{
 			_settingManager = settingManager;
-
 			_cameraService = cameraService;
+			_mainViewModel = mainViewModel;
 
-			LoadModels();
-			SaveCommand = new RelayCommand( SaveModels );
-
+			SaveWithNameCommand = new RelayCommand( SaveAsNewModel );
 			SelectPropertyCommand = new RelayCommand<string>( OnSelectProperty );
+			DeleteModelCommand = new RelayCommand( DeleteSelectedModel );
+
+			LoadAvailableModelNames();
+
+			// 🔥 마지막 열었던 모델 이름으로 자동 로딩
+			string lastModel = _settingManager.LastOpenedModel();
+
+			if (AvailableModelNames.Contains( lastModel ))
+			{
+				LoadModel( lastModel );
+				SelectedModelName = lastModel;
+			}
+			else if (AvailableModelNames.Any())
+			{
+				LoadModel( AvailableModelNames.First() );
+				SelectedModelName = AvailableModelNames.First();
+			}
+
 		}
 
-		private void LoadModels( )
+		//private void LoadModels( )
+		//{
+		//	// Load the model data using SettingManager.
+		//	ModelData data = _settingManager.LoadModelData();
+		//	InfraredCameraModels.Clear();
+		//	foreach (var model in data.InfraredCameraModels)
+		//	{
+		//		InfraredCameraModels.Add( model );
+		//	}
+		//	if (InfraredCameraModels.Any())
+		//	{
+		//		SelectedModel = InfraredCameraModels.First();
+		//	}
+		//}
+		//private void SaveModels( )
+		//{
+		//	// 1. 기존 파일 읽어오기
+		//	string modelFilePath = _settingManager.GetModelFilePath();
+		//	ModelData data = new ModelData();
+
+		//	if (File.Exists( modelFilePath ))
+		//	{
+		//		string existingJson = File.ReadAllText(modelFilePath);
+		//		data = JsonSerializer.Deserialize<ModelData>( existingJson );
+		//		if (data == null)
+		//			data = new ModelData();
+		//	}
+
+		//	// 2. 기존 데이터 중 MotionModels는 그대로 두고,
+		//	//    InfraredCameraModels만 현재 ViewModel 값으로 업데이트
+		//	data.InfraredCameraModels = InfraredCameraModels.ToList();
+
+		//	// 3. (옵션) LastOpenedModel을 설정하거나 Settings 업데이트 등
+		//	// _settingManager.Settings.LastOpenedModel = SelectedModel?.Name ?? "Default";
+
+		//	// 4. 저장
+		//	var options = new JsonSerializerOptions { WriteIndented = true };
+		//	string json = JsonSerializer.Serialize(data, options);
+		//	File.WriteAllText( modelFilePath, json );
+
+		//	_settingManager.LoadSettings();
+		//}
+
+		private void LoadModel( string modelName )
 		{
-			// Load the model data using SettingManager.
-			ModelData data = _settingManager.LoadModelData();
+			var data = _settingManager.LoadModelData(modelName);
+			if (data == null || data.InfraredCameraModels == null || data.MotionModels == null ) return;
+
 			InfraredCameraModels.Clear();
+			MotionModels.Clear();
+
 			foreach (var model in data.InfraredCameraModels)
-			{
 				InfraredCameraModels.Add( model );
-			}
-			if (InfraredCameraModels.Any())
-			{
-				SelectedModel = InfraredCameraModels.First();
-			}
+			foreach (var model in data.MotionModels)
+				MotionModels.Add( model );
+
+			SelectedInfraredCameraModel = InfraredCameraModels.FirstOrDefault();
+			SelectedMotionModel = MotionModels.FirstOrDefault();
+
+			_mainViewModel.ModelName = modelName;
 		}
-		private void SaveModels( )
-		{
-			// 1. 기존 파일 읽어오기
-			string modelFilePath = _settingManager.GetModelFilePath();
-			ModelData data = new ModelData();
 
-			if (File.Exists( modelFilePath ))
+		private void SaveAsNewModel( )
+		{
+			if (string.IsNullOrWhiteSpace( NewModelName ))
 			{
-				string existingJson = File.ReadAllText(modelFilePath);
-				data = JsonSerializer.Deserialize<ModelData>( existingJson );
-				if (data == null)
-					data = new ModelData();
+				Logger.WriteLine( "모델 이름이 비어 있습니다." );
+				return;
 			}
 
-			// 2. 기존 데이터 중 MotionModels는 그대로 두고,
-			//    InfraredCameraModels만 현재 ViewModel 값으로 업데이트
-			data.InfraredCameraModels = InfraredCameraModels.ToList();
+			var data = new ModelData
+			{
+				InfraredCameraModels = InfraredCameraModels.ToList(),
+				MotionModels = MotionModels.ToList()
+			};
 
-			// 3. (옵션) LastOpenedModel을 설정하거나 Settings 업데이트 등
-			// _settingManager.Settings.LastOpenedModel = SelectedModel?.Name ?? "Default";
+			_settingManager.SaveModelData( NewModelName, data );
+			LoadAvailableModelNames();
+			SelectedModelName = NewModelName;
+			NewModelName = "";
+		}
 
-			// 4. 저장
-			var options = new JsonSerializerOptions { WriteIndented = true };
-			string json = JsonSerializer.Serialize(data, options);
-			File.WriteAllText( modelFilePath, json );
+		private void LoadAvailableModelNames( )
+		{
+			AvailableModelNames.Clear();
+			foreach (var name in _settingManager.GetAvailableModelNames())
+				AvailableModelNames.Add( name );
+		}
 
-			_settingManager.LoadSettings();
+		private void DeleteSelectedModel( )
+		{
+			if (string.IsNullOrWhiteSpace( SelectedModelName ))
+				return;
+
+			var result = MessageBox.Show(
+		$"'{SelectedModelName}' 모델을 삭제하시겠습니까?",
+		"모델 삭제 확인",
+		MessageBoxButton.YesNo,
+		MessageBoxImage.Warning);
+
+			if (result != MessageBoxResult.Yes)
+				return;
+
+			_settingManager.DeleteModel( SelectedModelName );
+
+			LoadAvailableModelNames();
+
+			if (AvailableModelNames.Any())
+			{
+				SelectedModelName = AvailableModelNames.First();
+				LoadModel( SelectedModelName );
+			}
+			else
+			{
+				InfraredCameraModels.Clear();
+				SelectedInfraredCameraModel = null;
+				SelectedModelName = "";
+				Logger.WriteLine( "모델이 삭제되었습니다." );
+			}
 		}
 
 
@@ -189,13 +334,13 @@ namespace DamoOneVision.ViewModels
 
 		private void UpdateActiveValueFromModel( )
 		{
-			if (SelectedModel == null)
+			if (SelectedInfraredCameraModel == null)
 				return;
 
 			switch (ActivePropertyName)
 			{
 				case "BinarizedThreshold":
-					ActiveValue = SelectedModel.BinarizedThreshold;
+					ActiveValue = SelectedInfraredCameraModel.BinarizedThreshold;
 					ActiveValueMin = 0;
 					ActiveValueMax = 65535; // 예시: 16비트 이미지의 최대값
 					ActiveValueTick = 1; // 예시: 1단위로 조정
@@ -203,56 +348,56 @@ namespace DamoOneVision.ViewModels
 					//Logger.WriteLine( $"BinarizedThreshold: {SelectedModel.BinarizedThreshold}" );
 					break;
 				case "CircleCenterX":
-					ActiveValue = SelectedModel.CircleCenterX;
+					ActiveValue = SelectedInfraredCameraModel.CircleCenterX;
 					ActiveValueMin = 0;
 					ActiveValueMax = 640; // 예시: 화면 너비
 					ActiveValueTick = 1; // 예시: 1픽셀 단위
 					_isBinarized = false;
 					break;
 				case "CircleCenterY":
-					ActiveValue = SelectedModel.CircleCenterY;
+					ActiveValue = SelectedInfraredCameraModel.CircleCenterY;
 					ActiveValueMin = 0;
 					ActiveValueMax = 480; // 예시: 화면 높이
 					ActiveValueTick = 1; // 예시: 1픽셀 단위
 					_isBinarized = false;
 					break;
 				case "CircleMinRadius":
-					ActiveValue = SelectedModel.CircleMinRadius;
+					ActiveValue = SelectedInfraredCameraModel.CircleMinRadius;
 					ActiveValueMin = 0;
 					ActiveValueMax = 240; // 예시: 최소 반지름
 					ActiveValueTick = 0.1;
 					_isBinarized = false;
 					break;
 				case "CircleMaxRadius":
-					ActiveValue = SelectedModel.CircleMaxRadius;
+					ActiveValue = SelectedInfraredCameraModel.CircleMaxRadius;
 					ActiveValueMin = 0;
 					ActiveValueMax = 240; // 예시: 최대 반지름
 					ActiveValueTick = 0.1;
 					_isBinarized = false;
 					break;
 				case "CircleMinAreaRatio":
-					ActiveValue = SelectedModel.CircleMinAreaRatio;
+					ActiveValue = SelectedInfraredCameraModel.CircleMinAreaRatio;
 					ActiveValueMin = 0;
 					ActiveValueMax = 1.5; // 예시: 비율
 					ActiveValueTick = 0.01; // 예시: 0.01 단위로 조정
 					_isBinarized = false;
 					break;
 				case "CircleMaxAreaRatio":
-					ActiveValue = SelectedModel.CircleMaxAreaRatio;
+					ActiveValue = SelectedInfraredCameraModel.CircleMaxAreaRatio;
 					ActiveValueMin = 0;
 					ActiveValueMax = 1.5; // 예시: 비율
 					ActiveValueTick = 0.01; // 예시: 0.01 단위로 조정
 					_isBinarized = false;
 					break;
 				case "AvgTemperatureMin":
-					ActiveValue = SelectedModel.AvgTemperatureMin;
+					ActiveValue = SelectedInfraredCameraModel.AvgTemperatureMin;
 					ActiveValueMin = 0; // 예시: 최소 온도
 					ActiveValueMax = 65535; // 예시: 최대 온도
 					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
 					_isBinarized = false;
 					break;
 				case "AvgTemperatureMax":
-					ActiveValue = SelectedModel.AvgTemperatureMax;
+					ActiveValue = SelectedInfraredCameraModel.AvgTemperatureMax;
 					ActiveValueMin = 0; // 예시: 최소 온도
 					ActiveValueMax = 65535; // 예시: 최대 온도
 					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
@@ -268,37 +413,37 @@ namespace DamoOneVision.ViewModels
 
 		private void UpdateModelFromActiveValue( )
 		{
-			if (SelectedModel == null)
+			if (SelectedInfraredCameraModel == null)
 				return;
 
 			switch (ActivePropertyName)
 			{
 				case "BinarizedThreshold":
-					SelectedModel.BinarizedThreshold = ActiveValue;
+					SelectedInfraredCameraModel.BinarizedThreshold = ActiveValue;
 					break;
 				case "CircleCenterX":
-					SelectedModel.CircleCenterX = ActiveValue;
+					SelectedInfraredCameraModel.CircleCenterX = ActiveValue;
 					break;
 				case "CircleCenterY":
-					SelectedModel.CircleCenterY = ActiveValue;
+					SelectedInfraredCameraModel.CircleCenterY = ActiveValue;
 					break;
 				case "CircleMinRadius":
-					SelectedModel.CircleMinRadius = ActiveValue;
+					SelectedInfraredCameraModel.CircleMinRadius = ActiveValue;
 					break;
 				case "CircleMaxRadius":
-					SelectedModel.CircleMaxRadius = ActiveValue;
+					SelectedInfraredCameraModel.CircleMaxRadius = ActiveValue;
 					break;
 				case "CircleMinAreaRatio":
-					SelectedModel.CircleMinAreaRatio = ActiveValue;
+					SelectedInfraredCameraModel.CircleMinAreaRatio = ActiveValue;
 					break;
 				case "CircleMaxAreaRatio":
-					SelectedModel.CircleMaxAreaRatio = ActiveValue;
+					SelectedInfraredCameraModel.CircleMaxAreaRatio = ActiveValue;
 					break;
 				case "AvgTemperatureMin":
-					SelectedModel.AvgTemperatureMin = ActiveValue;
+					SelectedInfraredCameraModel.AvgTemperatureMin = ActiveValue;
 					break;
 				case "AvgTemperatureMax":
-					SelectedModel.AvgTemperatureMax = ActiveValue;
+					SelectedInfraredCameraModel.AvgTemperatureMax = ActiveValue;
 					break;
 					// CircleMinRadius, CircleMaxRadius, etc...
 			}
@@ -306,10 +451,17 @@ namespace DamoOneVision.ViewModels
 			ConversionImage();
 		}
 
+
+		public async void ConversionImage( )
+		{
+			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel, _cameraService.ImageData() );
+		}
+
+
 		public async void UpdateCameraSettings( )
 		{
 			_isImageDisplay = true;
-			if(SelectedModel == null )
+			if (SelectedInfraredCameraModel == null)
 			{
 				Logger.WriteLine( "모델정보가 없습니다." );
 				return;
@@ -326,23 +478,18 @@ namespace DamoOneVision.ViewModels
 
 
 			await Task.Run( async ( ) =>
+			{
+				while (_isImageDisplay)
 				{
-					while (_isImageDisplay)
-					{
-						await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedModel, _cameraService.ImageData() );
-						await Task.Delay( 100 );
-					}
-				} );
+					await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel, _cameraService.ImageData() );
+					await Task.Delay( 100 );
+				}
+			} );
 		}
 
 		public void UpdateCameraSettingsStop( )
 		{
 			_isImageDisplay = false;
-		}
-
-		public async void ConversionImage( )
-		{
-			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedModel, _cameraService.ImageData() );
 		}
 	}
 }
