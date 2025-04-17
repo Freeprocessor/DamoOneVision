@@ -93,6 +93,8 @@
                             <Separator/>
                             <MenuItem Header="Setting" IsCheckable="False" Click="SettingButton_Click"/>
                             <MenuItem Header="About"/>
+                            <Separator/>
+                            <MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>
                         </MenuItem>
                     </Menu>
 

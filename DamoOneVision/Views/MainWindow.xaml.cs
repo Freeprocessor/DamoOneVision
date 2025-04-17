@@ -252,6 +252,17 @@ namespace DamoOneVision
 			// Manual 화면으로 전환
 		}
 
+		private void ImageFusionButton_Click( object sender, RoutedEventArgs e )
+		{
+			ImageCompositionWindow imageFusionWindow = new ImageCompositionWindow();
+			imageFusionWindow.Show();
+			//_settingViewModel.ImageFusion();
+			//_settingViewModel.UpdateCameraSettings();
+			// Manual 화면으로 전환
+
+		}
+
+
 		private void Click( object sender, RoutedEventArgs e )
 		{
 			MessageBox.Show( "버튼이 클릭되었습니다." );

@@ -397,28 +397,15 @@ namespace DamoOneVision.ViewModels
 
 		private async Task XAxisMoveWaitAsync( )
 		{
-			await XAxisMoveToTargetAsync( XAxisWaitingPosition );
-		}
+			//await XAxisMoveToTargetAsync( XAxisWaitingPosition );
 
-		private async Task XAxisMoveEndAsync( )
-		{
-			await XAxisMoveToTargetAsync( XAxisEndPosition );
-		}
-
-		private async Task ZAxisMoveWorkAsync( )
-		{
-			await ZAxisMoveToTargetAsync( ZAxisWorkPosition );
-		}
-
-		private async Task XAxisMoveToTargetAsync( double TargetPosition )
-		{
 			_xAxisIsMoving = true;
 			(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 
 			try
 			{
-				await _motionService.XAxisMoveToPosition( TargetPosition, XAxisVelocity, XAxisAcceleration, XAxisDeceleration );
+				await _motionService.XAxisMoveToPosition( motionModel.XAxisWaitingPosition, motionModel.XAxisReturnSpeed, motionModel.XAxisReturnAcceleration, motionModel.XAxisReturnDeceleration );
 			}
 			finally
 			{
@@ -428,21 +415,75 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		private async Task ZAxisMoveToTargetAsync( double TargetPosition )
+		private async Task XAxisMoveEndAsync( )
+		{
+			//await XAxisMoveToTargetAsync( XAxisEndPosition );
+			_xAxisIsMoving = true;
+			(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+
+			try
+			{
+				await _motionService.XAxisMoveToPosition( motionModel.XAxisEndPosition, motionModel.XAxisTrackingSpeed, motionModel.XAxisMoveAcceleration, motionModel.XAxisMoveDeceleration );
+			}
+			finally
+			{
+				_xAxisIsMoving = false;
+				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+			}
+		}
+
+		private async Task ZAxisMoveWorkAsync( )
 		{
 			_zAxisIsMoving = true;
 			(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 
 			try
 			{
-				await _motionService.ZAxisMoveToPosition( TargetPosition, ZAxisVelocity, ZAxisAcceleration, ZAxisDeceleration );
+				await _motionService.ZAxisMoveToPosition( motionModel.ZAxisWorkPosition, motionModel.ZAxisSpeed, motionModel.ZAxisAcceleration, motionModel.ZAxisDeceleration );
 			}
 			finally
 			{
 				_zAxisIsMoving = false;
 				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
 			}
+			//await ZAxisMoveToTargetAsync( ZAxisWorkPosition );
 		}
+
+		//private async Task XAxisMoveToTargetAsync( double TargetPosition )
+		//{
+		//	_xAxisIsMoving = true;
+		//	(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+		//	(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+
+		//	try
+		//	{
+		//		await _motionService.XAxisMoveToPosition( TargetPosition, XAxisVelocity, XAxisAcceleration, XAxisDeceleration );
+		//	}
+		//	finally
+		//	{
+		//		_xAxisIsMoving = false;
+		//		(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+		//		(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+		//	}
+		//}
+
+		//private async Task ZAxisMoveToTargetAsync( double TargetPosition )
+		//{
+		//	_zAxisIsMoving = true;
+		//	(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+
+		//	try
+		//	{
+		//		await _motionService.ZAxisMoveToPosition( TargetPosition, ZAxisVelocity, ZAxisAcceleration, ZAxisDeceleration );
+		//	}
+		//	finally
+		//	{
+		//		_zAxisIsMoving = false;
+		//		(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+		//	}
+		//}
 
 		private void XAxizServoON( )
 		{
