@@ -169,6 +169,12 @@ namespace DamoOneVision.ViewModels
 		public ICommand SelectPropertyCommand { get; }
 		public ICommand SaveWithNameCommand { get; }
 		public ICommand DeleteModelCommand { get; }
+		public ICommand ActiveValuePlus1 { get; }
+		public ICommand ActiveValuePlus10 { get; }
+		public ICommand ActiveValuePlus100 { get; }
+		public ICommand ActiveValueMinus1 { get; }
+		public ICommand ActiveValueMinus10 { get; }
+		public ICommand ActiveValueMinus100 { get; }
 
 		private readonly SettingManager _settingManager;
 		private readonly CameraService _cameraService;
@@ -187,6 +193,13 @@ namespace DamoOneVision.ViewModels
 			SelectPropertyCommand = new RelayCommand<string>( OnSelectProperty );
 			DeleteModelCommand = new RelayCommand( DeleteSelectedModel );
 
+			ActiveValuePlus1 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick; } );
+			ActiveValuePlus10 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick * 10; } );
+			ActiveValuePlus100 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick * 100; } );
+			ActiveValueMinus1 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick; } );
+			ActiveValueMinus10 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick * 10; } );
+			ActiveValueMinus100 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick * 100; } );
+
 			LoadAvailableModelNames();
 
 			// 🔥 마지막 열었던 모델 이름으로 자동 로딩
@@ -204,49 +217,6 @@ namespace DamoOneVision.ViewModels
 			}
 
 		}
-
-		//private void LoadModels( )
-		//{
-		//	// Load the model data using SettingManager.
-		//	ModelData data = _settingManager.LoadModelData();
-		//	InfraredCameraModels.Clear();
-		//	foreach (var model in data.InfraredCameraModels)
-		//	{
-		//		InfraredCameraModels.Add( model );
-		//	}
-		//	if (InfraredCameraModels.Any())
-		//	{
-		//		SelectedModel = InfraredCameraModels.First();
-		//	}
-		//}
-		//private void SaveModels( )
-		//{
-		//	// 1. 기존 파일 읽어오기
-		//	string modelFilePath = _settingManager.GetModelFilePath();
-		//	ModelData data = new ModelData();
-
-		//	if (File.Exists( modelFilePath ))
-		//	{
-		//		string existingJson = File.ReadAllText(modelFilePath);
-		//		data = JsonSerializer.Deserialize<ModelData>( existingJson );
-		//		if (data == null)
-		//			data = new ModelData();
-		//	}
-
-		//	// 2. 기존 데이터 중 MotionModels는 그대로 두고,
-		//	//    InfraredCameraModels만 현재 ViewModel 값으로 업데이트
-		//	data.InfraredCameraModels = InfraredCameraModels.ToList();
-
-		//	// 3. (옵션) LastOpenedModel을 설정하거나 Settings 업데이트 등
-		//	// _settingManager.Settings.LastOpenedModel = SelectedModel?.Name ?? "Default";
-
-		//	// 4. 저장
-		//	var options = new JsonSerializerOptions { WriteIndented = true };
-		//	string json = JsonSerializer.Serialize(data, options);
-		//	File.WriteAllText( modelFilePath, json );
-
-		//	_settingManager.LoadSettings();
-		//}
 
 		private void LoadModel( string modelName )
 		{
@@ -408,7 +378,10 @@ namespace DamoOneVision.ViewModels
 				default:
 					ActiveValue = 0;
 					break;
+
+				
 			}
+			ConversionImage();
 		}
 
 		private void UpdateModelFromActiveValue( )
@@ -454,7 +427,7 @@ namespace DamoOneVision.ViewModels
 
 		public async void ConversionImage( )
 		{
-			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel, _cameraService.ImageData() );
+			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
 		}
 
 
@@ -481,7 +454,7 @@ namespace DamoOneVision.ViewModels
 			{
 				while (_isImageDisplay)
 				{
-					await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel, _cameraService.ImageData() );
+					await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
 					await Task.Delay( 100 );
 				}
 			} );
@@ -491,5 +464,48 @@ namespace DamoOneVision.ViewModels
 		{
 			_isImageDisplay = false;
 		}
+
+		//private void LoadModels( )
+		//{
+		//	// Load the model data using SettingManager.
+		//	ModelData data = _settingManager.LoadModelData();
+		//	InfraredCameraModels.Clear();
+		//	foreach (var model in data.InfraredCameraModels)
+		//	{
+		//		InfraredCameraModels.Add( model );
+		//	}
+		//	if (InfraredCameraModels.Any())
+		//	{
+		//		SelectedModel = InfraredCameraModels.First();
+		//	}
+		//}
+		//private void SaveModels( )
+		//{
+		//	// 1. 기존 파일 읽어오기
+		//	string modelFilePath = _settingManager.GetModelFilePath();
+		//	ModelData data = new ModelData();
+
+		//	if (File.Exists( modelFilePath ))
+		//	{
+		//		string existingJson = File.ReadAllText(modelFilePath);
+		//		data = JsonSerializer.Deserialize<ModelData>( existingJson );
+		//		if (data == null)
+		//			data = new ModelData();
+		//	}
+
+		//	// 2. 기존 데이터 중 MotionModels는 그대로 두고,
+		//	//    InfraredCameraModels만 현재 ViewModel 값으로 업데이트
+		//	data.InfraredCameraModels = InfraredCameraModels.ToList();
+
+		//	// 3. (옵션) LastOpenedModel을 설정하거나 Settings 업데이트 등
+		//	// _settingManager.Settings.LastOpenedModel = SelectedModel?.Name ?? "Default";
+
+		//	// 4. 저장
+		//	var options = new JsonSerializerOptions { WriteIndented = true };
+		//	string json = JsonSerializer.Serialize(data, options);
+		//	File.WriteAllText( modelFilePath, json );
+
+		//	_settingManager.LoadSettings();
+		//}
 	}
 }

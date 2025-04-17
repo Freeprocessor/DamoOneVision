@@ -165,7 +165,7 @@ namespace DamoOneVision.ImageProcessing
 
 
 
-		public static async Task<bool> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel, ushort[ ] ImageData )
+		public static async Task<bool> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel )
 		{
 			if (InfraredCameraImage == MIL.M_NULL)
 			{
@@ -279,6 +279,15 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MimArith( MilAnnulusImage, BinarizedImage, AnnulusAndBinarized, MIL.M_AND );
 			MIL.MimArith( MilAnnulusImage, InfraredCameraImage, AnnulusAndImage, MIL.M_AND );
 
+			int imageWidth = 0;
+			int imageHeight = 0;
+
+			MIL.MbufInquire( AnnulusAndImage, MIL.M_SIZE_X, ref imageWidth );
+			MIL.MbufInquire( AnnulusAndImage, MIL.M_SIZE_Y, ref imageHeight );
+
+
+			ushort[ ] ImageData = new ushort[imageWidth*imageHeight];
+			MIL.MbufGet( AnnulusAndImage, ImageData );
 			///
 			//MIL.MdispSelect( InfraredDisplay, AnnulusAndBinarized );
 

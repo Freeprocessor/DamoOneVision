@@ -195,7 +195,7 @@ namespace DamoOneVision.Services
 			_infraredCamera.LoadImage( MilSystem, filePath );
 
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
-			if (await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData()))
+			if (await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel))
 			{
 				vm.IsGoodColor = "Green";
 				vm.IsGoodStatus = "Good";
@@ -343,7 +343,7 @@ namespace DamoOneVision.Services
 							// 여기서 pixelData에 대한 추가 처리(예: HSLThreshold 등) 호출 가능
 							// 예: Conversion.RunHSLThreshold(hMin, hMax, sMin, sMax, lMin, lMax, pixelData);
 							// 처리 후 다시 DisplayImage(pixelData)로 화면에 갱신할 수 있음
-							
+
 
 							//InfraredCameraConversionImage = Conversion.InfraredCameraModel( InfraredCameraImage, ref isGood, currentInfraredCameraModel );
 							//await Task.Run( ( ) => Conversion.SideCameraModel( SideCamera1Image, MainSideCamera1Display ) );
@@ -361,7 +361,8 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
-							//isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel, ImageData() );
+							
+							isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel );
 
 							Logger.WriteLine( "이미지 처리 완료" );
 
