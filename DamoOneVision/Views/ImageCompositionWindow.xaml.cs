@@ -146,12 +146,18 @@ namespace DamoOneVision.Views
 			}
 			MIL.MbufPut( MilImage, image );
 
+
 			// 이미지 표시
+			
+			MIL.MbufPut( MilImage, ShortMilImageShortScale( MilImage )); 
+
+
 			MIL.MdispSelect( MilDisplay, MilImage );
-			MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_DEFAULT );
+			MIL.MdispControl( MilDisplay, MIL.M_VIEW_MODE, MIL.M_AUTO_SCALE );
 			MIL.MdispControl( MilDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE );
 			MIL.MdispControl( MilDisplay, MIL.M_CENTER_DISPLAY, MIL.M_ENABLE );
 			MIL.MdispControl( MilDisplay, MIL.M_MOUSE_USE, MIL.M_DISABLE );
+			//MIL.MdispControl(MilDisplay,MIL.M_)
 
 		}
 
@@ -171,7 +177,7 @@ namespace DamoOneVision.Views
 
 			if (dlg.ShowDialog() == true)
 			{
-				MIL.MbufExport( dlg.FileName, MIL.M_BMP, MilImage );
+				MIL.MbufSave( dlg.FileName, MilImage );
 				MessageBox.Show( "이미지가 저장되었습니다." );
 			}
 		}
@@ -232,6 +238,60 @@ namespace DamoOneVision.Views
 			{
 				//Logger.WriteLine( "ImageData가 null이거나 크기가 올바르지 않습니다." );
 			}
+		}
+
+		private ushort[ ] ShortMilImageShortScale( MIL_ID MilImage )
+		{
+			ushort [] ImageData = new ushort[ width1 * height1 ];
+
+			MIL.MbufGet( MilImage, ImageData );
+
+			///이미지 데이터 레밸링
+			//InfraredNoiseFiltering( ImageData );
+
+			/// 이미지 데이터의 최대값을 2번째로 큰 값으로 변경
+			/// MindVision의 GF120이 받아오는 이미지의 0번째 값이 0XFF로 고정되는 현상을 방지하기 위함
+			//var distinctNumbersDesc = ImageData.Distinct().OrderByDescending( x => x ).ToArray();
+			//if (distinctNumbersDesc.Length > 1)
+			//{
+			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
+			//}
+
+			ushort MinPixelValue = 30115;//28도
+			ushort MaxPixelValue = 36315;//90도
+
+			//MinPixelValue = ImageData.Min();
+			//MaxPixelValue = ImageData.Max();
+
+			MinPixelValue = 0;
+			MaxPixelValue = 40;
+
+			// 30~50도 범위로 Scale
+			//double dMinPixelValue = (30.0 / 190.0) * 65535.0;
+			//double dMaxPixelValue = (50.0 / 190.0) * 65535.0;
+
+			//MinPixelValue = (ushort) dMinPixelValue;
+			//MaxPixelValue = (ushort) dMaxPixelValue;
+			int data=0;
+
+			for (int i = 0; i < ImageData.Length; i++)
+			{
+				data = (int) (((double) (ImageData[ i ] - MinPixelValue) / (double) (MaxPixelValue - MinPixelValue)) * 65535);
+				if (data > 65535)
+				{
+					ImageData[ i ] = 65535;
+				}
+				else if (data < 0)
+				{
+					ImageData[ i ] = 0;
+				}
+				else
+				{
+					ImageData[ i ] = (ushort) data;
+				}
+			}
+
+			return ImageData;
 		}
 
 		protected override void OnClosed( EventArgs e )

@@ -40,6 +40,8 @@ namespace DamoOneVision.Views
 				}
 			};
 
+
+
 		}
 
 		private void ImageListBox_PreviewMouseWheel( object sender, MouseWheelEventArgs e )

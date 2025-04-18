@@ -367,7 +367,7 @@ namespace DamoOneVision.Camera
 			//Log.WriteLine( "Number of Bands (NbBands): " + nbBands );
 
 
-			//SaveImage( MilScaleImage, $"{CameraName}" );
+			SaveImage( MilScaleImage, $"{CameraName}" );
 		}
 
 
@@ -507,6 +507,8 @@ namespace DamoOneVision.Camera
 
 			}
 			InfraredCameraScaleImage( LoadMilImage, LoadMilScaleImage );
+
+			//SaveJetImage( LoadMilScaleImage, "JET" );
 
 			return LoadMilImage;
 		}

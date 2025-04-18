@@ -31,6 +31,9 @@ namespace DamoOneVision.ViewModels
 		/// </summary>
 		public event PropertyChangedEventHandler? PropertyChanged;
 
+		// View 쪽에서 구독할 이벤트
+		public event Action? RequestJetDisplayCapture;
+
 		/// <summary>
 		/// INotifyPropertyChanged 기본 구현
 		/// </summary>
@@ -471,6 +474,9 @@ namespace DamoOneVision.ViewModels
 			if (!string.IsNullOrEmpty( imagePath ) && File.Exists( imagePath ))
 			{
 				_cameraService.InfraredCameraLoadImage( imagePath );
+				//MIL.MdispWrite( MilDisplay, "SavedDisplayScreen.jpg", MIL.M_DEFAULT );
+				///
+				//RequestJetDisplayCapture?.Invoke();
 			}
 		}
 

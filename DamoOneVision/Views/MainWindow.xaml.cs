@@ -27,6 +27,8 @@ using DamoOneVision.Models;
 using DamoOneVision.Views;
 using System.Windows.Input;
 using System.Runtime.CompilerServices;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 
 namespace DamoOneVision
@@ -121,7 +123,19 @@ namespace DamoOneVision
 
 			//advantechCard.Connect();
 			//advantechCard.ReadBitAsync();
+			// ViewModel 이벤트 구독
+			if (DataContext is MainViewModel vm)
+			{
+				vm.RequestJetDisplayCapture += ( ) =>
+				{
+					string name = vm.ModelName ?? "Capture";
+					string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+					string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{name}_{timeStamp}.bmp");
 
+					SaveControlScreenshot( InfraredCameraDisplay, path );
+					Logger.WriteLine( $"디스플레이 캡처 저장: {path}" );
+				};
+			}
 			//cameraManager.ImageCaptured += OnImageCaptured;
 
 		}
@@ -267,6 +281,31 @@ namespace DamoOneVision
 		{
 			MessageBox.Show( "버튼이 클릭되었습니다." );
 			Logger.WriteLine( "버튼이 클릭되었습니다." );
+		}
+
+		private void SaveControlScreenshot( FrameworkElement control, string path )
+		{
+			RenderTargetBitmap rtb = new RenderTargetBitmap(
+		(int)control.ActualWidth,
+		(int)control.ActualHeight,
+		96, 96,
+		PixelFormats.Pbgra32);
+
+			rtb.Render( control );
+
+			BitmapEncoder encoder = new BmpBitmapEncoder();
+			encoder.Frames.Add( BitmapFrame.Create( rtb ) );
+
+			using (var fileStream = new FileStream( path, FileMode.Create ))
+			{
+				encoder.Save( fileStream );
+			}
+		}
+
+		private void SaveJetViewImage( )
+		{
+			string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JetDisplayCapture.bmp");
+			SaveControlScreenshot( InfraredCameraDisplay, filePath );
 		}
 
 

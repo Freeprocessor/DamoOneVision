@@ -195,6 +195,9 @@ namespace DamoOneVision.Services
 			_infraredCamera.LoadImage( MilSystem, filePath );
 
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
+			//JETImageSave();
+
+
 			if (await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel))
 			{
 				vm.IsGoodColor = "Green";
@@ -205,6 +208,28 @@ namespace DamoOneVision.Services
 				vm.IsGoodColor = "Red";
 				vm.IsGoodStatus = "Reject";
 			}
+		}
+
+		public void JETImageSave( )
+		{
+			MIL_ID displayedImage = MIL.M_NULL;
+			MIL.MdispInquire( _infraredCameraDisplay, MIL.M_SELECTED, ref displayedImage );
+			// 저장할 이미지 버퍼 복사 (이미 컬러맵 포함된 상태라면 그대로 복사됨)
+			MIL_ID copyImage = MIL.M_NULL;
+			MIL_INT width = 0, height = 0;
+			MIL.MbufInquire( displayedImage, MIL.M_SIZE_X, ref width );
+			MIL.MbufInquire( displayedImage, MIL.M_SIZE_Y, ref height );
+			MIL.MbufAllocColor( MilSystem, 3, width, height, MIL.M_UNSIGNED + 8, MIL.M_IMAGE + MIL.M_PROC + MIL.M_DISP, ref copyImage );
+
+			// 이미지 복사
+			MIL.MbufCopy( displayedImage, copyImage );
+
+			// 저장
+			MIL.MbufSave( "DisplayOutput.bmp", copyImage );
+
+			// 메모리 해제
+			MIL.MbufFree( copyImage );
+
 		}
 
 
