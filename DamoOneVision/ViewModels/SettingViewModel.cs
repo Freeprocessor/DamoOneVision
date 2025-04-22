@@ -345,6 +345,13 @@ namespace DamoOneVision.ViewModels
 					ActiveValueTick = 0.1;
 					_isBinarized = false;
 					break;
+				case "CircleInnerRadius":
+					ActiveValue = SelectedInfraredCameraModel.CircleInnerRadius;
+					ActiveValueMin = 0;
+					ActiveValueMax = 240; // 예시: 최대 반지름
+					ActiveValueTick = 1;
+					_isBinarized = false;
+					break;
 				case "CircleMinAreaRatio":
 					ActiveValue = SelectedInfraredCameraModel.CircleMinAreaRatio;
 					ActiveValueMin = 0;
@@ -405,6 +412,9 @@ namespace DamoOneVision.ViewModels
 					break;
 				case "CircleMaxRadius":
 					SelectedInfraredCameraModel.CircleMaxRadius = ActiveValue;
+					break;
+				case "CircleInnerRadius":
+					SelectedInfraredCameraModel.CircleInnerRadius = ActiveValue;
 					break;
 				case "CircleMinAreaRatio":
 					SelectedInfraredCameraModel.CircleMinAreaRatio = ActiveValue;

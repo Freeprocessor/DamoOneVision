@@ -73,11 +73,11 @@
                                     Height="50"
                                     Style="{DynamicResource MaterialDesignRaisedButton}"
                                     Command="{Binding EjectOFFCommand}"/>
-                            <Button Content="Eject V/V&#x0A;Routine"
+                            <!--<Button Content="Eject V/V&#x0A;Routine"
                                     Margin="5"
                                     Width="110"
                                     Height="50"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"/>-->
                         </WrapPanel>
 
                         <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
@@ -165,7 +165,7 @@
                             </Grid.RowDefinitions>
 
                             <!-- Row 0 -->
-                            <Label Content="Command Pos" Grid.Column="0"
+                            <Label Content="현재위치" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding XAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="0" Grid.Column="1"
@@ -173,44 +173,37 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Feedback Pos -->
-                            <Label Content="Feedback Pos"
-                                   Grid.Row="1" Grid.Column="0"
-                                   Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisFeedbackPosition, UpdateSourceTrigger=PropertyChanged}"
-                                     Grid.Row="1" Grid.Column="1"
-                                     Margin="5,5,5,5"
-                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Waiting Pos -->
-                            <Label Content="Waiting Pos"
+                            <Label Content="대기위치"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Button Content="Move"
+                            <Button Content="위치이동"
                                     Command="{Binding XAxisMoveWaitCommand}"
                                     Grid.Row="2" Grid.Column="2"
                                     Margin="5,14,5,14"
                                     Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
                             <!-- End Pos -->
-                            <Label Content="End Pos"
+                            <Label Content="종료위치"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Button Content="Move"
+                            <Button Content="종료위치"
                                     Command="{Binding XAxisMoveEndCommand}"
                                     Grid.Row="3" Grid.Column="2"
                                     Margin="5,14,5,14"
                                     Style="{DynamicResource MaterialDesignRaisedButton}" />
 
                             <!-- Acc / Dec -->
-                            <Label Content="Move Acc"
+                            <Label Content="이동가속도"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisMoveAcceleration , UpdateSourceTrigger=PropertyChanged}"
@@ -218,7 +211,7 @@
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
-                            <Label Content="Move Dec"
+                            <Label Content="이동감속도"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisMoveDeceleration , UpdateSourceTrigger=PropertyChanged}"
@@ -226,7 +219,7 @@
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             
-                            <Label Content="Return Acc"
+                            <Label Content="복귀가속도"
                                    Grid.Row="6" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisReturnAcceleration, UpdateSourceTrigger=PropertyChanged}"
@@ -234,7 +227,7 @@
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
-                            <Label Content="Return Dec"
+                            <Label Content="복귀감속도"
                                    Grid.Row="7" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisReturnDeceleration, UpdateSourceTrigger=PropertyChanged}"
@@ -243,14 +236,14 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Speed -->
-                            <Label Content="Tracking Spd"
+                            <Label Content="이동속도"
                                    Grid.Row="8" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisTrackingSpeed , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="8" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Label Content="Return Spd"
+                            <Label Content="복귀속도"
                                    Grid.Row="9" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
                             <TextBox Text="{Binding motionModel.XAxisReturnSpeed , UpdateSourceTrigger=PropertyChanged}"
@@ -336,7 +329,7 @@
                             </Grid.RowDefinitions>
 
                             <!-- Command Pos -->
-                            <Label Content="Command Pos"
+                            <Label Content="현재위치"
                                    Grid.Row="0" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding ZAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}"
@@ -345,23 +338,16 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Feedback Pos -->
-                            <Label Content="Feedback Pos"
-                                   Grid.Row="1" Grid.Column="0"
-                                   Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisFeedbackPosition, UpdateSourceTrigger=PropertyChanged}"
-                                     Grid.Row="1" Grid.Column="1"
-                                     Margin="5"
-                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Work Pos -->
-                            <Label Content="Work Pos"
+                            <Label Content="작동위치"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding motionModel.ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                            <Button Content="Move Work"
+                            <Button Content="위치 이동"
                                     Command="{Binding ZAxisMoveWorkCommand}"
                                     Grid.Row="2" Grid.Column="3"
                                     Margin="5"
@@ -369,7 +355,7 @@
                                     Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
                             <!-- Acc / Dec -->
-                            <Label Content="Acc"
+                            <Label Content="가속도"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding motionModel.ZAxisAcceleration , UpdateSourceTrigger=PropertyChanged}"
@@ -377,7 +363,7 @@
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
-                            <Label Content="Dec"
+                            <Label Content="감속도"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding motionModel.ZAxisDeceleration , UpdateSourceTrigger=PropertyChanged}"
@@ -386,7 +372,7 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
                             <!-- Speed -->
-                            <Label Content="Speed"
+                            <Label Content="이동속도"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding motionModel.ZAxisSpeed , UpdateSourceTrigger=PropertyChanged}"

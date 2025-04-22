@@ -215,8 +215,8 @@ namespace DamoOneVision.Services
 					if (_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
 					{
 						/// Tast
-						//await TriggerActionAsync();
-						await TriggerAtionTestAsync();
+						await TriggerActionAsync();
+						//await TriggerAtionTestAsync();
 					}
 
 				}

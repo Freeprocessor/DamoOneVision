@@ -94,15 +94,12 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Binarized Threshold:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
+                                    <TextBlock Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
                                                                        CommandParameter="BinarizedThreshold"/>
                                             </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBlock>
+                                        </i:Interaction.Triggers><Run Text="이진화"/><Run Language="ko-kr" Text=" 임계 온도"/></TextBlock>
                                     <TextBox Text="{Binding SelectedInfraredCameraModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
@@ -179,6 +176,25 @@
                                         </i:Interaction.Triggers>
                                     </TextBlock>
                                     <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Inner Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleInnerRadius"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleInnerRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
@@ -264,7 +280,7 @@
                                         TickFrequency="{Binding ActiveValueTick, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         IsSnapToTickEnabled="True"
                                         Value="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="20" Orientation="Vertical" Height="258"/>
+                                        Width="20" Orientation="Vertical" Height="300"/>
                                 <TextBox Text="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Width="80"
                                         Margin="10"

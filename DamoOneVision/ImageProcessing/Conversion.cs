@@ -269,7 +269,7 @@ namespace DamoOneVision.ImageProcessing
 				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
 			}
 
-			double smallRadius = Radius - 60;
+			double smallRadius = Radius - infraredCameraModel.CircleInnerRadius;
 			// 도넛모양 도형 생성
 			MIL.MgraColor( AnnulusContext, MIL.M_COLOR_WHITE );
 			MIL.MgraArcFill( AnnulusContext, MilAnnulusImage, DetectCirclrCenterX, DetectCirclrCenterY, Radius, Radius, -360.0, 360.0 );

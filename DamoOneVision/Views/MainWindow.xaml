@@ -83,18 +83,18 @@
                           FontSize="16"
                           FontWeight="Bold">
                             <!-- 서브 메뉴 항목들 -->
-                            <MenuItem Header="Connect"  Command="{Binding ConnectCommand}"/>
-                            <MenuItem Header="Disconnect" Command="{Binding DisconnectCommand}"/>
+                            <MenuItem Header="카메라 연결"  Command="{Binding ConnectCommand}"/>
+                            <MenuItem Header="카메라 연결 해제" Command="{Binding DisconnectCommand}"/>
                             <MenuItem Header="SoftWare Trigger" Command="{Binding VisionTriggerCommand}"/>
                             <Separator/>
 
-                            <MenuItem Header="Manual" IsCheckable="False" Click="ManualButton_Click"/>
+                            <MenuItem Header="수동조작" IsCheckable="False" Click="ManualButton_Click"/>
 
                             <Separator/>
-                            <MenuItem Header="Setting" IsCheckable="False" Click="SettingButton_Click"/>
+                            <MenuItem Header="모델" IsCheckable="False" Click="SettingButton_Click"/>
                             <MenuItem Header="About"/>
                             <Separator/>
-                            <MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>
+                            <!--<MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>-->
                         </MenuItem>
                     </Menu>
 
@@ -109,7 +109,6 @@
 
                     <!-- (2) 닫기 버튼 -->
                 </StackPanel>
-                <Label Grid.Column="2" Content="{Binding CurrentTemperature}" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Center" Height="22" Width="67"/>
             </Grid>
         </Border>
         <!-- (1-1) 수평선(가로줄): 제목바(Row=0)과 본문(Row=1) 사이 -->
@@ -161,6 +160,21 @@
                                   IsManipulationEnabled="False"
                                   Focusable="False" />
                         </Border>
+                        <!-- 투명 오버레이 (텍스트·마커 전용) -->
+                        <Canvas x:Name="OverlayCanvas"
+                            IsHitTestVisible="False">
+                            <!-- 마우스 이벤트는 영상으로 통과 -->
+
+                            <!-- 현재 온도 (예: 우측 상단 고정) -->
+                            <TextBlock x:Name="TemperatureText"
+                                Text="{Binding CurrentTemperature}"
+                                FontSize="48"
+                                FontWeight="Bold"
+                                Foreground="Yellow"
+                                Canvas.Right="20"
+                                Canvas.Top="20"/>
+
+                        </Canvas>
                     </Grid>
                 </TabItem>
                 <TabItem Header="infraredCamera" Height="50">

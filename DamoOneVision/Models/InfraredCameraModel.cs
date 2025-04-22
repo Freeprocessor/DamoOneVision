@@ -80,6 +80,20 @@ namespace DamoOneVision.Models
 			}
 		}
 
+		private double _circleInnerRadius;
+		public double CircleInnerRadius
+		{
+			get => _circleInnerRadius;
+			set
+			{
+				if (_circleInnerRadius != value)
+				{
+					_circleInnerRadius = value;
+					OnPropertyChanged( nameof( CircleInnerRadius ) );
+				}
+			}
+		}
+
 		private double _circleMinAreaRatio;
 		public double CircleMinAreaRatio
 		{
