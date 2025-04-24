@@ -122,6 +122,20 @@ namespace DamoOneVision.Models
 			}
 		}
 
+		private double _circleAreaMinLength;
+		public double CircleAreaMinLength
+		{
+			get => _circleAreaMinLength;
+			set
+			{
+				if (_circleAreaMinLength != value)
+				{
+					_circleAreaMinLength = value;
+					OnPropertyChanged( nameof( CircleAreaMinLength ) );
+				}
+			}
+		}
+
 		private double _avgTemperatureMin;
 		public double AvgTemperatureMin
 		{

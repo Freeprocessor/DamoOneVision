@@ -76,7 +76,7 @@
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="105"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
 
@@ -231,6 +231,24 @@
                                         </i:Interaction.Triggers>
                                     </TextBlock>
                                     <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Circle Area Min Length:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                                       CommandParameter="CircleAreaMinLength"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleAreaMinLength}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">

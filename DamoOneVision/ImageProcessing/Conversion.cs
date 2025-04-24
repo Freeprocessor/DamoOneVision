@@ -296,6 +296,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
 
 			MIL.MblobControl( BlobContext, MIL.M_BOX, MIL.M_ENABLE );
+			MIL.MblobControl( BlobContext, MIL.M_FERETS, MIL.M_ENABLE );
 			//면적이 큰 순서대로 Sort
 			MIL.MblobControl( BlobContext, MIL.M_SORT1, MIL.M_BOX_AREA );
 			MIL.MblobControl( BlobContext, MIL.M_NUMBER_OF_HOLES, MIL.M_ENABLE );
@@ -310,9 +311,12 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
 
 			//Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
-			int SelectBlob = 0;
+			//int SelectBlob = 0;
+			
 			double AreaSum = 0.0;
 			double Area = 0.0;
+			double MaxArea = 0.0;
+			double MaxLangth = 0.0;
 			//double LastBlobTouchingImageBorders = 0.0;
 			for (MIL_INT i = 0; i < selectedBlobCount; i++)
 			{
@@ -320,19 +324,27 @@ namespace DamoOneVision.ImageProcessing
 				// M_BLOB_INDEX 속성 가져오기
 				// 블롭 인덱스는 보통 0부터 시작
 				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_AREA + MIL.M_TYPE_MIL_DOUBLE, ref Area );
+				
 				//MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
+				if (Area > MaxArea)
+				{
+					MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_FERET_MIN_DIAMETER + MIL.M_TYPE_MIL_DOUBLE, ref MaxLangth );
+					MaxArea = Area;
+				}
 				AreaSum = Area + AreaSum;
 
 			}
 			Logger.WriteLine( $"블롭의 전체 면적 : {AreaSum}\n" );
+			Logger.WriteLine( $"최소 길이 : {MaxLangth} \n" );
 
-			if ( selectedBlobCount != 0 )
+			if ( selectedBlobCount != 0 && ( MaxLangth + infraredCameraModel.CircleAreaMinLength ) >= ( Radius*2 ) )
 			{
 				blobGood = true;
 			}
 			else
 			{
 				Logger.WriteLine( "selectedBlobCount가 0입니다." );
+				Logger.WriteLine( " 최소 길이 미달 " );
 				blobGood = false;
 			}
 

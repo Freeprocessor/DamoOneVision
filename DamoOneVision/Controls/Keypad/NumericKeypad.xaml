@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="DamoOneVision.Controls.Keypad.NumericKeypad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Width="230" Height="260"
+             Background="{DynamicResource MaterialDesignPaper}">
+    <UniformGrid Columns="3" Rows="4" Margin="6">
+        <!-- 1~9 -->
+        <Button Content="1" Click="OnButton"/>
+        <Button Content="2" Click="OnButton"/>
+        <Button Content="3" Click="OnButton"/>
+        <Button Content="4" Click="OnButton"/>
+        <Button Content="5" Click="OnButton"/>
+        <Button Content="6" Click="OnButton"/>
+        <Button Content="7" Click="OnButton"/>
+        <Button Content="8" Click="OnButton"/>
+        <Button Content="9" Click="OnButton"/>
+        <!-- Back / 0 / Done -->
+        <Button Content="←" Tag="Back" Click="OnButton"/>
+        <Button Content="0" Click="OnButton"/>
+        <Button Content="OK" Tag="Done" Click="OnButton"/>
+    </UniformGrid>
+</UserControl>

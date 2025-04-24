@@ -239,23 +239,50 @@ namespace DamoOneVision.ViewModels
 
 		private void SaveAsNewModel( )
 		{
-			if (string.IsNullOrWhiteSpace( NewModelName ))
+			// 1) 실제로 저장할 이름 결정
+			string targetName = string.IsNullOrWhiteSpace(NewModelName)
+						? SelectedModelName          // 새 이름이 없으면 현재 모델명
+                        : NewModelName.Trim();       // 새 이름이 있으면 그걸 사용
+
+			// 2) 두 경우 모두 이름이 비어 있으면 취소
+			if (string.IsNullOrWhiteSpace( targetName ))
 			{
-				Logger.WriteLine( "모델 이름이 비어 있습니다." );
+				Logger.WriteLine( "저장할 모델 이름이 지정되지 않았습니다." );
 				return;
 			}
 
+			// 3) 같은 이름이 이미 존재하면 사용자에게 덮어쓰기 여부 확인
+			bool nameExists = _settingManager.GetAvailableModelNames()
+									 .Contains(targetName);
+			if (nameExists)
+			{
+				var result = MessageBox.Show(
+			$"'{targetName}' 모델을 덮어쓰시겠습니까?",
+			"모델 덮어쓰기 확인",
+			MessageBoxButton.YesNo,
+			MessageBoxImage.Question);
+
+				if (result != MessageBoxResult.Yes)
+					return;   // 사용자가 ‘아니요’를 선택하면 저장 취소
+			}
+
+			// 4) 데이터 구성
 			var data = new ModelData
 			{
 				InfraredCameraModels = InfraredCameraModels.ToList(),
-				MotionModels = MotionModels.ToList()
+				MotionModels         = MotionModels.ToList()
 			};
 
-			_settingManager.SaveModelData( NewModelName, data );
+			// 5) 저장
+			_settingManager.SaveModelData( targetName, data );
+
+			// 6) 모델 목록 갱신 및 상태 업데이트
 			LoadAvailableModelNames();
-			SelectedModelName = NewModelName;
-			NewModelName = "";
+			SelectedModelName = targetName;
+			NewModelName = "";   // 입력창 초기화
 		}
+
+
 
 		private void LoadAvailableModelNames( )
 		{
@@ -366,6 +393,13 @@ namespace DamoOneVision.ViewModels
 					ActiveValueTick = 0.01; // 예시: 0.01 단위로 조정
 					_isBinarized = false;
 					break;
+				case "CircleAreaMinLength":
+					ActiveValue = SelectedInfraredCameraModel.CircleAreaMinLength;
+					ActiveValueMin = 0;
+					ActiveValueMax = 100; // 예시: 비율
+					ActiveValueTick = 1; // 예시: 0.01 단위로 조정
+					_isBinarized = false;
+					break;
 				case "AvgTemperatureMin":
 					ActiveValue = SelectedInfraredCameraModel.AvgTemperatureMin;
 					ActiveValueMin = 0; // 예시: 최소 온도
@@ -421,6 +455,9 @@ namespace DamoOneVision.ViewModels
 					break;
 				case "CircleMaxAreaRatio":
 					SelectedInfraredCameraModel.CircleMaxAreaRatio = ActiveValue;
+					break;
+				case "CircleAreaMinLength":
+					SelectedInfraredCameraModel.CircleAreaMinLength = ActiveValue;
 					break;
 				case "AvgTemperatureMin":
 					SelectedInfraredCameraModel.AvgTemperatureMin = ActiveValue;
