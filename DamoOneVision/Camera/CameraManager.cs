@@ -242,15 +242,17 @@ namespace DamoOneVision.Camera
 			return null;
 		}
 
-		public void AutoFocus( )
+		public async Task<double> AutoFocus( )
 		{
+			double focusValue = 0.0;
 			if (this.IsConnected == true)
 			{
-				camera.AutoFocus();
+				focusValue = await camera.AutoFocus();
 			}
+			return focusValue;
 		}
 
-		public void ManualFocus( double focusValue = 0.2614000141620636 )
+		public void ManualFocus( double focusValue )
 		{
 			if (this.IsConnected == true)
 			{

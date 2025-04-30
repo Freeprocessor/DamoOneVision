@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using DamoOneVision.Models;
+using DamoOneVision.Services.Repository;
+using System.Windows.Input;
 
 
 namespace DamoOneVision.Services
@@ -40,6 +42,9 @@ namespace DamoOneVision.Services
 		private readonly Lazy<MainViewModel> _mainViewModel;
 
 		private InfraredCameraModel _infraredCameraModel;
+
+		private readonly IModelRepository _repo;       // ★
+		private readonly string _key = "Camera:Infrared";
 
 		private MIL_ID MilSystem = MIL.M_NULL;
 
@@ -178,14 +183,15 @@ namespace DamoOneVision.Services
 			SetVisionConnected(false);
 		}
 
-		public void InfraredCameraAutoFocus( )
+		public async void InfraredCameraAutoFocus( )
 		{
-			_infraredCamera.AutoFocus();
+			_infraredCameraModel.CameraFocusValue = await _infraredCamera.AutoFocus();
+			
 		}
 
 		public void InfraredCameraManualFocus( )
 		{
-			_infraredCamera.ManualFocus();
+			_infraredCamera.ManualFocus( _infraredCameraModel.CameraFocusValue );
 		}
 
 		public async void InfraredCameraLoadImage( string filePath )

@@ -2,6 +2,7 @@
 using DamoOneVision.Data;
 using DamoOneVision.Services;
 using DamoOneVision.Services.Input;
+using DamoOneVision.Services.Repository;
 using DamoOneVision.ViewModels;
 using DamoOneVision.Views;
 using KeypadDemo.Services;
@@ -40,7 +41,7 @@ namespace DamoOneVision
 
 		private void ConfigureServices( IServiceCollection services )
 		{
-
+			services.AddSingleton<IModelRepository, JsonModelRepository>();
 
 			// 카메라 인스턴스(여러 카메라가 있으므로, 미리 생성하여 등록)
 			var infraredCamera = new CameraManager("Matrox", "InfraredCamera");
@@ -73,7 +74,8 @@ namespace DamoOneVision
 				sideCamera2,
 				sideCamera3,
 				milSystemService,
-				 new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>() )
+				new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>())
+				
 			) );
 
 			// DeviceControlService

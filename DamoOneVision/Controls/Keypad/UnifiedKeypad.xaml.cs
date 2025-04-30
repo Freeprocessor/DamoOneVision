@@ -22,9 +22,24 @@ public partial class UnifiedKeypad : UserControl
 
 	void Hook( IKeypad pad )
 	{
-		pad.KeyPressed += ( s, txt ) => { if (Target != null) Target.Text += txt; };
+		pad.KeyPressed += ( s, txt ) =>
+		{
+			if (Target == null) return;
+
+			if (txt == "Back")                         // ← 추가
+			{                                          //    
+				if (Target.Text.Length > 0)            // 한 글자 지우기
+					Target.Text = Target.Text[ ..^1 ];   //
+			}
+			else
+			{
+				Target.Text += txt;                    // 기존 입력
+			}
+		};
+
 		pad.Done += ( s, _ ) => RaiseEvent( new RoutedEventArgs( DoneEvent ) );
 	}
+
 
 	public void SetMode( PadMode m )
 		=> Host.Content = m switch { PadMode.Numeric => _num, PadMode.Korean => _kor, _ => _eng };

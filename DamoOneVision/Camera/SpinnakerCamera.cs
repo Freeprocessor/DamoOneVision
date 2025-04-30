@@ -215,9 +215,9 @@ namespace DamoOneVision.Camera
 			return MilImage;
 		}
 
-		public void AutoFocus( )
+		public async Task<double> AutoFocus( )
 		{
-
+			return 0.0;
 		}
 
 		public MIL_ID ReciveScaleImage( )

@@ -104,7 +104,7 @@ namespace DamoOneVision.Data
 			}
 
 			// 모델 파일 생성
-			string defaultModelFile = Path.Combine(modelPath, "Models.json");
+			string defaultModelFile = Path.Combine(modelPath, "Default.json");
 			if (!File.Exists( defaultModelFile ))
 			{
 
@@ -119,7 +119,8 @@ namespace DamoOneVision.Data
 					CircleMinAreaRatio = 0.97,
 					CircleMaxAreaRatio = 1.5,
 					AvgTemperatureMin = 33000,
-					AvgTemperatureMax = 35000
+					AvgTemperatureMax = 35000,
+					CameraFocusValue = 0.2
 				};
 
 				MotionModel defaultMotionModel = new MotionModel

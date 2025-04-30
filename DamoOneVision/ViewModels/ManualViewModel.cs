@@ -23,8 +23,8 @@ namespace DamoOneVision.ViewModels
 
 		
 		private SettingManager _settingManager;
-		public InfraredCameraModel _infraredCameraModel { get; set; }
-		public MotionModel motionModel { get; set; }
+		public InfraredCameraModel InfraredCameraModel { get; set; }
+		public MotionModel MotionModel { get; set; }
 
 		private double _xAxisWaitingPosition;
 		private double _xAxisEndPosition;
@@ -104,14 +104,14 @@ namespace DamoOneVision.ViewModels
 			_positionTimer.Tick += PositionTimer_Tick;
 
 
-			setModel();
+			//setModel();
 		}
 
 		private void setModel( )
 		{
 			var modeldata = _settingManager.LoadModelData( _settingManager.LastOpenedModel());
-			_infraredCameraModel = modeldata.InfraredCameraModels.First();
-			motionModel = modeldata.MotionModels.First();
+			InfraredCameraModel = modeldata.InfraredCameraModels.First();
+			MotionModel = modeldata.MotionModels.First();
 
 		}
 
@@ -405,7 +405,7 @@ namespace DamoOneVision.ViewModels
 
 			try
 			{
-				await _motionService.XAxisMoveToPosition( motionModel.XAxisWaitingPosition, motionModel.XAxisReturnSpeed, motionModel.XAxisReturnAcceleration, motionModel.XAxisReturnDeceleration );
+				await _motionService.XAxisMoveToPosition( MotionModel.XAxisWaitingPosition, MotionModel.XAxisReturnSpeed, MotionModel.XAxisReturnAcceleration, MotionModel.XAxisReturnDeceleration );
 			}
 			finally
 			{
@@ -424,7 +424,7 @@ namespace DamoOneVision.ViewModels
 
 			try
 			{
-				await _motionService.XAxisMoveToPosition( motionModel.XAxisEndPosition, motionModel.XAxisTrackingSpeed, motionModel.XAxisMoveAcceleration, motionModel.XAxisMoveDeceleration );
+				await _motionService.XAxisMoveToPosition( MotionModel.XAxisEndPosition, MotionModel.XAxisTrackingSpeed, MotionModel.XAxisMoveAcceleration, MotionModel.XAxisMoveDeceleration );
 			}
 			finally
 			{
@@ -441,7 +441,7 @@ namespace DamoOneVision.ViewModels
 
 			try
 			{
-				await _motionService.ZAxisMoveToPosition( motionModel.ZAxisWorkPosition, motionModel.ZAxisSpeed, motionModel.ZAxisAcceleration, motionModel.ZAxisDeceleration );
+				await _motionService.ZAxisMoveToPosition( MotionModel.ZAxisWorkPosition, MotionModel.ZAxisSpeed, MotionModel.ZAxisAcceleration, MotionModel.ZAxisDeceleration );
 			}
 			finally
 			{

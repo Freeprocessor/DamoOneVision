@@ -31,7 +31,7 @@ namespace DamoOneVision.Camera
 
 		ushort[ ] CaptureImageData( );
 
-		void AutoFocus( );
+		Task<double> AutoFocus( );
 
 		void ManualFocus( double focusValue );
 

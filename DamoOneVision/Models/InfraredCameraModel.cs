@@ -163,5 +163,19 @@ namespace DamoOneVision.Models
 				}
 			}
 		}
+
+		private double _cameraFocusValue;
+		public double CameraFocusValue
+		{
+			get => _cameraFocusValue;
+			set
+			{
+				if (_cameraFocusValue != value)
+				{
+					_cameraFocusValue = value;
+					OnPropertyChanged( nameof( CameraFocusValue ) );
+				}
+			}
+		}
 	}
 }
