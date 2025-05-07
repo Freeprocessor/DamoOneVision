@@ -154,7 +154,7 @@
             <TabControl Margin="0,0,0,0">
                 <TabItem Header="Main" Height="50">
                     <Grid Margin="0">
-                        <Border BorderBrush="{Binding IsGoodColor}" BorderThickness="5">
+                        <Border BorderBrush="{Binding IsGoodColor, TargetNullValue=Transparent, FallbackValue=Transparent}" BorderThickness="5">
                             <milwpf:MILWPFDisplay x:Name="InfraredCameraDisplay"
                                   MouseMove="MILWPFDisplay_MouseMove"
                                   IsManipulationEnabled="False"

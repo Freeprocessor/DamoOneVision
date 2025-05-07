@@ -104,7 +104,7 @@ namespace DamoOneVision.ViewModels
 			_positionTimer.Tick += PositionTimer_Tick;
 
 
-			//setModel();
+			setModel();
 		}
 
 		private void setModel( )

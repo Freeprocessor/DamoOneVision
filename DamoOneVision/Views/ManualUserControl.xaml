@@ -178,7 +178,7 @@
                             <Label Content="대기위치"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisWaitingPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -192,7 +192,7 @@
                             <Label Content="종료위치"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisEndPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -206,7 +206,7 @@
                             <Label Content="이동가속도"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisMoveAcceleration , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisMoveAcceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="4" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -214,7 +214,7 @@
                             <Label Content="이동감속도"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisMoveDeceleration , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisMoveDeceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="5" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -222,7 +222,7 @@
                             <Label Content="복귀가속도"
                                    Grid.Row="6" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisReturnAcceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisReturnAcceleration, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="6" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -230,7 +230,7 @@
                             <Label Content="복귀감속도"
                                    Grid.Row="7" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisReturnDeceleration, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisReturnDeceleration, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="7" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -239,14 +239,14 @@
                             <Label Content="이동속도"
                                    Grid.Row="8" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisTrackingSpeed , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisTrackingSpeed , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="8" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             <Label Content="복귀속도"
                                    Grid.Row="9" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding motionModel.XAxisReturnSpeed , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.XAxisReturnSpeed , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="9" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}" Cursor=""/>
@@ -343,7 +343,7 @@
                             <Label Content="작동위치"
                                    Grid.Row="2" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding motionModel.ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.ZAxisWorkPosition, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="2" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -358,7 +358,7 @@
                             <Label Content="가속도"
                                    Grid.Row="3" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding motionModel.ZAxisAcceleration , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.ZAxisAcceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="3" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -366,7 +366,7 @@
                             <Label Content="감속도"
                                    Grid.Row="4" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding motionModel.ZAxisDeceleration , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.ZAxisDeceleration , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="4" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -375,7 +375,7 @@
                             <Label Content="이동속도"
                                    Grid.Row="5" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding motionModel.ZAxisSpeed , UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding MotionModel.ZAxisSpeed , UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="5" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>

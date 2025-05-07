@@ -152,7 +152,7 @@
             <materialDesign:Card Background="{Binding IsGoodColor}"
                                      Height="60" Width="380">
 
-                <Label Content="{Binding IsGoodStatus}"
+                <Label Content="{Binding IsGoodStatus, TargetNullValue=Transparent}"
                            HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center"
                            FontSize="28"
