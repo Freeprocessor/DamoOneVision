@@ -216,6 +216,7 @@ namespace DamoOneVision.Services
 					{
 						/// Tast
 						await TriggerActionAsync();
+						Logger.WriteLine( "Trigger Detected." );
 						//await TriggerAtionTestAsync();
 					}
 

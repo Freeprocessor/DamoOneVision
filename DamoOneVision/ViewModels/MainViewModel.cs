@@ -42,27 +42,10 @@ namespace DamoOneVision.ViewModels
 		=> PropertyChanged?.Invoke( this, new PropertyChangedEventArgs( propertyName ) );
 
 
-		
-		private StringBuilder _logBuilder = new StringBuilder();
-		public string LogContents
-		{
-			get => _logBuilder.ToString();
-			private set
-			{
-				_logBuilder = new StringBuilder( value );
-				OnPropertyChanged( nameof( LogContents ) );
-			}
-		}
-
 		/// <summary>
 		/// 로컬 앱 폴더 경로 app/local/DamoOneVision
 		/// </summary>
 		private string appFolder = "";
-
-		/// <summary>
-		/// 이미지 폴더 경로 app/local/DamoOneVision/Images
-		/// </summary>
-		private string imageFolder = "";
 
 		/// <summary>
 		/// 모델 폴더 경로 app/local/DamoOneVision/Model
@@ -121,6 +104,17 @@ namespace DamoOneVision.ViewModels
 					_currentTime = value;
 					OnPropertyChanged( nameof( CurrentTime ) );
 				}
+			}
+		}
+
+		private InfraredInspectionResult _inspectionResult = new();
+		public InfraredInspectionResult InspectionResult
+		{
+			get => _inspectionResult;
+			set
+			{
+				_inspectionResult = value;
+				OnPropertyChanged( nameof( InspectionResult ) );
 			}
 		}
 
@@ -288,15 +282,10 @@ namespace DamoOneVision.ViewModels
 		public ICommand MachineStartCommand { get; }
 		public ICommand MachineStopCommand { get; }
 		public ICommand VisionTriggerCommand { get; }
-		public ICommand LoadImagesCommand { get; }
-		public ICommand ImageSelectedCommand { get; }
-
 
 
 		public ICommand TestGoodCommand { get; }
 		public ICommand TestRejectCommand { get; }
-
-
 
 
 		private readonly SettingManager _settingManager;
@@ -316,18 +305,6 @@ namespace DamoOneVision.ViewModels
 
 			InfraredCameraModels = new ObservableCollection<InfraredCameraModel>();
 			LoadModelsAsync();
-
-
-			// Logger 이벤트를 받아, ViewModel에서 로그를 누적
-			Logger.OnLogReceived += ( s, msg ) =>
-			{
-				Application.Current?.Dispatcher?.Invoke( ( ) =>
-				{
-					_logBuilder.AppendLine( msg );
-					// TextBox와 바인딩된 프로퍼티를 갱신
-					OnPropertyChanged( nameof( LogContents ) );
-				} );
-			};
 
 			//이벤트 구독
 			_deviceControlService.TriggerDetected += async ( ) =>
@@ -377,10 +354,7 @@ namespace DamoOneVision.ViewModels
 			_cameraService.BusyStateChanged += OnBusyStateChanged;
 			//ListBoxSelectionChangedCommand = new RelayCommand(
 			//	_ => ListBox_SelectionChanged()
-			//);
-			LoadImagesCommand = new AsyncRelayCommand( _ => LoadAllImages());
 
-			ImageSelectedCommand = new RelayCommand<string>( OnImageSelected );
 
 
 			///
@@ -393,6 +367,8 @@ namespace DamoOneVision.ViewModels
 
 			GoodCount = _settingManager.Settings.GoodCount;
 			RejectCount = _settingManager.Settings.RejectCount;
+
+			IsGoodColor = "Transparent";
 
 		}
 
@@ -422,61 +398,13 @@ namespace DamoOneVision.ViewModels
 			ImagePaths = new ObservableCollection<string>();
 			string localAppData = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
 			appFolder = System.IO.Path.Combine( localAppData, "DamoOneVision" );
-			imageFolder = System.IO.Path.Combine( appFolder, "Images" );
 			/// 임시 추가. 추후에 날짜별로 정리해서 불러올 수 있도록 수정
-			imageFolder = System.IO.Path.Combine( imageFolder, "InfraredCamera" );
-			imageFolder = System.IO.Path.Combine( imageFolder, "RAWInfraredCamera" );
 			//imageFolder = System.IO.Path.Combine( imageFolder, "2025-04-2" );
 			modelfolder = System.IO.Path.Combine( appFolder, "Model" );
 			modelfile = System.IO.Path.Combine( modelfolder, "Models.json" );
 			if (!Directory.Exists( appFolder ))
 			{
 				Directory.CreateDirectory( appFolder );
-			}
-			if (!Directory.Exists( imageFolder ))
-			{
-				Directory.CreateDirectory( imageFolder );
-			}
-		}
-
-		/// <summary>
-		/// 이미지 로드버튼 클릭 이벤트 핸들러 
-		/// 이미지 폴더 내의 모든 BMP 파일 로드
-		/// </summary>
-		public async Task LoadAllImages( )
-		{
-			var dialog = new CommonOpenFileDialog
-			{
-				IsFolderPicker = true,
-				Title = "이미지가 있는 폴더를 선택하세요.",
-				InitialDirectory = imageFolder // 기본 경로 설정
-			};
-
-			if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-			{
-				string selectedFolder = dialog.FileName;
-				ImagePaths.Clear();
-				string[] files = Directory.GetFiles(selectedFolder, "*.bmp");
-
-				foreach (var file in files)
-				{
-					ImagePaths.Add( file );
-				}
-
-				MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
-				Logger.WriteLine( $"{files.Length}개의 이미지가 로드되었습니다." );
-			}
-		}
-
-
-		private void OnImageSelected( string imagePath )
-		{
-			if (!string.IsNullOrEmpty( imagePath ) && File.Exists( imagePath ))
-			{
-				_cameraService.InfraredCameraLoadImage( imagePath );
-				//MIL.MdispWrite( MilDisplay, "SavedDisplayScreen.jpg", MIL.M_DEFAULT );
-				///
-				//RequestJetDisplayCapture?.Invoke();
 			}
 		}
 
@@ -503,6 +431,8 @@ namespace DamoOneVision.ViewModels
 			currentInfraredCameraModel = InfraredCameraModels[ 0 ];
 			await Task.CompletedTask;
 		}
+
+
 
 
 
@@ -597,12 +527,6 @@ namespace DamoOneVision.ViewModels
 		{
 			_stopClock = true;
 		}
-
-
-
-
-
-
 
 
 

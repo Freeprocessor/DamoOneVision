@@ -62,12 +62,16 @@ namespace DamoOneVision
 
 		private SettingViewModel _settingViewModel;
 
+		private AdvancedViewModel _advancedViewModel;
+
 
 		private MainUserControl _mainUserControl;
 
 		private ManualUserControl _manualUserControl;
 
 		private SettingUserControl _settingUserControl;
+
+		private AdvancedUserControl _advancedUserControl;
 
 		private readonly MilSystemService _milSystemService;
 
@@ -84,6 +88,7 @@ namespace DamoOneVision
 			_mainViewModel = mainViewModel;
 			_manualViewModel = manualViewModel;
 			_settingViewModel = settingViewModel;
+			_advancedViewModel = new AdvancedViewModel( cameraService );
 
 			/// ViewModel을 DataContext로 설정
 			this.DataContext = _mainViewModel;
@@ -102,6 +107,8 @@ namespace DamoOneVision
 
 			_settingUserControl = new SettingUserControl( _settingViewModel );
 
+			_advancedUserControl = new AdvancedUserControl( _advancedViewModel );
+
 			MainContent.Content = _mainUserControl;
 
 			// ManualUserControl에서 이벤트 구독 (예: "돌아가기" 신호)
@@ -112,6 +119,11 @@ namespace DamoOneVision
 			};
 
 			_settingUserControl.GoMainRequested += ( s, e ) =>
+			{
+				MainContent.Content = _mainUserControl;
+			};
+
+			_advancedUserControl.GoMainRequested += ( s, e ) =>
 			{
 				MainContent.Content = _mainUserControl;
 			};
@@ -262,6 +274,17 @@ namespace DamoOneVision
 
 			MainContent.Content = _settingUserControl;
 			_settingViewModel.ConversionImage();
+			//_settingViewModel.UpdateCameraSettings();
+			// Manual 화면으로 전환
+		}
+
+		private void AdvancedButton_Click( object sender, RoutedEventArgs e )
+		{
+			///TODO : Button Disable로 변경
+			///
+
+			MainContent.Content = _advancedUserControl;
+			//_settingViewModel.ConversionImage();
 			//_settingViewModel.UpdateCameraSettings();
 			// Manual 화면으로 전환
 		}

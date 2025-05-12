@@ -202,9 +202,9 @@ namespace DamoOneVision.Services
 
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
 			//JETImageSave();
+			var result = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel );
 
-
-			if (await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel))
+			if (result.IsGood)
 			{
 				vm.IsGoodColor = "Green";
 				vm.IsGoodStatus = "Good";
@@ -214,6 +214,7 @@ namespace DamoOneVision.Services
 				vm.IsGoodColor = "Red";
 				vm.IsGoodStatus = "Reject";
 			}
+			vm.InspectionResult = result;
 		}
 
 		public void JETImageSave( )
@@ -392,9 +393,9 @@ namespace DamoOneVision.Services
 							//bool[] result = await Task.WhenAll( tasks );
 
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
+							var result = await Task.Run( ( ) => Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel ) );
+							isGood = result.IsGood;
 							
-							isGood = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel );
-
 							Logger.WriteLine( "이미지 처리 완료" );
 
 							///GOOD REJECT LAMP 바인딩
@@ -410,6 +411,7 @@ namespace DamoOneVision.Services
 								vm.IsGoodColor = "Green";
 								vm.IsGoodStatus = "Good";
 							}
+							vm.InspectionResult = result;
 							vm.OnProductDetected( isGood );
 							//if (!Dispatcher.CheckAccess())
 							//{

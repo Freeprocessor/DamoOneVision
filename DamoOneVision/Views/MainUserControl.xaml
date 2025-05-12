@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:DamoOneVision.ViewModels" 
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="700" d:DesignWidth="400">
+             d:DesignHeight="683.2" d:DesignWidth="400">
     
     <Grid Grid.Column="1" Margin="10,0,10,0">
         <Grid.RowDefinitions>
@@ -66,59 +66,80 @@
                 </StackPanel>
             </materialDesign:Card>
 
-            <!-- ImageLoad & Log Tab -->
-            <TabControl Margin="0,0,0,10">
-                <TabItem Header="ImageLoad" Height="50" >
-                    <Grid Height="200" PreviewMouseWheel="ImageListBox_PreviewMouseWheel">
-                        <ScrollViewer Margin="10,10,10,40" 
-                                              VerticalScrollBarVisibility="Auto" 
-                                              HorizontalScrollBarVisibility="Disabled">
-                            <ListBox ItemsSource="{Binding ImagePaths}"
-                                     SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                      >
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
-                                            <Image Source="{Binding}" Width="120" Height="120" Stretch="Uniform"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                                <!-- 이벤트 트리거를 통해 SelectionChanged 시 커맨드 실행 -->
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding ImageSelectedCommand}"
-                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ListBox>
-                        </ScrollViewer>
-                        <Button Content="Load File" 
-                                        Margin="0,0,20,10" 
-                                        VerticalAlignment="Bottom" 
-                                        HorizontalAlignment="Right"
-                                        Height="25"
-                                        Width="68"
-                                        Command="{Binding LoadImagesCommand}"
-                                        Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Log" Height="44">
-                    <ScrollViewer x:Name="LogScroll" Height="200">
-                        <TextBlock Text="{Binding LogContents, UpdateSourceTrigger=PropertyChanged}"
-                                           Margin="10" 
-                                           TextWrapping="Wrap" 
-                                           FontSize="14" Width="340" />
-                    </ScrollViewer>
-                </TabItem>
-            </TabControl>
 
+            <StackPanel Margin="10,50,10,10">
+                <TextBlock Text="불량 유형 램프" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                <!-- 블롭 검사 -->
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="Green"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InspectionResult.MoonCutIssue}" Value="True">
+                                        <Setter Property="Fill" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="MoonCut 검사" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+
+                <!-- 원 검사 -->
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="Green"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InspectionResult.CircleIssue}" Value="True">
+                                        <Setter Property="Fill" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="Circle 검사" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+
+                <!-- 도넛 영역 검사 -->
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="Green"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InspectionResult.OverHeatIssue}" Value="True">
+                                        <Setter Property="Fill" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="과열 검사" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+
+                <!-- 온도 검사 -->
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="Green"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InspectionResult.UnderHeatIssue}" Value="True">
+                                        <Setter Property="Fill" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="과냉 검사" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            
         </StackPanel>
 
 
@@ -152,7 +173,7 @@
             <materialDesign:Card Background="{Binding IsGoodColor}"
                                      Height="60" Width="380">
 
-                <Label Content="{Binding IsGoodStatus, TargetNullValue=Transparent}"
+                <Label Content="{Binding IsGoodStatus}"
                            HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center"
                            FontSize="28"

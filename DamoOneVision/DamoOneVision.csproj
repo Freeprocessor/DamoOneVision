@@ -68,6 +68,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\AdvancedUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="InputDialog.xam">
       <Generator>MSBuild:Compile</Generator>
     </None>

@@ -9,8 +9,8 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="DamoOne Vision" 
-        Height="807" Width="1420" 
-        WindowStyle="None" WindowState="Maximized"
+        Height="768" Width="1366" 
+        WindowStyle="None"
         Icon="/Logo.png">
     <!--Background="{DynamicResource MaterialDesignPaper}">-->
 
@@ -92,6 +92,7 @@
 
                             <Separator/>
                             <MenuItem Header="모델" IsCheckable="False" Click="SettingButton_Click"/>
+                            <MenuItem Header="고급" IsCheckable="False" Click="AdvancedButton_Click"/>
                             <MenuItem Header="About"/>
                             <Separator/>
                             <!--<MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>-->

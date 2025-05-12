@@ -24,6 +24,20 @@ namespace DamoOneVision.Models
 			}
 		}
 
+		private double _referenceBaseTemperature ;
+		public double ReferenceBaseTemperature
+		{
+			get => _referenceBaseTemperature;
+			set
+			{
+				if (_referenceBaseTemperature != value)
+				{
+					_referenceBaseTemperature = value;
+					OnPropertyChanged( nameof( ReferenceBaseTemperature ) );
+				}
+			}
+		}
+
 		private double _circleCenterX;
 		public double CircleCenterX
 		{

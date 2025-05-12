@@ -241,8 +241,8 @@ namespace DamoOneVision.ViewModels
 		{
 			// 1) 실제로 저장할 이름 결정
 			string targetName = string.IsNullOrWhiteSpace(NewModelName)
-						? SelectedModelName          // 새 이름이 없으면 현재 모델명
-                        : NewModelName.Trim();       // 새 이름이 있으면 그걸 사용
+				? SelectedModelName
+				: NewModelName.Trim();
 
 			// 2) 두 경우 모두 이름이 비어 있으면 취소
 			if (string.IsNullOrWhiteSpace( targetName ))
@@ -253,7 +253,7 @@ namespace DamoOneVision.ViewModels
 
 			// 3) 같은 이름이 이미 존재하면 사용자에게 덮어쓰기 여부 확인
 			bool nameExists = _settingManager.GetAvailableModelNames()
-									 .Contains(targetName);
+							 .Contains(targetName);
 			if (nameExists)
 			{
 				var result = MessageBox.Show(
@@ -263,14 +263,28 @@ namespace DamoOneVision.ViewModels
 			MessageBoxImage.Question);
 
 				if (result != MessageBoxResult.Yes)
-					return;   // 사용자가 ‘아니요’를 선택하면 저장 취소
+					return;
+			}
+
+			// 3.5) 기준 온도 계산 및 모델에 저장
+			MIL_ID image = _cameraService.GetImage();
+			if (image == MIL.M_NULL)
+			{
+				Logger.WriteLine( "기준 온도 계산용 이미지가 없습니다." );
+				return;
+			}
+
+			foreach (var model in InfraredCameraModels)
+			{
+				model.ReferenceBaseTemperature = CalculateReferenceRoiAverage( image );
+				Logger.WriteLine( $"모델 기준 온도 저장됨: {model.ReferenceBaseTemperature}" );
 			}
 
 			// 4) 데이터 구성
 			var data = new ModelData
 			{
 				InfraredCameraModels = InfraredCameraModels.ToList(),
-				MotionModels         = MotionModels.ToList()
+				MotionModels = MotionModels.ToList()
 			};
 
 			// 5) 저장
@@ -279,8 +293,9 @@ namespace DamoOneVision.ViewModels
 			// 6) 모델 목록 갱신 및 상태 업데이트
 			LoadAvailableModelNames();
 			SelectedModelName = targetName;
-			NewModelName = "";   // 입력창 초기화
+			NewModelName = ""; // 입력창 초기화
 		}
+
 
 
 
@@ -297,10 +312,10 @@ namespace DamoOneVision.ViewModels
 				return;
 
 			var result = MessageBox.Show(
-		$"'{SelectedModelName}' 모델을 삭제하시겠습니까?",
-		"모델 삭제 확인",
-		MessageBoxButton.YesNo,
-		MessageBoxImage.Warning);
+			$"'{SelectedModelName}' 모델을 삭제하시겠습니까?",
+			"모델 삭제 확인",
+			MessageBoxButton.YesNo,
+			MessageBoxImage.Warning);
 
 			if (result != MessageBoxResult.Yes)
 				return;
@@ -511,6 +526,22 @@ namespace DamoOneVision.ViewModels
 		{
 			_isImageDisplay = false;
 		}
+
+		private double CalculateReferenceRoiAverage( MIL_ID image )
+		{
+			int refX = 610, refY = 10, refW = 20, refH = 20;
+
+			MIL_ID roi = MIL.M_NULL;
+			MIL.MbufChild2d( image, refX, refY, refW, refH, ref roi );
+
+			ushort[] roiData = new ushort[refW * refH];
+			MIL.MbufGet( roi, roiData );
+			MIL.MbufFree( roi );
+
+			// ushort[] → double로 변환 후 평균
+			return roiData.Select( v => (double) v ).Average();
+		}
+
 
 		//private void LoadModels( )
 		//{

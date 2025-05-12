@@ -95,12 +95,13 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
+                                    <TextBlock Text="이진화 임계 온도:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
                                                                        CommandParameter="BinarizedThreshold"/>
                                             </i:EventTrigger>
-                                        </i:Interaction.Triggers><Run Text="이진화"/><Run Language="ko-kr" Text=" 임계 온도"/></TextBlock>
+                                        </i:Interaction.Triggers>
+                                    </TextBlock>
                                     <TextBox Text="{Binding SelectedInfraredCameraModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"
                                              beh:KeypadBehavior.Enable="True"  
                                              Tag="Numeric"/>
@@ -113,9 +114,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Center X:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
+                                    <TextBlock Text="원 중심 좌표 Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
                                                                        CommandParameter="CircleCenterX"/>
@@ -132,9 +131,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Center Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
+                                    <TextBlock Text="원 중심 좌표 Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
                                                                        CommandParameter="CircleCenterY"/>
@@ -151,9 +148,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Min Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
+                                    <TextBlock Text="원 최소 반지름:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
                                                                        CommandParameter="CircleMinRadius"/>
@@ -169,7 +164,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Max Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="원 최대 반지름:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -188,7 +183,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Inner Radius:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="내부 원 반지름 차이:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -206,7 +201,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Min Area Ratio:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0" Margin="0">
+                                    <TextBlock Text="온도 임계값 최소 비율:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0" Margin="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -224,7 +219,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Max Area Ratio:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="온도 임계값 최대 비율:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -242,7 +237,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Circle Area Min Length:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="원 최소 반지름 길이차" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -260,7 +255,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Avg Temperature Min:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="평균 임계온도 최대값:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -278,7 +273,7 @@
                                         <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Avg Temperature Max:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
+                                    <TextBlock Text="평균 임계온도 최대값:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
                                         <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">

@@ -165,20 +165,19 @@ namespace DamoOneVision.ImageProcessing
 
 
 
-		public static async Task<bool> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel )
+		public static async Task<InfraredInspectionResult> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel )
 		{
 			if (InfraredCameraImage == MIL.M_NULL)
 			{
 				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
-				return false;
+				return null;
 			}
 			//return true;
 			//Logger.WriteLine( "InfraredCameraModel 호출" );
-			bool blobGood = false;
-			bool circleGood = false;
 			bool moonCutGood = false;
-			bool isGood = false;
-			bool temperatureGood = false;
+			bool circleGood = false;
+			bool overHeatGood = false;
+			bool underHeatGood = false;
 
 			//MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
@@ -198,6 +197,16 @@ namespace DamoOneVision.ImageProcessing
 			double DetectCirclrCenterX = 0.0;
 			double DetectCirclrCenterY = 0.0;
 
+			// 기준 ROI 평균 온도 측정
+			double currentReferenceAvg = CalculateReferenceRoiAverage(InfraredCameraImage);
+
+			// 모델 등록 시 저장된 기준 온도와의 차이 계산
+			double delta = currentReferenceAvg - infraredCameraModel.ReferenceBaseTemperature;
+
+			// 기준 온도 차이만큼 임계값을 동적으로 보정
+			double dynamicThreshold = infraredCameraModel.BinarizedThreshold + delta;
+
+
 			/*
 			double Radius = 0;
 			double XPos = 0;
@@ -212,17 +221,22 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MdispInquire( InfraredDisplay, MIL.M_OVERLAY_ID, ref MilOverlayImage );
 
 
-
+			/// InfraredCameraImage의 클론 생성
 			//MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BinarizedImage );
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MilAnnulusImage );
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndBinarized );
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndImage );
 
+			/// Black으로 초기화 
 			MIL.MbufClear( MilAnnulusImage, MIL.M_COLOR_BLACK );
 			MIL.MbufClear( AnnulusAndBinarized, MIL.M_COLOR_BLACK );
 			MIL.MbufClear( AnnulusAndImage, MIL.M_COLOR_BLACK );
 
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, infraredCameraModel.BinarizedThreshold, MIL.M_NULL );
+			/// 이진화 이미지 생성 
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, dynamicThreshold, MIL.M_NULL );
+
+			// 로그 기록 (권장)
+			Logger.WriteLine( $"기준 온도: {infraredCameraModel.ReferenceBaseTemperature}, 현재 온도: {currentReferenceAvg}, 동적 임계값: {dynamicThreshold}" );
 
 			///
 			/*
@@ -243,13 +257,13 @@ namespace DamoOneVision.ImageProcessing
 			*/
 			///
 
-			// 그래픽 컨텍스트 생성(디스플레이 오버레이)
+			/// 그래픽 컨텍스트 생성(디스플레이 오버레이)
 			MIL.MgraAlloc( MilSystem, ref GraphicsContext );
 			MIL.MgraAlloc( MilSystem, ref AnnulusContext );
 			MIL.MgraAlloc( MilSystem, ref SettingGraphicsContext );
 
 
-			// 원찾기 
+			/// 원찾기 
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
 
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
@@ -270,12 +284,14 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 			double smallRadius = Radius - infraredCameraModel.CircleInnerRadius;
-			// 도넛모양 도형 생성
+
+			/// 도넛모양 도형 생성
 			MIL.MgraColor( AnnulusContext, MIL.M_COLOR_WHITE );
 			MIL.MgraArcFill( AnnulusContext, MilAnnulusImage, DetectCirclrCenterX, DetectCirclrCenterY, Radius, Radius, -360.0, 360.0 );
 			MIL.MgraColor( AnnulusContext, MIL.M_COLOR_BLACK );
 			MIL.MgraArcFill( AnnulusContext, MilAnnulusImage, DetectCirclrCenterX, DetectCirclrCenterY, smallRadius, smallRadius, -360.0, 360.0 );
 
+			/// 생성된 도넛모양 도형과 이진화 이미지, 흑백이미지 AND연산 
 			MIL.MimArith( MilAnnulusImage, BinarizedImage, AnnulusAndBinarized, MIL.M_AND );
 			MIL.MimArith( MilAnnulusImage, InfraredCameraImage, AnnulusAndImage, MIL.M_AND );
 
@@ -285,13 +301,13 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufInquire( AnnulusAndImage, MIL.M_SIZE_X, ref imageWidth );
 			MIL.MbufInquire( AnnulusAndImage, MIL.M_SIZE_Y, ref imageHeight );
 
-
+			/// 온도데이터를 담고 있는 AnnulusAndImage를 ushort 배열로 변환
 			ushort[ ] ImageData = new ushort[imageWidth*imageHeight];
 			MIL.MbufGet( AnnulusAndImage, ImageData );
 			///
 			//MIL.MdispSelect( InfraredDisplay, AnnulusAndBinarized );
 
-
+			/// 이진화 + 도넛 AND 연산한 이미지에서 Blob 검출
 			MIL.MblobAlloc( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobContext );
 			MIL.MblobAllocResult( MilSystem, MIL.M_DEFAULT, MIL.M_DEFAULT, ref BlobResult );
 
@@ -305,7 +321,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MblobCalculate( BlobContext, AnnulusAndBinarized, MIL.M_NULL, BlobResult );
 
 
-			// 블롭 개수 가져오기
+			/// 블롭 개수 가져오기
 			MIL_INT selectedBlobCount = 0;
 
 			MIL.MblobGetResult( BlobResult, MIL.M_GENERAL, MIL.M_NUMBER + MIL.M_TYPE_MIL_INT, ref selectedBlobCount );
@@ -321,8 +337,8 @@ namespace DamoOneVision.ImageProcessing
 			for (MIL_INT i = 0; i < selectedBlobCount; i++)
 			{
 
-				// M_BLOB_INDEX 속성 가져오기
-				// 블롭 인덱스는 보통 0부터 시작
+				/// M_BLOB_INDEX 속성 가져오기
+				/// 블롭 인덱스는 보통 0부터 시작
 				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_AREA + MIL.M_TYPE_MIL_DOUBLE, ref Area );
 				
 				//MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
@@ -335,24 +351,10 @@ namespace DamoOneVision.ImageProcessing
 
 			}
 			Logger.WriteLine( $"블롭의 전체 면적 : {AreaSum}\n" );
-			Logger.WriteLine( $"최소 길이 : {MaxLangth} \n" );
+			Logger.WriteLine( $"블롭의 최대 길이 : {MaxLangth} \n" );
 
-			if ( selectedBlobCount != 0 && ( MaxLangth + infraredCameraModel.CircleAreaMinLength ) >= ( Radius*2 ) )
-			{
-				blobGood = true;
-			}
-			else
-			{
-				Logger.WriteLine( "selectedBlobCount가 0입니다." );
-				Logger.WriteLine( " 최소 길이 미달 " );
-				blobGood = false;
-			}
 
-			
-
-			
-
-			if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
+			if (selectedBlobCount == 0 || Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
 			{
 				Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
 				circleGood = false;
@@ -366,7 +368,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			if ( FillRatio > infraredCameraModel.CircleMinAreaRatio && FillRatio < infraredCameraModel.CircleMaxAreaRatio )
+			if ( (FillRatio > infraredCameraModel.CircleMinAreaRatio) && (FillRatio < infraredCameraModel.CircleMaxAreaRatio) && (MaxLangth + infraredCameraModel.CircleAreaMinLength) >= (Radius * 2))
 			{
 				moonCutGood = true;
 			}
@@ -381,7 +383,7 @@ namespace DamoOneVision.ImageProcessing
 			int avg = 0;
 			for (int i = 0; i < ImageData.Length; i++)
 			{
-				if (ImageData[ i ] >= infraredCameraModel.BinarizedThreshold)
+				if (ImageData[ i ] >= dynamicThreshold)
 				{
 					sum += ImageData[ i ];
 					divnum++;
@@ -393,22 +395,33 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			if ( avg > infraredCameraModel.AvgTemperatureMin && avg < infraredCameraModel.AvgTemperatureMax )
+			if ( avg > infraredCameraModel.AvgTemperatureMin  )
 			{
-				temperatureGood = true;
+				underHeatGood = true;
 			}
 			else
 			{
-				temperatureGood = false;
-				Logger.WriteLine("평균온도 이상");
+				underHeatGood = false;
+				Logger.WriteLine( "OverHeat Error" );
 			}
+
+			if (avg < infraredCameraModel.AvgTemperatureMax)
+			{
+				overHeatGood = true;
+			}
+			else
+			{
+				overHeatGood = false;
+				Logger.WriteLine( "UnderHeat Error" );
+			}
+
 
 			Logger.WriteLine( $"avg: {avg}" );
 
 
 
 
-			isGood = blobGood && circleGood && moonCutGood && temperatureGood;
+			//isGood = blobGood && circleGood && moonCutGood && temperatureGood;
 			/*
 
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius * 2 - 20 );
@@ -487,8 +500,30 @@ namespace DamoOneVision.ImageProcessing
 			//}
 
 			//BinarizedImage = MIL.M_NULL;
+			var inspectionResult = new InfraredInspectionResult
+			{
+				MoonCutIssue = !moonCutGood,
+				CircleIssue = !circleGood,
+				OverHeatIssue = !overHeatGood,
+				UnderHeatIssue = !underHeatGood
+			};
 
-			return isGood;
+			return inspectionResult;
+		}
+
+		private static double CalculateReferenceRoiAverage( MIL_ID image )
+		{
+			int refX = 610, refY = 10, refW = 20, refH = 20;
+
+			MIL_ID roi = MIL.M_NULL;
+			MIL.MbufChild2d( image, refX, refY, refW, refH, ref roi );
+
+			ushort[] roiData = new ushort[refW * refH];
+			MIL.MbufGet( roi, roiData );
+			MIL.MbufFree( roi );
+
+			// ushort[] → double로 변환 후 평균
+			return roiData.Select( v => (double) v ).Average();
 		}
 
 
