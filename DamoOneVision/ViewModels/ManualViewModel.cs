@@ -96,7 +96,9 @@ namespace DamoOneVision.ViewModels
 			TowerLampStopCommand = new RelayCommand( ( ) => TowerLampStop() );
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
 
-			AutoFocusCommand = new RelayCommand( ( ) => AutoFocus() );
+			AutoFocusCommand = new RelayCommand( ( ) => {
+				AutoFocus();
+			} );
 			ManualFocusCommand = new RelayCommand( ( ) => ManualFocus() );
 
 			_positionTimer = new DispatcherTimer();
@@ -525,10 +527,38 @@ namespace DamoOneVision.ViewModels
 			_motionService.ZAxisStop();
 		}
 
-		private void AutoFocus( )
+		private async void AutoFocus( )
 		{
-			_cameraService.InfraredCameraAutoFocus();
+			// 1. 자동 포커스 실행
+			double focusValue = await _cameraService.InfraredCameraAutoFocus();
+
+			// 2. 사용자에게 저장 여부 확인
+			var result = System.Windows.MessageBox.Show(
+				$"현재 포커스 값 ({focusValue:F6}) 을 저장하시겠습니까?",
+				"포커스 저장 확인",
+				System.Windows.MessageBoxButton.YesNo,
+				System.Windows.MessageBoxImage.Question);
+
+			// 3. 확인을 누른 경우 저장
+			if (result == System.Windows.MessageBoxResult.Yes)
+			{
+				// 모델에 포커스 값 저장
+				InfraredCameraModel.CameraFocusValue = focusValue;
+
+				// 모델 저장 (현재 모델 이름 기준으로 덮어쓰기)
+				var modelData = new ModelData
+				{
+					InfraredCameraModels = new List<InfraredCameraModel> { InfraredCameraModel },
+					MotionModels = new List<MotionModel> { MotionModel }
+				};
+
+				string modelName = _settingManager.LastOpenedModel(); // 현재 사용 중인 모델 이름
+				_settingManager.SaveModelData( modelName, modelData );
+
+				Logger.WriteLine( $"AutoFocus 완료, 포커스 값({focusValue:F6})을 모델 '{modelName}'에 저장했습니다." );
+			}
 		}
+
 
 		private void ManualFocus( )
 		{

@@ -206,6 +206,7 @@ namespace DamoOneVision.ImageProcessing
 			// 기준 온도 차이만큼 임계값을 동적으로 보정
 			double dynamicThreshold = infraredCameraModel.BinarizedThreshold + delta;
 
+			double thresholdForMil = (dynamicThreshold + 273.15) * 100;
 
 			/*
 			double Radius = 0;
@@ -233,7 +234,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClear( AnnulusAndImage, MIL.M_COLOR_BLACK );
 
 			/// 이진화 이미지 생성 
-			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, dynamicThreshold, MIL.M_NULL );
+			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, thresholdForMil, MIL.M_NULL );
 
 			// 로그 기록 (권장)
 			Logger.WriteLine( $"기준 온도: {infraredCameraModel.ReferenceBaseTemperature}, 현재 온도: {currentReferenceAvg}, 동적 임계값: {dynamicThreshold}" );
@@ -389,13 +390,18 @@ namespace DamoOneVision.ImageProcessing
 					divnum++;
 				}
 			}
+
+			/// 아래 구문으로 대체
 			if (divnum != 0)
 			{
 				avg = (int)(sum / divnum);
 			}
 
+			double avgCelsius = divnum != 0 ? (sum / divnum) / 100.0 - 273.15 : 0.0;
+			Logger.WriteLine( $"평균 온도(℃): {avgCelsius}" );
 
-			if ( avg > infraredCameraModel.AvgTemperatureMin  )
+
+			if ( avgCelsius > infraredCameraModel.AvgTemperatureMin )
 			{
 				underHeatGood = true;
 			}
@@ -405,7 +411,7 @@ namespace DamoOneVision.ImageProcessing
 				Logger.WriteLine( "OverHeat Error" );
 			}
 
-			if (avg < infraredCameraModel.AvgTemperatureMax)
+			if ( avgCelsius < infraredCameraModel.AvgTemperatureMax )
 			{
 				overHeatGood = true;
 			}
@@ -416,7 +422,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			Logger.WriteLine( $"avg: {avg}" );
+			//Logger.WriteLine( $"avg: {avg}" );
 
 
 
@@ -523,7 +529,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufFree( roi );
 
 			// ushort[] → double로 변환 후 평균
-			return roiData.Select( v => (double) v ).Average();
+			return roiData.Select( v => (v / 100.0) - 273.15 ).Average();
 		}
 
 

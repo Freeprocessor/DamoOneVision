@@ -11,7 +11,7 @@
         Title="DamoOne Vision" 
         Height="768" Width="1366" 
         WindowStyle="None"
-        Icon="/Logo.png">
+        Icon="/Logo.png" MinWidth="1366" MinHeight="768" WindowState="Maximized">
     <!--Background="{DynamicResource MaterialDesignPaper}">-->
 
     <!-- 리소스 사전에서 MaterialDesign 테마와 컬러를 불러오기 -->
@@ -93,7 +93,7 @@
                             <Separator/>
                             <MenuItem Header="모델" IsCheckable="False" Click="SettingButton_Click"/>
                             <MenuItem Header="고급" IsCheckable="False" Click="AdvancedButton_Click"/>
-                            <MenuItem Header="About"/>
+                            <MenuItem Header="About" Click="AboutMenu_Click"/>
                             <Separator/>
                             <!--<MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>-->
                         </MenuItem>

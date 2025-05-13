@@ -353,9 +353,9 @@ namespace DamoOneVision.ViewModels
 			{
 				case "BinarizedThreshold":
 					ActiveValue = SelectedInfraredCameraModel.BinarizedThreshold;
-					ActiveValueMin = 0;
-					ActiveValueMax = 65535; // 예시: 16비트 이미지의 최대값
-					ActiveValueTick = 1; // 예시: 1단위로 조정
+					ActiveValueMin = 10;
+					ActiveValueMax = 380; // 예시: 16비트 이미지의 최대값
+					ActiveValueTick = 0.01; // 예시: 1단위로 조정
 					_isBinarized = true;
 					//Logger.WriteLine( $"BinarizedThreshold: {SelectedModel.BinarizedThreshold}" );
 					break;
@@ -417,16 +417,16 @@ namespace DamoOneVision.ViewModels
 					break;
 				case "AvgTemperatureMin":
 					ActiveValue = SelectedInfraredCameraModel.AvgTemperatureMin;
-					ActiveValueMin = 0; // 예시: 최소 온도
-					ActiveValueMax = 65535; // 예시: 최대 온도
-					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
+					ActiveValueMin = 10; // 예시: 최소 온도
+					ActiveValueMax = 100; // 예시: 최대 온도
+					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
 					_isBinarized = false;
 					break;
 				case "AvgTemperatureMax":
 					ActiveValue = SelectedInfraredCameraModel.AvgTemperatureMax;
-					ActiveValueMin = 0; // 예시: 최소 온도
-					ActiveValueMax = 65535; // 예시: 최대 온도
-					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
+					ActiveValueMin = 10; // 예시: 최소 온도
+					ActiveValueMax = 100; // 예시: 최대 온도
+					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
 					_isBinarized = false;
 					break;
 
@@ -539,7 +539,8 @@ namespace DamoOneVision.ViewModels
 			MIL.MbufFree( roi );
 
 			// ushort[] → double로 변환 후 평균
-			return roiData.Select( v => (double) v ).Average();
+			return roiData.Select( v => (v / 100.0) - 273.15 ).Average();  // 단위 변환
+
 		}
 
 

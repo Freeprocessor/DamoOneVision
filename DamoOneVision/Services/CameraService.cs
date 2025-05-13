@@ -137,6 +137,8 @@ namespace DamoOneVision.Services
 
 				SetVisionConnected(true);
 
+				_infraredCamera.ManualFocus( _infraredCameraModel.CameraFocusValue );
+
 			}
 			catch (Exception ex)
 			{
@@ -183,15 +185,22 @@ namespace DamoOneVision.Services
 			SetVisionConnected(false);
 		}
 
-		public async void InfraredCameraAutoFocus( )
+		public async Task<double> InfraredCameraAutoFocus( )
 		{
-			_infraredCameraModel.CameraFocusValue = await _infraredCamera.AutoFocus();
-			
+			double focusValue = await _infraredCamera.AutoFocus();
+
+			await VisionTrigger();
+
+			return focusValue;
+
+
 		}
 
-		public void InfraredCameraManualFocus( )
+		public async void InfraredCameraManualFocus( )
 		{
 			_infraredCamera.ManualFocus( _infraredCameraModel.CameraFocusValue );
+
+			await VisionTrigger();
 		}
 
 		public async void InfraredCameraLoadImage( string filePath )
@@ -217,6 +226,10 @@ namespace DamoOneVision.Services
 			vm.InspectionResult = result;
 		}
 
+
+		/// <summary>
+		///  화면 캡쳐용 메소드
+		/// </summary>
 		public void JETImageSave( )
 		{
 			MIL_ID displayedImage = MIL.M_NULL;
@@ -249,6 +262,7 @@ namespace DamoOneVision.Services
 				CameraConnectedChanged?.Invoke( _isCameraConnected );
 			}
 		}
+
 		private void SetBusy( bool busy )
 		{
 			if (_isBusy != busy)

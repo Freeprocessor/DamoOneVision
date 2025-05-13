@@ -68,10 +68,12 @@ namespace DamoOneVision.Camera
 					//cts = new CancellationTokenSource();
 					//captureTask = Task.Run( ( ) => CaptureImages( cts.Token ), cts.Token );
 					await Task.Delay( 1000 );
-					if(_cameraName == "InfraredCamera")
-					{
-						camera.ManualFocus( 0.21140 );
-					}
+
+					///Camera Service로 이동
+					//if(_cameraName == "InfraredCamera")
+					//{
+					//	camera.ManualFocus( 0.21140 );
+					//}
 
 					IsConnected = true;
 

@@ -330,7 +330,12 @@ namespace DamoOneVision
 			string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JetDisplayCapture.bmp");
 			SaveControlScreenshot( InfraredCameraDisplay, filePath );
 		}
-
+		private void AboutMenu_Click( object sender, RoutedEventArgs e )
+		{
+			var aboutWindow = new Views.AboutWindow();
+			aboutWindow.Owner = this;
+			aboutWindow.ShowDialog();
+		}
 
 		protected override void OnClosed( EventArgs e )
 		{
@@ -339,6 +344,7 @@ namespace DamoOneVision
 			// MILContext 해제
 			
 		}
+
 
 
 		private async void ExitProgram( object sender, EventArgs e )
