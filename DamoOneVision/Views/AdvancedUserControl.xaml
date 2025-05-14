@@ -8,8 +8,13 @@
              xmlns:vm="clr-namespace:DamoOneVision.ViewModels" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="683.2"
+             xmlns:conv="clr-namespace:DamoOneVision.Converters"
+
              Background="{DynamicResource MaterialDesignPaper}">
 
+    <UserControl.Resources>
+        <conv:FileNameConverter x:Key="FileNameConverter"/>
+    </UserControl.Resources>
     <Grid>
         <!-- 상단 'Manual Window' 타이틀 바 -->
         <Grid.RowDefinitions>
@@ -59,8 +64,10 @@
                         <TabItem Header="ImageLoad" Height="50" >
                             <Grid Height="550" PreviewMouseWheel="ImageListBox_PreviewMouseWheel">
                                 <ScrollViewer Margin="10,10,10,40" 
-                                                      VerticalScrollBarVisibility="Auto" 
-                                                      HorizontalScrollBarVisibility="Disabled">
+                                    VerticalScrollBarVisibility="Auto" 
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    CanContentScroll="True"
+                                    PanningMode="VerticalOnly">
                                     <ListBox ItemsSource="{Binding ImagePaths}"
                                              SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -73,9 +80,16 @@
                                         </ListBox.ItemsPanel>
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
-                                                    <Image Source="{Binding}" Width="120" Height="120" Stretch="Uniform"/>
-                                                </Border>
+                                                <StackPanel Margin="5" Width="120">
+                                                    <Border BorderBrush="Gray" BorderThickness="1">
+                                                        <Image Source="{Binding}" Width="120" Height="120" Stretch="Uniform"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"
+                                                       TextAlignment="Center"
+                                                       FontSize="12"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxWidth="120"/>
+                                                </StackPanel>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
 

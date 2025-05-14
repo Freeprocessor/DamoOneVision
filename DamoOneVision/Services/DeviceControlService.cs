@@ -203,6 +203,11 @@ namespace DamoOneVision.Services
 			{
 				//modbus.WriteSingleCoil( 0, 0x2A, true );
 				Logger.WriteLine( "TriggerReadingAsync Start" );
+				// 제품 간섭 대기
+				while(_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
+				{
+					await Task.Delay( 100 );
+				}
 
 				while (true)
 				{

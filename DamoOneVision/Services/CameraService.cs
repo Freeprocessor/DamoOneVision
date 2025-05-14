@@ -115,12 +115,12 @@ namespace DamoOneVision.Services
 			_infraredCameraModel = infraredCameraModel;
 		}
 
-		public async Task ConnectAction( )
+		public async Task<bool> ConnectAction( )
 		{
 			if (IsVisionConnected)
 			{
 				Logger.WriteLine( "이미 카메라가 연결되어 있습니다." );
-				return;
+				return true;
 			}
 			SetBusy(true);
 			try
@@ -153,13 +153,16 @@ namespace DamoOneVision.Services
 				};
 
 				await Task.WhenAll( tasks );
+				return false;
 
 			}
 			finally
 			{
 				//_infraredCamera.AutoFocus();
 				SetBusy(false);
+				
 			}
+			return true;
 		}
 
 		public async Task DisconnectAction( )
@@ -415,15 +418,15 @@ namespace DamoOneVision.Services
 							///GOOD REJECT LAMP 바인딩
 							///
 							var vm = _mainViewModel.Value;
-							if (!isGood)
-							{
-								vm.IsGoodColor = "Red";
-								vm.IsGoodStatus = "Reject";
-							}
-							else
+							if (isGood)
 							{
 								vm.IsGoodColor = "Green";
 								vm.IsGoodStatus = "Good";
+							}
+							else
+							{
+								vm.IsGoodColor = "Red";
+								vm.IsGoodStatus = "Reject";
 							}
 							vm.InspectionResult = result;
 							vm.OnProductDetected( isGood );

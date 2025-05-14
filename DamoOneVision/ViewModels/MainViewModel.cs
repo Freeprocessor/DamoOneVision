@@ -124,37 +124,7 @@ namespace DamoOneVision.ViewModels
 		private readonly CameraService _cameraService;
 
 
-		private bool _isVisionConnected;
-		public bool IsVisionConnected
-		{
-			get => _isVisionConnected;
-			set
-			{
-				if (_isVisionConnected != value)
-				{
-					_isVisionConnected = value;
-					OnPropertyChanged( nameof( IsVisionConnected ) );
-					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-				}
-			}	
-		}
 
-		private bool _isBusy;
-		public bool IsBusy
-		{
-			get => _isBusy;
-			set
-			{
-				if (_isBusy != value)
-				{
-					_isBusy = value;
-					OnPropertyChanged( nameof( IsBusy ) );
-					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-				}
-			}
-		}
 
 		private string _isGoodStatus;
 		public string IsGoodStatus
@@ -265,11 +235,7 @@ namespace DamoOneVision.ViewModels
 		private int RejectPercent => (GoodCount + RejectCount) > 0 ? RejectCount * 100 / (GoodCount + RejectCount) : 0;
 
 
-		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
-		public bool CanConnect => !IsVisionConnected && !IsBusy;
 
-		// Disconnect 버튼이 활성화되는 조건 (예: 이미 연결되어 있고, 작업 중이 아님)
-		public bool CanDisconnect => IsVisionConnected && !IsBusy;
 
 		
 
@@ -277,11 +243,10 @@ namespace DamoOneVision.ViewModels
 		// -----------------------------------------------------------------------
 		// 2. 실제로 UI에서 바인딩할 Command들
 		// -----------------------------------------------------------------------
-		public ICommand ConnectCommand { get; }
-		public ICommand DisconnectCommand { get; }
+
 		public ICommand MachineStartCommand { get; }
 		public ICommand MachineStopCommand { get; }
-		public ICommand VisionTriggerCommand { get; }
+
 
 
 		public ICommand TestGoodCommand { get; }
@@ -314,18 +279,11 @@ namespace DamoOneVision.ViewModels
 				return result;
 			};
 
-			ConnectCommand = new AsyncRelayCommand(
-				_cameraService.ConnectAction,
-				() => CanConnect
-			);
 
-			DisconnectCommand = new AsyncRelayCommand(
-				_cameraService.DisconnectAction,
-				() => CanDisconnect
-			);
 
 			MachineStartCommand = new AsyncRelayCommand(
 				async _ => await Task.Run(async()=>{
+					/// 카메라 연결 실패, 성공여부 확인해서 함수 중단 or 계속진행
 					await _cameraService.ConnectAction();
 					_deviceControlService.ConveyorReadStart();
 					//await _deviceControlService.ZAxisMoveEndPos();
@@ -347,11 +305,7 @@ namespace DamoOneVision.ViewModels
 				} )
 			);
 
-			VisionTriggerCommand = new AsyncRelayCommand(
-				_ => _cameraService.VisionTrigger()
-			);
-			_cameraService.CameraConnectedChanged += OnCameraConnectedChanged;
-			_cameraService.BusyStateChanged += OnBusyStateChanged;
+
 			//ListBoxSelectionChangedCommand = new RelayCommand(
 			//	_ => ListBox_SelectionChanged()
 
@@ -372,22 +326,7 @@ namespace DamoOneVision.ViewModels
 
 		}
 
-		private void OnCameraConnectedChanged( bool connected )
-		{
-			// UI 스레드에서 프로퍼티를 업데이트해야 할 수 있으므로 Dispatcher 사용 고려
-			Application.Current.Dispatcher.Invoke( ( ) =>
-			{
-				IsVisionConnected = connected;
-			} );
-		}
 
-		private void OnBusyStateChanged( bool busy )
-		{
-			Application.Current.Dispatcher.Invoke( ( ) =>
-			{
-				IsBusy = busy;
-			} );
-		}
 
 
 		/// <summary>

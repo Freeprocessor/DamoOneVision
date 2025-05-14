@@ -83,7 +83,7 @@ namespace DamoOneVision
 		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, SettingViewModel settingViewModel, MilSystemService milSystemService, CameraService cameraService )
 		{
 			InitializeComponent();
-
+			Stylus.SetIsPressAndHoldEnabled( this, false );
 
 			_mainViewModel = mainViewModel;
 			_manualViewModel = manualViewModel;
@@ -173,7 +173,7 @@ namespace DamoOneVision
 		{
 
 			InfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
-			InfraredCameraConversionDisplay.DisplayId = _milSystemService.InfraredConversionDisplay;
+			//InfraredCameraConversionDisplay.DisplayId = _milSystemService.InfraredConversionDisplay;
 
 			//mainInfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
 			//mainInfraredCameraConversionDisplay.DisplayId = MainInfraredCameraConversionDisplay;
@@ -350,7 +350,11 @@ namespace DamoOneVision
 		private async void ExitProgram( object sender, EventArgs e )
 		{
 			await Task.Delay( 1 );
-			Application.Current.Shutdown();
+			var confirmationWindow = new ExitConfirmationWindow
+			{
+				Owner = Application.Current.MainWindow
+			};
+			confirmationWindow.ShowDialog();  // 모달로 표시
 		}
 
 

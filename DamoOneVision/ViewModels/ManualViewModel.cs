@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using DamoOneVision.Services;
 using DamoOneVision.Data;
 using DamoOneVision.Models;
+using System.Windows;
 
 namespace DamoOneVision.ViewModels
 {
@@ -42,6 +43,12 @@ namespace DamoOneVision.ViewModels
 		private bool _zAxisIsMoving;
 
 		private double _conveyorSpeed;
+
+		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
+		public bool CanConnect => !IsVisionConnected && !IsBusy;
+
+		// Disconnect 버튼이 활성화되는 조건 (예: 이미 연결되어 있고, 작업 중이 아님)
+		public bool CanDisconnect => IsVisionConnected && !IsBusy;
 
 
 
@@ -96,10 +103,42 @@ namespace DamoOneVision.ViewModels
 			TowerLampStopCommand = new RelayCommand( ( ) => TowerLampStop() );
 			TowerLampErrorCommand = new RelayCommand( ( ) => TowerLampError() );
 
-			AutoFocusCommand = new RelayCommand( ( ) => {
-				AutoFocus();
-			} );
-			ManualFocusCommand = new RelayCommand( ( ) => ManualFocus() );
+			AutoFocusCommand = new RelayCommand(
+				( ) => AutoFocus(),
+				( ) => CanDisconnect
+			);
+
+			ManualFocusCommand = new RelayCommand(
+				( ) => ManualFocus(),
+				( ) => CanDisconnect
+			);
+
+
+			ConnectCommand = new AsyncRelayCommand( async ( ) =>
+			{
+				bool result = await _cameraService.ConnectAction();
+				if (result)
+				{
+					MessageBox.Show( "카메라 연결에 성공했습니다.", "카메라 연결", MessageBoxButton.OK, MessageBoxImage.Information );
+				}
+				else
+				{
+					MessageBox.Show( "카메라 연결에 실패했습니다.", "카메라 연결", MessageBoxButton.OK, MessageBoxImage.Error );
+				}
+			}, ( ) => CanConnect );
+
+			DisconnectCommand = new AsyncRelayCommand(
+				_cameraService.DisconnectAction,
+				( ) => CanDisconnect
+			);
+
+			VisionTriggerCommand = new AsyncRelayCommand(
+				( ) => _cameraService.VisionTrigger(),
+				( ) => CanDisconnect // 연결되었을 때만 실행 가능
+			);
+
+			_cameraService.CameraConnectedChanged += OnCameraConnectedChanged;
+			_cameraService.BusyStateChanged += OnBusyStateChanged;
 
 			_positionTimer = new DispatcherTimer();
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
@@ -117,6 +156,38 @@ namespace DamoOneVision.ViewModels
 
 		}
 
+		private void OnCameraConnectedChanged( bool connected )
+		{
+			// UI 스레드에서 프로퍼티를 업데이트해야 할 수 있으므로 Dispatcher 사용 고려
+			Application.Current.Dispatcher.Invoke( ( ) =>
+			{
+				IsVisionConnected = connected;
+				OnPropertyChanged( nameof( CanConnect ) );
+				OnPropertyChanged( nameof( CanDisconnect ) );
+
+				(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(VisionTriggerCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(AutoFocusCommand as RelayCommand)?.NotifyCanExecuteChanged();
+				(ManualFocusCommand as RelayCommand)?.NotifyCanExecuteChanged();
+			} );
+		}
+
+		private void OnBusyStateChanged( bool busy )
+		{
+			Application.Current.Dispatcher.Invoke( ( ) =>
+			{
+				IsBusy = busy;
+				OnPropertyChanged( nameof( CanConnect ) );
+				OnPropertyChanged( nameof( CanDisconnect ) );
+
+				(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(VisionTriggerCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				(AutoFocusCommand as RelayCommand)?.NotifyCanExecuteChanged();
+				(ManualFocusCommand as RelayCommand)?.NotifyCanExecuteChanged();
+			} );
+		}
 
 
 		public void PositionReadStart( )
@@ -262,6 +333,38 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private bool _isVisionConnected;
+		public bool IsVisionConnected
+		{
+			get => _isVisionConnected;
+			set
+			{
+				if (_isVisionConnected != value)
+				{
+					_isVisionConnected = value;
+					OnPropertyChanged( nameof( IsVisionConnected ) );
+					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				}
+			}
+		}
+
+		private bool _isBusy;
+		public bool IsBusy
+		{
+			get => _isBusy;
+			set
+			{
+				if (_isBusy != value)
+				{
+					_isBusy = value;
+					OnPropertyChanged( nameof( IsBusy ) );
+					(ConnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+					(DisconnectCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
+				}
+			}
+		}
+
 
 		public ICommand EjectONCommand { get; }
 		public ICommand EjectOFFCommand { get; }
@@ -297,6 +400,10 @@ namespace DamoOneVision.ViewModels
 		public ICommand ZAxisHomeCommand { get; }
 		public ICommand AutoFocusCommand { get; }
 		public ICommand ManualFocusCommand { get; }
+
+		public ICommand ConnectCommand { get; }
+		public ICommand DisconnectCommand { get; }
+		public ICommand VisionTriggerCommand { get; }
 
 
 		private bool XAxisCanMove( )

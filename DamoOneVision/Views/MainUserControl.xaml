@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:DamoOneVision.ViewModels" 
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="683.2" d:DesignWidth="400">
+             d:DesignHeight="683.2" d:DesignWidth="400" Cursor="Hand">
     
     <Grid Grid.Column="1" Margin="10,0,10,0">
         <Grid.RowDefinitions>

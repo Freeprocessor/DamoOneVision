@@ -57,7 +57,9 @@
                     <ColumnDefinition Width="400"/>
                 </Grid.ColumnDefinitions>
 
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" ClipToBounds="False" >
 
+                </StackPanel>
                 <!-- 로고 아이콘 (Column=0) -->
                 <Image Source="/Logo.png"
                Width="32" Height="32"
@@ -71,34 +73,69 @@
                    Foreground="Black"
                    VerticalAlignment="Center"
                    FontFamily="Bahnschrift SemiLight"
-                   Margin="10,0,0,0" Grid.ColumnSpan="2" Height="24"/>
+                   Margin="10,0,0,0" Height="24" Width="160" HorizontalAlignment="Left"/>
 
                 <!-- 오른쪽 영역: 메뉴 + 닫기 버튼 (Column=2) -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" ClipToBounds="False" >
 
                     <!-- (1) 설정 메뉴 -->
-                    <Menu Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Right">
-                        <MenuItem Header="⚙ 설정"
+                    <Menu Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Right"  ClipToBounds="False">
+                        <MenuItem Header="🛠수동조작"
+                          Foreground="Black"
+                                  
+                          FontSize="16"
+                          FontWeight="Bold"
+                          Click="ManualButton_Click">
+                        </MenuItem>
+                        <MenuItem Header="🧩모델"
+                          Foreground="Black"
+                          FontSize="16"
+                          FontWeight="Bold"
+                          Click="SettingButton_Click">
+                        </MenuItem>
+                        <MenuItem Header="🧠고급"
+                          Foreground="Black"
+                          FontSize="16"
+                          FontWeight="Bold"
+                          Click="AdvancedButton_Click">
+                        </MenuItem>
+                        <MenuItem Header="ℹ️About"
+                          Foreground="Black"
+                          FontSize="16"
+                          FontWeight="Bold"
+                          Click="AboutMenu_Click">
+                        </MenuItem>
+
+                        <!--<MenuItem Header="⚙ 설정"
                           Foreground="Black"
                           FontSize="16"
                           FontWeight="Bold">
-                            <!-- 서브 메뉴 항목들 -->
-                            <MenuItem Header="카메라 연결"  Command="{Binding ConnectCommand}"/>
-                            <MenuItem Header="카메라 연결 해제" Command="{Binding DisconnectCommand}"/>
-                            <MenuItem Header="SoftWare Trigger" Command="{Binding VisionTriggerCommand}"/>
-                            <Separator/>
+                            -->
+                        <!-- 서브 메뉴 항목들 -->
+                        <!--
 
                             <MenuItem Header="수동조작" IsCheckable="False" Click="ManualButton_Click"/>
 
                             <Separator/>
                             <MenuItem Header="모델" IsCheckable="False" Click="SettingButton_Click"/>
+                            <Separator/>
                             <MenuItem Header="고급" IsCheckable="False" Click="AdvancedButton_Click"/>
+                            <Separator/>
                             <MenuItem Header="About" Click="AboutMenu_Click"/>
                             <Separator/>
-                            <!--<MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>-->
-                        </MenuItem>
+                            -->
+                        <!--<MenuItem Header="ImageFusion" IsCheckable="False" Click="ImageFusionButton_Click"/>-->
+                        <!--
+                        </MenuItem>-->
+
+
                     </Menu>
 
+
+
+                    <!-- (2) 닫기 버튼 -->
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2" ClipToBounds="False" >
                     <Button Content="×"
                     Width="48"
                     FontSize="20"
@@ -107,8 +144,6 @@
                     Click="ExitProgram"
                     Style="{DynamicResource MaterialDesignFlatButton}"
                     Height="48" HorizontalAlignment="Right"/>
-
-                    <!-- (2) 닫기 버튼 -->
                 </StackPanel>
             </Grid>
         </Border>
@@ -152,22 +187,22 @@
             </Grid.ColumnDefinitions>
 
             <!-- (왼쪽) 카메라 디스플레이 탭 -->
-            <TabControl Margin="0,0,0,0">
-                <TabItem Header="Main" Height="50">
-                    <Grid Margin="0">
-                        <Border BorderBrush="{Binding IsGoodColor, TargetNullValue=Transparent, FallbackValue=Transparent}" BorderThickness="5">
-                            <milwpf:MILWPFDisplay x:Name="InfraredCameraDisplay"
+            <!--<TabControl Margin="0,0,0,0">
+                <TabItem Header="Main" Height="50">-->
+            <Grid Margin="0">
+                <Border BorderBrush="{Binding IsGoodColor, TargetNullValue=Transparent, FallbackValue=Transparent}" BorderThickness="5">
+                    <milwpf:MILWPFDisplay x:Name="InfraredCameraDisplay"
                                   MouseMove="MILWPFDisplay_MouseMove"
                                   IsManipulationEnabled="False"
                                   Focusable="False" />
-                        </Border>
-                        <!-- 투명 오버레이 (텍스트·마커 전용) -->
-                        <Canvas x:Name="OverlayCanvas"
+                </Border>
+                <!-- 투명 오버레이 (텍스트·마커 전용) -->
+                <Canvas x:Name="OverlayCanvas"
                             IsHitTestVisible="False">
-                            <!-- 마우스 이벤트는 영상으로 통과 -->
+                    <!-- 마우스 이벤트는 영상으로 통과 -->
 
-                            <!-- 현재 온도 (예: 우측 상단 고정) -->
-                            <TextBlock x:Name="TemperatureText"
+                    <!-- 현재 온도 (예: 우측 상단 고정) -->
+                    <TextBlock x:Name="TemperatureText"
                                 Text="{Binding CurrentTemperature}"
                                 FontSize="48"
                                 FontWeight="Bold"
@@ -175,9 +210,9 @@
                                 Canvas.Right="20"
                                 Canvas.Top="20"/>
 
-                        </Canvas>
-                    </Grid>
-                </TabItem>
+                </Canvas>
+            </Grid>
+            <!--</TabItem>
                 <TabItem Header="infraredCamera" Height="50">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -186,9 +221,9 @@
                         <milwpf:MILWPFDisplay x:Name="InfraredCameraConversionDisplay" Grid.Column="1" />
                     </Grid>
                 </TabItem>
-            </TabControl>
+            </TabControl>-->
 
-            <Image x:Name="image" Grid.Column="1" Margin="2,55,2,5" Stretch="Fill" >
+            <Image x:Name="image" Grid.Column="1" Margin="2,5,2,5" Stretch="Fill" >
                 <Image.Source>
                     <BitmapImage UriSource="pack://application:,,,/ColorMap/JETColorMap.mim" Rotation="Rotate270" />
                 </Image.Source>

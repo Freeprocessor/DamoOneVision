@@ -12,6 +12,7 @@ using DamoOneVision.ImageProcessing;
 using DamoOneVision.Models;
 using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
+using MS.WindowsAPICodePack.Internal;
 
 namespace DamoOneVision.ViewModels
 {
@@ -165,16 +166,74 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _activeValueFactor;
+		public double ActiveValueFactor
+		{
+			get => _activeValueFactor;
+			set
+			{
+				if (_activeValueFactor != value)
+				{
+					_activeValueFactor = value;
+					OnPropertyChanged( nameof( ActiveValueFactor ) );
+					// ActiveValue 바뀌면, 해당 모델 속성에 반영
+					UpdateModelFromActiveValue();
+				}
+			}
+		}
+
+		private bool _isMul1Selected;
+		public bool IsMul1Selected
+		{
+			get => _isMul1Selected;
+			set
+			{
+				if (_isMul1Selected != value)
+				{
+					_isMul1Selected = value;
+					OnPropertyChanged( nameof( IsMul1Selected ) );
+				}
+			}
+		}
+
+		private bool _isMul10Selected;
+		public bool IsMul10Selected
+		{
+			get => _isMul10Selected;
+			set
+			{
+				if (_isMul10Selected != value)
+				{
+					_isMul10Selected = value;
+					OnPropertyChanged( nameof( IsMul10Selected ) );
+				}
+			}
+		}
+
+		private bool _isMul100Selected;
+		public bool IsMul100Selected
+		{
+			get => _isMul100Selected;
+			set
+			{
+				if (_isMul100Selected != value)
+				{
+					_isMul100Selected = value;
+					OnPropertyChanged( nameof( IsMul100Selected ) );
+				}
+			}
+		}
+
 		// 커맨드: 어떤 속성을 선택할지
 		public ICommand SelectPropertyCommand { get; }
 		public ICommand SaveWithNameCommand { get; }
 		public ICommand DeleteModelCommand { get; }
-		public ICommand ActiveValuePlus1 { get; }
-		public ICommand ActiveValuePlus10 { get; }
-		public ICommand ActiveValuePlus100 { get; }
-		public ICommand ActiveValueMinus1 { get; }
-		public ICommand ActiveValueMinus10 { get; }
-		public ICommand ActiveValueMinus100 { get; }
+		public ICommand ActiveValuePlus { get; }
+		public ICommand ActiveValueMinus { get; }
+		public ICommand ActiveValueMul1 { get; }
+		public ICommand ActiveValueMul10 { get; }
+		public ICommand ActiveValueMul100 { get; }
+
 
 		private readonly SettingManager _settingManager;
 		private readonly CameraService _cameraService;
@@ -193,12 +252,33 @@ namespace DamoOneVision.ViewModels
 			SelectPropertyCommand = new RelayCommand<string>( OnSelectProperty );
 			DeleteModelCommand = new RelayCommand( DeleteSelectedModel );
 
-			ActiveValuePlus1 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick; } );
-			ActiveValuePlus10 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick * 10; } );
-			ActiveValuePlus100 = new RelayCommand( ( ) => { ActiveValue += ActiveValueTick * 100; } );
-			ActiveValueMinus1 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick; } );
-			ActiveValueMinus10 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick * 10; } );
-			ActiveValueMinus100 = new RelayCommand( ( ) => { ActiveValue -= ActiveValueTick * 100; } );
+			ActiveValuePlus = new RelayCommand( ( ) => { ActiveValue = Math.Round( ActiveValue + ActiveValueTick * ActiveValueFactor, 4 ); } );
+			ActiveValueMinus = new RelayCommand( ( ) => { ActiveValue = Math.Round( ActiveValue - ActiveValueTick * ActiveValueFactor, 4 ); } );
+
+			ActiveValueMul1 = new RelayCommand( ( ) =>
+			{
+				ActiveValueFactor = 1;
+				IsMul1Selected = true;
+				IsMul10Selected = false;
+				IsMul100Selected = false;
+			} );
+
+			ActiveValueMul10 = new RelayCommand( ( ) =>
+			{
+				ActiveValueFactor = 10;
+				IsMul1Selected = false;
+				IsMul10Selected = true;
+				IsMul100Selected = false;
+			} );
+
+			ActiveValueMul100 = new RelayCommand( ( ) =>
+			{
+				ActiveValueFactor = 100;
+				IsMul1Selected = false;
+				IsMul10Selected = false;
+				IsMul100Selected = true;
+			} );
+
 
 			LoadAvailableModelNames();
 
@@ -217,6 +297,7 @@ namespace DamoOneVision.ViewModels
 			}
 
 		}
+
 
 		private void LoadModel( string modelName )
 		{
@@ -489,7 +570,24 @@ namespace DamoOneVision.ViewModels
 
 		public async void ConversionImage( )
 		{
-			await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
+			var result = await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
+			if (result == null)
+			{
+				Logger.WriteLine( "ConversionImage 결과가 null입니다." );
+				return;
+			}
+			if (result.IsGood)
+
+			{
+				_mainViewModel.IsGoodColor = "Green";
+				_mainViewModel.IsGoodStatus = "Good";
+
+			}
+			else
+			{
+				_mainViewModel.IsGoodColor = "Red";
+				_mainViewModel.IsGoodStatus = "Reject";
+			}
 		}
 
 
@@ -516,7 +614,24 @@ namespace DamoOneVision.ViewModels
 			{
 				while (_isImageDisplay)
 				{
-					await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
+					var result = await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
+					if (result == null)
+					{
+						Logger.WriteLine( "ConversionImage 결과가 null입니다." );
+						return;
+					}
+					if (result.IsGood)
+
+					{
+						_mainViewModel.IsGoodColor = "Green";
+						_mainViewModel.IsGoodStatus = "Good";
+
+					}
+					else
+					{
+						_mainViewModel.IsGoodColor = "Red";
+						_mainViewModel.IsGoodStatus = "Reject";
+					}
 					await Task.Delay( 100 );
 				}
 			} );

@@ -47,14 +47,18 @@
         </Border>
 
         <!-- 메인 콘텐츠 (Row=1) -->
-        <ScrollViewer Grid.Row="1" Padding="10" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1"
+              Padding="10"
+              VerticalScrollBarVisibility="Auto"
+              CanContentScroll="True"
+              PanningMode="VerticalOnly">
             <StackPanel Orientation="Vertical" Margin="0,0,0,10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
                 <!-- 1) 상단 버튼들: Eject V/V, Main C/V, TowerLamp 등 
                      한 카드에 묶거나, 영역별로 분리할 수 있습니다.-->
                 <materialDesign:Card Margin="0,0,0,10">
                     <StackPanel Orientation="Vertical" Margin="10">
-                        <TextBlock Text="Valve / Conveyor / Tower Lamp" 
+                        <TextBlock Text="Valve / Tower Lamp" 
                                    FontSize="16"
                                    Margin="0,0,0,10"
                                    FontWeight="Bold"/>
@@ -81,36 +85,6 @@
                         </WrapPanel>
 
                         <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
-                            <Button Content="Main C/V&#x0A;ON"
-                                    Margin="5"
-                                    Width="100"
-                                    Height="50"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"
-                                    Command="{Binding MainCVOnCommand}"/>
-                            <Button Content="Main C/V&#x0A;OFF"
-                                    Margin="5"
-                                    Width="100"
-                                    Height="50"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"
-                                    Command="{Binding MainCVOffCommand}"/>
-                        </WrapPanel>
-
-                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
-                            <Button Content="Side C/V&#x0A;ON"
-                                    Margin="5"
-                                    Width="100"
-                                    Height="50"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"
-                                    Command="{Binding SideCVOnCommand}"/>
-                            <Button Content="Side C/V&#x0A;OFF"
-                                    Margin="5"
-                                    Width="100"
-                                    Height="50"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}"
-                                    Command="{Binding SideCVOffCommand}"/>
-                        </WrapPanel>
-
-                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
                             <Button Content="Tower Lamp&#x0A;Start"
                                     Margin="5"
                                     Width="110"
@@ -133,6 +107,102 @@
                     </StackPanel>
                 </materialDesign:Card>
 
+
+                <!-- 4) ConveyorSpeed, Camera Auto Focus 등 -->
+                <materialDesign:Card Margin="0,0,0,10">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <TextBlock Text="Conveyor" 
+                                   FontSize="16"
+                                   Margin="0,0,0,10"
+                                   FontWeight="Bold"/>
+
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <Button Content="Side C/V&#x0A;ON"
+                                    Margin="5"
+                                    Width="100"
+                                    Height="50"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding SideCVOnCommand}"/>
+                            <Button Content="Side C/V&#x0A;OFF"
+                                    Margin="5"
+                                    Width="100"
+                                    Height="50"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding SideCVOffCommand}"/>
+                        </WrapPanel>
+                        
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <Button Content="Main C/V&#x0A;ON"
+                                    Margin="5"
+                                    Width="100"
+                                    Height="50"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding MainCVOnCommand}"/>
+                            <Button Content="Main C/V&#x0A;OFF"
+                                    Margin="5"
+                                    Width="100"
+                                    Height="50"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding MainCVOffCommand}"/>
+                        </WrapPanel>
+                        
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <Label Content="ConveyorSpeed :" 
+                               VerticalAlignment="Center"
+                               Margin="0,0,5,0"/>
+                            <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" 
+                               VerticalAlignment="Center"
+                               Width="100" />
+                        </WrapPanel>
+
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- 4) ConveyorSpeed, Camera Auto Focus 등 -->
+                <materialDesign:Card Margin="0,0,0,10">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <TextBlock Text="Camera"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+
+                            <Button Content="Camera&#x0A;Connect"
+                                    Margin="5"
+                                    Height="50" Width="120"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding ConnectCommand}"/>
+                            <Button Content="Camera&#xA;Disconnect"
+                                    Margin="5,0,0,0"
+                                    Height="50" Width="120"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding DisconnectCommand}"/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+                            <Button Content="Camera&#x0A;Trigger"
+                                    Margin="5"
+                                    Height="50" Width="120"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding VisionTriggerCommand}"/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,0,0">
+
+
+                            <Button Content="Camera&#x0A;Manual Focus"
+                                    Margin="5"
+                                    Height="50" Width="120"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding ManualFocusCommand}"/>
+
+                            <Button Content="Camera&#x0A;Auto Focus"
+                                    Margin="5"
+                                    Height="50" Width="120"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}"
+                                    Command="{Binding AutoFocusCommand}"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </materialDesign:Card>
+                
                 <!-- 2) X-Axis 조작 영역 -->
                 <materialDesign:Card Margin="0,0,0,10">
                     <StackPanel Margin="10">
@@ -429,35 +499,9 @@
                     </StackPanel>
                 </materialDesign:Card>
 
-                <!-- 4) ConveyorSpeed, Camera Auto Focus 등 -->
-                <materialDesign:Card Margin="0,0,0,10">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Label Content="ConveyorSpeed :" 
-                               VerticalAlignment="Center"
-                               Margin="0,0,5,0"/>
-                        <Label Content="{Binding ConveyorSpeed, UpdateSourceTrigger=PropertyChanged}" 
-                               VerticalAlignment="Center"
-                               Width="100" />
 
-                    </StackPanel>
-                </materialDesign:Card>
 
-                <!-- 4) ConveyorSpeed, Camera Auto Focus 등 -->
-                <materialDesign:Card Margin="0,0,0,10">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Button Content="Camera&#x0A;Manual Focus"
-                                Margin="0,0,0,0"
-                                Height="50" Width="120"
-                                Style="{DynamicResource MaterialDesignRaisedButton}"
-                                Command="{Binding ManualFocusCommand}"/>
-                        
-                        <Button Content="Camera&#x0A;Auto Focus"
-                                Margin="20,0,0,0"
-                                Height="50" Width="120"
-                                Style="{DynamicResource MaterialDesignRaisedButton}"
-                                Command="{Binding AutoFocusCommand}"/>
-                    </StackPanel>
-                </materialDesign:Card>
+
 
             </StackPanel>
         </ScrollViewer>

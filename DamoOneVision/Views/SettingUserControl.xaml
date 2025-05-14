@@ -47,8 +47,9 @@
             </Grid>
         </Border>
         <Grid Margin="0" Grid.Row="2">
-            <ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto">
-
+            <ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto"
+                CanContentScroll="True"
+                PanningMode="VerticalOnly">
 
                 <!-- 모델 선택 ComboBox -->
                 <StackPanel Orientation="Vertical" Margin="0,0,0,10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
@@ -92,197 +93,491 @@
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="이진화 임계 온도:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="BinarizedThreshold">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="이진화 임계 온도:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="BinarizedThreshold"/>
+                                       CommandParameter="BinarizedThreshold"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.BinarizedThreshold}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"
-                                             beh:KeypadBehavior.Enable="True"  
-                                             Tag="Numeric"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.BinarizedThreshold}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <!-- Circle Center X -->
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="원 중심 좌표 Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleCenterX">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="원 중심 좌표 X:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleCenterX"/>
+                                       CommandParameter="CircleCenterX"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterX}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterX}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <!-- Circle Center Y -->
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="원 중심 좌표 Y:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleCenterY">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="원 중심 좌표 Y:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleCenterY"/>
+                                       CommandParameter="CircleCenterY"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterY}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleCenterY}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <!-- Circle Center Y -->
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="원 최소 반지름:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0"><!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 --><i:Interaction.Triggers>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleMinRadius">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="원 최소 반지름:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleMinRadius"/>
+                                       CommandParameter="CircleMinRadius"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinRadius}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleMaxRadius">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="원 최대 반지름:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="CircleMaxRadius"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxRadius}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleInnerRadius">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="내부 원 반지름 차이:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="CircleInnerRadius"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleInnerRadius}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleMinAreaRatio">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="온도 임계값 최소 비율:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="CircleMinAreaRatio"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinAreaRatio}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="원 최대 반지름:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleMaxAreaRatio">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="온도 임계값 최대 비율:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleMaxRadius"/>
+                                       CommandParameter="CircleMaxAreaRatio"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
-                                </Grid>
+                                    </Border>
 
-
-                                <Grid Margin="5,5,5,5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
-                                        <ColumnDefinition Width="60"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="내부 원 반지름 차이:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleInnerRadius"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleInnerRadius}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
-                                </Grid>
-
-                                <Grid Margin="5,5,5,5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
-                                        <ColumnDefinition Width="60"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="온도 임계값 최소 비율:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0" Margin="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleMinAreaRatio"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMinAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxAreaRatio}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="온도 임계값 최대 비율:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="CircleAreaMinLength">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="원 최소 반지름 길이차:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleMaxAreaRatio"/>
+                                       CommandParameter="CircleAreaMinLength"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleMaxAreaRatio}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleAreaMinLength}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="원 최소 반지름 길이차" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="AvgTemperatureMin">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="평균 임계온도 최소값:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="CircleAreaMinLength"/>
+                                       CommandParameter="AvgTemperatureMin"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.CircleAreaMinLength}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMin}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="평균 임계온도 최대값:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="AvgTemperatureMin"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMin}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
-                                </Grid>
 
-                                <Grid Margin="5,5,5,5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="130"/>
-                                        <!--<ColumnDefinition Width="*"/>-->
-                                        <ColumnDefinition Width="60"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="평균 임계온도 최대값:" Background="Transparent" Cursor="Hand" IsHitTestVisible="True" VerticalAlignment="Center" Grid.Column="0">
-                                        <!-- 클릭 시 "Circle Center X"를 슬라이더 대상 속성으로 지정 -->
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="AvgTemperatureMax">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="평균 임계온도 최대값:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
-                                                                       CommandParameter="AvgTemperatureMax"/>
+                                       CommandParameter="AvgTemperatureMax"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBlock>
-                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMax}" VerticalAlignment="Center" Grid.Column="1" Margin="5,0" HorizontalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.AvgTemperatureMax}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
                                 </Grid>
 
                             </StackPanel>
@@ -291,7 +586,7 @@
 
                                 <!-- (3) 선택된 속성 이름 표시 (선택사항) -->
                                 <TextBlock Grid.Row="2" Text="{Binding ActivePropertyName}" 
-                                FontStyle="Italic" Foreground="Gray" Margin="10"/>
+                                FontStyle="Italic" Foreground="Gray" Margin="0,0,0,10"/>
                                 <Slider Minimum="{Binding ActiveValueMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding ActiveValueMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         TickFrequency="{Binding ActiveValueTick, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         IsSnapToTickEnabled="True"
@@ -304,12 +599,46 @@
                             </StackPanel>
                             <Grid Grid.Column="2" >
                                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                    <Button Background="#76FF03" Margin="0,0,0,10" Height="48" Content="+100" Command="{Binding ActiveValuePlus100}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#76FF03" Margin="0,0,0,10" Height="48" Content="+10" Command="{Binding ActiveValuePlus10}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#76FF03" Margin="0,0,0,10" Height="48" Content="+1" Command="{Binding ActiveValuePlus1}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="-1" Command="{Binding ActiveValueMinus1}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="-10" Command="{Binding ActiveValueMinus10}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="-100" Command="{Binding ActiveValueMinus100}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    <Button Height="48" Content="×100" Margin="0,0,0,10"  Command="{Binding ActiveValueMul100}" >
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                                                <Setter Property="Background" Value="LightGray"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMul100Selected}" Value="True">
+                                                        <Setter Property="Background" Value="#76FF03"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Height="48" Content="×10" Margin="0,0,0,10" Command="{Binding ActiveValueMul10}" >
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                                                <Setter Property="Background" Value="LightGray"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMul10Selected}" Value="True">
+                                                        <Setter Property="Background" Value="#76FF03"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Height="48" Content="×1" Margin="0,0,0,50" Command="{Binding ActiveValueMul1}" >
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                                                <Setter Property="Background" Value="LightGray"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMul1Selected}" Value="True">
+                                                        <Setter Property="Background" Value="#76FF03"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="+" Command="{Binding ActiveValuePlus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="-" Command="{Binding ActiveValueMinus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+
+                                    <TextBlock Text="{Binding ActiveValueTick}" FontStyle="Italic" Foreground="Gray"/>
                                 </StackPanel>
                                 
                             </Grid>
