@@ -247,6 +247,8 @@ namespace DamoOneVision.ViewModels
 		public ICommand MachineStartCommand { get; }
 		public ICommand MachineStopCommand { get; }
 
+		public ICommand ResetGoodCountCommand { get; }
+		public ICommand ResetRejectCountCommand { get; }
 
 
 		public ICommand TestGoodCommand { get; }
@@ -284,7 +286,12 @@ namespace DamoOneVision.ViewModels
 			MachineStartCommand = new AsyncRelayCommand(
 				async _ => await Task.Run(async()=>{
 					/// 카메라 연결 실패, 성공여부 확인해서 함수 중단 or 계속진행
-					await _cameraService.ConnectAction();
+					bool isConnect = await _cameraService.ConnectAction();
+					if (!isConnect)
+					{
+						MessageBox.Show( "카메라 연결 실패" );
+						return;
+					}
 					_deviceControlService.ConveyorReadStart();
 					//await _deviceControlService.ZAxisMoveEndPos();
 					//Logger.WriteLine( "Camera AutoFocus Start" );
@@ -308,7 +315,8 @@ namespace DamoOneVision.ViewModels
 
 			//ListBoxSelectionChangedCommand = new RelayCommand(
 			//	_ => ListBox_SelectionChanged()
-
+			ResetGoodCountCommand = new RelayCommand( ( ) => GoodCount = 0 );
+			ResetRejectCountCommand = new RelayCommand( ( ) => RejectCount = 0 );
 
 
 			///

@@ -664,6 +664,10 @@ namespace DamoOneVision.ViewModels
 
 				Logger.WriteLine( $"AutoFocus 완료, 포커스 값({focusValue:F6})을 모델 '{modelName}'에 저장했습니다." );
 			}
+			else
+			{
+				ManualFocus();
+			}
 		}
 
 

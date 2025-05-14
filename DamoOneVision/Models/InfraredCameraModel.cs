@@ -191,5 +191,19 @@ namespace DamoOneVision.Models
 				}
 			}
 		}
+
+		private double _productHeight;
+		public double ProductHeight
+		{
+			get => _productHeight;
+			set
+			{
+				if (_productHeight != value)
+				{
+					_productHeight = value;
+					OnPropertyChanged( nameof( ProductHeight ) );
+				}
+			}
+		}
 	}
 }

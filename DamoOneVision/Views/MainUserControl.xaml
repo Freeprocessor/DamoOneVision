@@ -9,7 +9,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="683.2" d:DesignWidth="400" Cursor="Hand">
-    
+
     <Grid Grid.Column="1" Margin="10,0,10,0">
         <Grid.RowDefinitions>
             <!-- 위쪽(정보 패널, TabControl 등)을 놓을 공간. 화면 남은 부분을 모두 차지하도록 Star(*) -->
@@ -45,24 +45,57 @@
                                            HorizontalAlignment="Right"/>
                         <TextBlock Text="{Binding RateDisplay}" FontSize="20" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="125"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
                         <TextBlock Text="Good"
-                                           FontWeight="Bold"
-                                           Width="125"
-                                           FontSize="20"
-                                           HorizontalAlignment="Right"/>
-                        <TextBlock Text="{Binding GoodDisplay}" FontSize="20" Margin="10,0,0,0"/>
-                        <!--<TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>-->
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                           FontWeight="Bold"
+                           FontSize="20"
+                           Grid.Column="0" />
+
+                        <TextBlock Text="{Binding GoodDisplay}" 
+                           FontSize="20" 
+                           Margin="10,0,0,0"
+                           Grid.Column="1" />
+
+                        <Button Content="↺"
+                        Height="30"
+                                Margin="10,0,0,0"
+                        ToolTip="Good 수량 초기화"
+                        Command="{Binding ResetGoodCountCommand}"
+                        Grid.Column="2" />
+                    </Grid>
+
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="125"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
                         <TextBlock Text="Reject"
-                                           FontWeight="Bold"
-                                           Width="125"
-                                           FontSize="20"
-                                           HorizontalAlignment="Right"/>
-                        <TextBlock Text="{Binding RejectDisplay}" FontSize="20" Margin="10,0,0,0"/>
-                        <!--<TextBlock Text="(123%)" FontSize="20" Margin="10,0,0,0"/>-->
-                    </StackPanel>
+                           FontWeight="Bold"
+                           FontSize="20"
+                           Grid.Column="0" />
+
+                        <TextBlock Text="{Binding RejectDisplay}" 
+                           FontSize="20" 
+                           Margin="10,0,0,0"
+                           Grid.Column="1" />
+
+                        <Button Content="↺"
+
+                            Height="30"
+                            Margin="10,0,0,0"
+                            ToolTip="Reject 수량 초기화"
+                            Command="{Binding ResetRejectCountCommand}"
+                            Grid.Column="2" />
+                    </Grid>
+
                 </StackPanel>
             </materialDesign:Card>
 
@@ -139,7 +172,7 @@
                 </StackPanel>
             </StackPanel>
 
-            
+
         </StackPanel>
 
 

@@ -66,8 +66,19 @@ namespace DamoOneVision.ViewModels
 			{
 				if (_selectedInfraredCameraModel != value)
 				{
+					// 이전 모델 이벤트 제거
+					if (_selectedInfraredCameraModel != null)
+						_selectedInfraredCameraModel.PropertyChanged -= OnInfraredModelPropertyChanged;
+
 					_selectedInfraredCameraModel = value;
 					OnPropertyChanged( nameof( SelectedInfraredCameraModel ) );
+
+					// 새 모델 이벤트 등록
+					if (_selectedInfraredCameraModel != null)
+						_selectedInfraredCameraModel.PropertyChanged += OnInfraredModelPropertyChanged;
+
+					// 초기 설정도 반영
+					UpdateZAxisWorkPosition();
 				}
 			}
 		}
@@ -297,6 +308,22 @@ namespace DamoOneVision.ViewModels
 			}
 
 		}
+		private void OnInfraredModelPropertyChanged( object? sender, PropertyChangedEventArgs e )
+		{
+			if (e.PropertyName == nameof( InfraredCameraModel.ProductHeight ))
+			{
+				UpdateZAxisWorkPosition();
+			}
+		}
+		private void UpdateZAxisWorkPosition( )
+		{
+			if (SelectedInfraredCameraModel != null && SelectedMotionModel != null)
+			{
+				double calculatedValue = (84 - SelectedInfraredCameraModel.ProductHeight) * 1000 + 48000;
+				SelectedMotionModel.ZAxisWorkPosition = Math.Max( 0, calculatedValue );
+				OnPropertyChanged( nameof( SelectedMotionModel ) ); // 선택적 알림
+			}
+		}
 
 
 		private void LoadModel( string modelName )
@@ -316,6 +343,7 @@ namespace DamoOneVision.ViewModels
 			SelectedMotionModel = MotionModels.FirstOrDefault();
 
 			_mainViewModel.ModelName = modelName;
+			UpdateZAxisWorkPosition();
 		}
 
 		private void SaveAsNewModel( )
@@ -347,19 +375,32 @@ namespace DamoOneVision.ViewModels
 					return;
 			}
 
+
 			// 3.5) 기준 온도 계산 및 모델에 저장
-			MIL_ID image = _cameraService.GetImage();
-			if (image == MIL.M_NULL)
+			var result1 = MessageBox.Show(
+			$"'{targetName}' 기준온도를 재설정하시겠습니까?",
+			"기준온도 재설정 확인",
+			MessageBoxButton.YesNo,
+			MessageBoxImage.Question);
+
+			if (result1 == MessageBoxResult.Yes)
 			{
-				Logger.WriteLine( "기준 온도 계산용 이미지가 없습니다." );
-				return;
+				MIL_ID image = _cameraService.GetImage();
+				if (image == MIL.M_NULL)
+				{
+					Logger.WriteLine( "기준 온도 계산용 이미지가 없습니다." );
+					MessageBox.Show( "기준 온도 계산용 이미지가 없습니다.\n기존 설정값으로 대체합니다." );
+				}
+				else
+				{
+					foreach (var model in InfraredCameraModels)
+					{
+						model.ReferenceBaseTemperature = CalculateReferenceRoiAverage( image );
+						Logger.WriteLine( $"모델 기준 온도 저장됨: {model.ReferenceBaseTemperature}" );
+					}
+				}
 			}
 
-			foreach (var model in InfraredCameraModels)
-			{
-				model.ReferenceBaseTemperature = CalculateReferenceRoiAverage( image );
-				Logger.WriteLine( $"모델 기준 온도 저장됨: {model.ReferenceBaseTemperature}" );
-			}
 
 			// 4) 데이터 구성
 			var data = new ModelData
@@ -510,6 +551,13 @@ namespace DamoOneVision.ViewModels
 					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
 					_isBinarized = false;
 					break;
+				case "ProductHeight":
+					ActiveValue = SelectedInfraredCameraModel.ProductHeight;
+					ActiveValueMin = 40; // 예시: 최소 온도
+					ActiveValueMax = 150; // 예시: 최대 온도
+					ActiveValueTick = 0.1; // 예시: 0.1 단위로 조정
+					_isBinarized = false;
+					break;
 
 				// CircleMinRadius, CircleMaxRadius, etc...
 				default:
@@ -560,6 +608,9 @@ namespace DamoOneVision.ViewModels
 					break;
 				case "AvgTemperatureMax":
 					SelectedInfraredCameraModel.AvgTemperatureMax = ActiveValue;
+					break;
+				case "ProductHeight":
+					SelectedInfraredCameraModel.ProductHeight = ActiveValue;
 					break;
 					// CircleMinRadius, CircleMaxRadius, etc...
 			}

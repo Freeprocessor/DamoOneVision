@@ -579,6 +579,50 @@
                                          Margin="5,0"
                                          HorizontalAlignment="Center"/>
                                 </Grid>
+                                
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="ProductHeight">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="제품 높이:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                                   CommandParameter="ProductHeight"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.ProductHeight}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
 
                             </StackPanel>
                             <!-- (2) 슬라이더 & 텍스트 박스 (ActiveValue 바인딩) -->
