@@ -50,7 +50,7 @@
         <ScrollViewer Grid.Row="1"
               Padding="10"
               VerticalScrollBarVisibility="Auto"
-              CanContentScroll="True"
+              CanContentScroll="false"
               PanningMode="VerticalOnly">
             <StackPanel Orientation="Vertical" Margin="0,0,0,10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 

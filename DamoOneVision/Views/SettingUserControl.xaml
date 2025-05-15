@@ -48,7 +48,7 @@
         </Border>
         <Grid Margin="0" Grid.Row="2">
             <ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto"
-                CanContentScroll="True"
+                CanContentScroll="false"
                 PanningMode="VerticalOnly">
 
                 <!-- 모델 선택 ComboBox -->

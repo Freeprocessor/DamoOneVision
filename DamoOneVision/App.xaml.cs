@@ -25,18 +25,33 @@ namespace DamoOneVision
 		public IServiceProvider ServiceProvider { get; private set; }
 		private static MILContext _milContextRef = MILContext.Instance;
 
-		protected override void OnStartup( StartupEventArgs e )
+		protected override async void OnStartup( StartupEventArgs e )
 		{
 			base.OnStartup( e );
 
+			// 1. Splash 먼저 띄우기
+			var splash = new SplashWindow();
+			splash.Show();
+
+			// 렌더링 여유 시간 확보 (UI 락 방지)
+			await Task.Delay( 100 ); // <- 핵심: 렌더링될 시간 줌
+
 			// DI 컨테이너 설정
-			var services = new ServiceCollection();
-			ConfigureServices( services );
-			ServiceProvider = services.BuildServiceProvider();
+			var services = await Task.Run(() =>
+			{
+				var serviceCollection = new ServiceCollection();
+				ConfigureServices(serviceCollection);
+				return serviceCollection.BuildServiceProvider();
+			});
+
+			ServiceProvider = services;
+
 
 			// MainWindow를 DI 컨테이너에서 resolve하고 표시
 			var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
 			mainWindow.Show();
+			await Task.Delay( 100 ); // MainWindow 띄우기 전에 약간 여유
+			splash.FadeOutAndClose(); // 애니메이션으로 종료
 		}
 
 		private void ConfigureServices( IServiceCollection services )

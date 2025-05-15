@@ -350,12 +350,21 @@ namespace DamoOneVision
 		private async void ExitProgram( object sender, EventArgs e )
 		{
 			await Task.Delay( 1 );
+
 			var confirmationWindow = new ExitConfirmationWindow
 			{
-				Owner = Application.Current.MainWindow
+				WindowStartupLocation = WindowStartupLocation.CenterOwner
 			};
-			confirmationWindow.ShowDialog();  // 모달로 표시
+
+			// MainWindow와 다른 인스턴스일 때만 Owner 설정
+			if (Application.Current.Windows.OfType<Window>().FirstOrDefault( w => w is MainWindow ) is Window main && main != confirmationWindow)
+			{
+				confirmationWindow.Owner = main;
+			}
+
+			confirmationWindow.ShowDialog();
 		}
+
 
 
 		//private void Show3DButton_Click( object sender, RoutedEventArgs e )
