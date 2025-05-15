@@ -34,23 +34,25 @@ namespace DamoOneVision
 			splash.Show();
 
 			// 렌더링 여유 시간 확보 (UI 락 방지)
-			await Task.Delay( 100 ); // <- 핵심: 렌더링될 시간 줌
+			await Task.Delay( 300 ); // <- 핵심: 렌더링될 시간 줌
 
 			// DI 컨테이너 설정
-			var services = await Task.Run(() =>
+			IServiceProvider services = null!;
+			await Task.Run( ( ) =>
 			{
 				var serviceCollection = new ServiceCollection();
-				ConfigureServices(serviceCollection);
-				return serviceCollection.BuildServiceProvider();
-			});
+				ConfigureServices( serviceCollection );
+				services = serviceCollection.BuildServiceProvider();
+			} );
 
 			ServiceProvider = services;
 
 
 			// MainWindow를 DI 컨테이너에서 resolve하고 표시
 			var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+			Application.Current.MainWindow = mainWindow; // 💡 핵심!!
 			mainWindow.Show();
-			await Task.Delay( 100 ); // MainWindow 띄우기 전에 약간 여유
+			//await Task.Delay( 100 ); // MainWindow 띄우기 전에 약간 여유
 			splash.FadeOutAndClose(); // 애니메이션으로 종료
 		}
 

@@ -722,9 +722,9 @@ namespace DamoOneVision.ViewModels
 		}
 		public void ShowResultWindow( )
 		{
-			if (_resultWindow == null || !_resultWindow.IsVisible)
+			Application.Current.Dispatcher.Invoke( ( ) =>
 			{
-				Application.Current.Dispatcher.Invoke( ( ) =>
+				if (_resultWindow == null || !_resultWindow.IsVisible)
 				{
 					_resultWindow = new ConversionResultWindow
 					{
@@ -737,26 +737,35 @@ namespace DamoOneVision.ViewModels
 						ShowInTaskbar = false
 					};
 
-					var mainWindow = Application.Current.MainWindow;
-					if (mainWindow != null)
+					_resultWindow.Loaded += ( s, e ) =>
 					{
-						var screenTopLeft = mainWindow.PointToScreen(new Point(0, 0));
+						var mainWindow = Application.Current.MainWindow;
+						if (PresentationSource.FromVisual( mainWindow ) != null)
+						{
+							var screenTopLeft = mainWindow.PointToScreen(new Point(0, 0));
 
-						// === 위치 조정 ===
-						double settingPanelWidth = 400;     // 오른쪽 설정창 너비
-						double resultWindowWidth = 280;     // 결과 요약창 너비
-						double padding = 20;                // 설정창과 결과창 사이 여백
-						double topMargin = 140;             // 상단 여백 (온도 텍스트 피하기)
+							double settingPanelWidth = 400;
+							double resultWindowWidth = 280;
+							double padding = 20;
+							double topMargin = 140;
 
-						_resultWindow.Left = screenTopLeft.X + mainWindow.ActualWidth - settingPanelWidth - resultWindowWidth - padding - 20;
-						_resultWindow.Top = screenTopLeft.Y + topMargin;
-					}
+							_resultWindow.Left = screenTopLeft.X + mainWindow.ActualWidth - settingPanelWidth - resultWindowWidth - padding - 20;
+							_resultWindow.Top = screenTopLeft.Y + topMargin;
+						}
+					};
 
 					_resultWindow.Closed += ( s, e ) => _resultWindow = null;
 					_resultWindow.Show();
-				} );
-			}
+				}
+				else
+				{
+					_resultWindow.DataContext = null;
+					_resultWindow.DataContext = this;
+				}
+			} );
 		}
+
+
 
 
 

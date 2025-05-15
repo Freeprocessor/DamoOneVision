@@ -378,10 +378,13 @@ namespace DamoOneVision.Services
 		{
 			await Task.Run( async ( ) =>
 			{
+
 				int ejectorDelay = 0;
 				int ejecttorDistance = 530;
 				ejectorDelay = (int) (ejecttorDistance / _motionService.ConveyorSpeed * 1000.00);
-				await Task.Delay( ejectorDelay );
+				Logger.WriteLine( $"[Ejector] Eject Delay 설정값: {_motionService.ConveyorSpeed} ms" );
+				int safeDelay = Math.Max(0, ejectorDelay); // 음수 방지
+				await Task.Delay( safeDelay );
 				if (IsGood)
 				{
 					return;

@@ -61,10 +61,9 @@ namespace DamoOneVision.Services
 			//motionModel.XAxisDeceleration = 0.1;
 			
 			InitLibrary();
-			_positionTimer = new DispatcherTimer();
+			_positionTimer = new DispatcherTimer( DispatcherPriority.Normal, Application.Current.Dispatcher );
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
 			_positionTimer.Tick += PositionTimer_Tick;
-			
 
 		}
 
@@ -72,6 +71,7 @@ namespace DamoOneVision.Services
 		{
 			_lastTime = DateTime.Now;
 			_positionTimer.Start();
+			Logger.WriteLine( "ConveyorReadStart" );
 		}
 
 		public void ConveyorReadStop( )
@@ -374,6 +374,7 @@ namespace DamoOneVision.Services
 			
 
 			ConveyorSpeed = speedMmPerSec;
+			//Logger.WriteLine( $"Conveyor Speed: {ConveyorSpeed} mm/s" );
 			//Logger.WriteLine( $"Speed: {ConveyorSpeed} mm/s" );
 			return speedMmPerSec;
 		}
