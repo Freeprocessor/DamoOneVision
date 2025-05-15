@@ -58,7 +58,10 @@ namespace DamoOneVision.Camera
 
 		public async Task ConnectAsync( )
 		{
-
+			if (camera == null)
+			{
+				CameraInit();
+			}
 			await Task.Run( async ( ) =>
 			{
 

@@ -35,4 +35,10 @@ public class InfraredInspectionResult : INotifyPropertyChanged
 	}
 
 	public bool IsGood => !(MoonCutIssue || CircleIssue || OverHeatIssue || UnderHeatIssue);
+
+	// 추가 정보
+	public double FillRatio { get; set; }
+	public double AverageTemperature { get; set; }
+	public double Radius { get; set; }
+	public double MaxBlobLength { get; set; }
 }

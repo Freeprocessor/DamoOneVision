@@ -511,7 +511,12 @@ namespace DamoOneVision.ImageProcessing
 				MoonCutIssue = !moonCutGood,
 				CircleIssue = !circleGood,
 				OverHeatIssue = !overHeatGood,
-				UnderHeatIssue = !underHeatGood
+				UnderHeatIssue = !underHeatGood,
+
+				FillRatio = FillRatio,
+				AverageTemperature = avgCelsius,
+				Radius = Radius,
+				MaxBlobLength = MaxLangth
 			};
 
 			return inspectionResult;

@@ -1,4 +1,13 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;  // CommunityToolkit.Mvvm 또는 다른 RelayCommand 구현 사용
+using DamoOneVision.Data;
+using DamoOneVision.ImageProcessing;
+using DamoOneVision.Models;
+using DamoOneVision.Services;
+using DamoOneVision.Views;
+using Matrox.MatroxImagingLibrary;
+using MS.WindowsAPICodePack.Internal;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -6,17 +15,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;  // CommunityToolkit.Mvvm 또는 다른 RelayCommand 구현 사용
-using DamoOneVision.Data;
-using DamoOneVision.ImageProcessing;
-using DamoOneVision.Models;
-using DamoOneVision.Services;
-using Matrox.MatroxImagingLibrary;
-using MS.WindowsAPICodePack.Internal;
 
 namespace DamoOneVision.ViewModels
 {
-	public class SettingViewModel : INotifyPropertyChanged
+	public partial class SettingViewModel : ObservableObject, INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler? PropertyChanged;
 		private void OnPropertyChanged( string propertyName ) =>
@@ -28,6 +30,11 @@ namespace DamoOneVision.ViewModels
 
 		public ObservableCollection<string> AvailableModelNames { get; } = new();
 
+
+		[ObservableProperty]
+		private InfraredInspectionResult? lastInspectionResult;
+
+		private ConversionResultWindow? _resultWindow;
 
 
 		private string _selectedModelName = "";
@@ -627,6 +634,11 @@ namespace DamoOneVision.ViewModels
 				Logger.WriteLine( "ConversionImage 결과가 null입니다." );
 				return;
 			}
+
+			// 👉 여기에 결과 저장 및 창 띄우기
+			LastInspectionResult = result;
+			ShowResultWindow();
+
 			if (result.IsGood)
 
 			{
@@ -708,6 +720,47 @@ namespace DamoOneVision.ViewModels
 			return roiData.Select( v => (v / 100.0) - 273.15 ).Average();  // 단위 변환
 
 		}
+		public void ShowResultWindow( )
+		{
+			if (_resultWindow == null || !_resultWindow.IsVisible)
+			{
+				Application.Current.Dispatcher.Invoke( ( ) =>
+				{
+					_resultWindow = new ConversionResultWindow
+					{
+						DataContext = this,
+						WindowStartupLocation = WindowStartupLocation.Manual,
+						Width = 280,
+						Height = 320,
+						Topmost = true,
+						ResizeMode = ResizeMode.NoResize,
+						ShowInTaskbar = false
+					};
+
+					var mainWindow = Application.Current.MainWindow;
+					if (mainWindow != null)
+					{
+						var screenTopLeft = mainWindow.PointToScreen(new Point(0, 0));
+
+						// === 위치 조정 ===
+						double settingPanelWidth = 400;     // 오른쪽 설정창 너비
+						double resultWindowWidth = 280;     // 결과 요약창 너비
+						double padding = 20;                // 설정창과 결과창 사이 여백
+						double topMargin = 140;             // 상단 여백 (온도 텍스트 피하기)
+
+						_resultWindow.Left = screenTopLeft.X + mainWindow.ActualWidth - settingPanelWidth - resultWindowWidth - padding - 20;
+						_resultWindow.Top = screenTopLeft.Y + topMargin;
+					}
+
+					_resultWindow.Closed += ( s, e ) => _resultWindow = null;
+					_resultWindow.Show();
+				} );
+			}
+		}
+
+
+
+
 
 
 		//private void LoadModels( )
