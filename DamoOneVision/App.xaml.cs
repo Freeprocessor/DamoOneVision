@@ -91,8 +91,8 @@ namespace DamoOneVision
 				sideCamera2,
 				sideCamera3,
 				milSystemService,
-				new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>())
-				
+				new Lazy<MainViewModel>( ( ) => sp.GetRequiredService<MainViewModel>() )
+
 			) );
 
 			// DeviceControlService
