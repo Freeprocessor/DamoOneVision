@@ -1,20 +1,12 @@
 ﻿using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace DamoOneVision.Camera
 {
-	public class MatroxCamera : ICamera,IDisposable
+	public class MatroxCamera : ICamera, IDisposable
 	{
 		// Matrox SDK 관련 필드
 		private MIL_ID MilSystem = MIL.M_NULL;
@@ -74,7 +66,7 @@ namespace DamoOneVision.Camera
 				Directory.CreateDirectory( imagesFolder );
 			}
 
-			if(!Directory.Exists( cameraImageFolder ))
+			if (!Directory.Exists( cameraImageFolder ))
 			{
 				Directory.CreateDirectory( cameraImageFolder );
 			}
@@ -90,9 +82,9 @@ namespace DamoOneVision.Camera
 			//string selectionString = $" M_GC_DEVICE_NAME={CameraName}";
 			int devNum = 0;
 			MIL_INT countNum = 0;
-			
 
-			MIL.MsysControl(MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
+
+			MIL.MsysControl( MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
 
 			MIL.MsysInquire( MilSystem, MIL.M_DISCOVER_DEVICE_COUNT, ref countNum );
 			Logger.WriteLine( $"Device Count Number : {countNum}" );
@@ -110,10 +102,10 @@ namespace DamoOneVision.Camera
 					devNum = i;
 					break;
 				}
-				
+
 			}
 
-			Logger.WriteLine($"Camera Name: {CameraName}, Digitizer Num: {(int)devNum}");
+			Logger.WriteLine( $"Camera Name: {CameraName}, Digitizer Num: {(int) devNum}" );
 
 			// 디지타이저(카메라) 할당
 			MIL.MdigAlloc( MilSystem, devNum, DCFPath, MIL.M_DEFAULT, ref MilDigitizer );
@@ -138,7 +130,7 @@ namespace DamoOneVision.Camera
 				this.NbBands = nbBands;
 				this.DataType = dataType;
 
-				Logger.WriteLine( $"{CameraName} Spec -> Width: {width}, Height: {height}, NbBands: {nbBands}, DataType: {dataType}"  );
+				Logger.WriteLine( $"{CameraName} Spec -> Width: {width}, Height: {height}, NbBands: {nbBands}, DataType: {dataType}" );
 
 				// 이미지 버퍼 할당
 				//Bayer 이미지일 경우 NbBand 확인
@@ -165,7 +157,7 @@ namespace DamoOneVision.Camera
 			if (MilDigitizer != MIL.M_NULL) MIL.MdigFree( MilDigitizer );
 			MilDigitizer = MIL.M_NULL;
 
-			Logger.WriteLine($"{CameraName} is Disconnect");
+			Logger.WriteLine( $"{CameraName} is Disconnect" );
 
 			//if (MilImage != MIL.M_NULL) MIL.MbufFree( MilImage );
 			//MilImage = MIL.M_NULL;
@@ -211,7 +203,7 @@ namespace DamoOneVision.Camera
 			Stopwatch TectTime = new Stopwatch();
 			TectTime.Start();
 			//MIL_ID MilDisplay = MIL.M_NULL;
-			for (int i=0;i<2;i++)
+			for (int i = 0; i < 2; i++)
 			{
 				MIL.MdigGrab( MilDigitizer, MilImage );
 			}
@@ -220,7 +212,7 @@ namespace DamoOneVision.Camera
 			///
 			//Logger.WriteLine($"{CameraName} Grab Complete");
 
-			SaveImage( MilImage , $"RAW{CameraName}" );
+			SaveImage( MilImage, $"RAW{CameraName}" );
 
 			//if (CameraName == "InfraredCamera" && _infraredImageFilter != null)
 			//{
@@ -322,7 +314,7 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		private void InfraredNoiseFiltering( ushort[] ImageData )
+		private void InfraredNoiseFiltering( ushort[ ] ImageData )
 		{
 			for (int i = 0; i < ImageData.Length; i++)
 			{
@@ -337,7 +329,7 @@ namespace DamoOneVision.Camera
 			}
 		}
 
-		private void InfraredCameraScaleImage( MIL_ID MilImage, MIL_ID MilScaleImage ) 
+		private void InfraredCameraScaleImage( MIL_ID MilImage, MIL_ID MilScaleImage )
 		{
 			/// 버퍼이미지를 Scale히여 16bit 이미지로 변환
 			if (true)
@@ -416,7 +408,7 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					ImageData[ i ] = (ushort)data;
+					ImageData[ i ] = (ushort) data;
 				}
 			}
 
@@ -437,7 +429,7 @@ namespace DamoOneVision.Camera
 			//{
 			//	ImageData[ 0 ] = distinctNumbersDesc[ 1 ];
 			//}
-				
+
 
 			byte MinPixelValue = ImageData.Min();
 			byte MaxPixelValue = ImageData.Max();
@@ -466,7 +458,7 @@ namespace DamoOneVision.Camera
 
 		public MIL_ID LoadImage( MIL_ID MilSystem, string filePath )
 		{
-			
+
 			if (File.Exists( filePath ))
 			{
 				if (LoadMilImage != MIL.M_NULL)
@@ -485,7 +477,7 @@ namespace DamoOneVision.Camera
 					Logger.WriteLine( "MilLoadBinarizedImage 해제" );
 				}
 
-				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE+MIL.M_NO_GRAB+MIL.M_NO_COMPRESS, MilSystem, ref LoadMilImage );
+				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilImage );
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilScaleImage );
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref MilLoadBinarizedImage );
 
@@ -519,13 +511,13 @@ namespace DamoOneVision.Camera
 			await Task.Delay( 2000 );
 
 			double currentFocus = 0.0;
-			MIL.MdigInquireFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance",  MIL.M_TYPE_DOUBLE, ref currentFocus );
+			MIL.MdigInquireFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance", MIL.M_TYPE_DOUBLE, ref currentFocus );
 			//ManualFocus();
 			Logger.WriteLine( $"{CameraName} AutoFocus : {currentFocus}" );
 			return currentFocus;
 		}
 
-		public async void ManualFocus(double focusValue )
+		public async void ManualFocus( double focusValue )
 		{
 			MIL.MdigControlFeature( MilDigitizer, MIL.M_FEATURE_VALUE, "FocusDistance", MIL.M_TYPE_DOUBLE, ref focusValue );
 
@@ -560,8 +552,8 @@ namespace DamoOneVision.Camera
 
 		public void Dispose( )
 		{
-			Disconnect( );
-			if(MilImage != MIL.M_NULL)
+			Disconnect();
+			if (MilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage );
 				Logger.WriteLine( "MilImage 해제" );

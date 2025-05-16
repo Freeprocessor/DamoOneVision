@@ -1,16 +1,5 @@
 ﻿using Advantech.Adam;
-using Advantech.Common;
-using Advantech.Protocol;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-
-using System.Diagnostics;
 
 namespace DamoOneVision.Services
 {
@@ -61,7 +50,7 @@ namespace DamoOneVision.Services
 			_adamSocket.SetTimeout( 1000, 1000, 1000 );
 
 			// Connect to the ADAM-6000 device
-			await Task.Run( () => _isConnected = _adamSocket.Connect( _ip, ProtocolType.Tcp, _port ) );
+			await Task.Run( ( ) => _isConnected = _adamSocket.Connect( _ip, ProtocolType.Tcp, _port ) );
 
 			if (_isConnected)
 			{
@@ -73,7 +62,7 @@ namespace DamoOneVision.Services
 				Logger.WriteLine( "Advantech Connect Fail" );
 			}
 
-			
+
 		}
 
 		/// <summary>
@@ -113,7 +102,7 @@ namespace DamoOneVision.Services
 		/// </summary>
 		public async void ReadBitAsync( )
 		{
-			await Task.Run( async( ) =>
+			await Task.Run( async ( ) =>
 			{
 				Logger.WriteLine( "Advantech ReadBitAsync Start" );
 				while (true)

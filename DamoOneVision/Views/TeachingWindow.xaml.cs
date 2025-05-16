@@ -1,25 +1,13 @@
-﻿using DamoOneVision.ViewModels;
+﻿using DamoOneVision.ImageProcessing;
+using DamoOneVision.Services;
+using DamoOneVision.ViewModels;
 using Matrox.MatroxImagingLibrary;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Shapes;
-using DamoOneVision.ImageProcessing;
-using DamoOneVision.Services;
 
 
 namespace DamoOneVision
@@ -40,7 +28,7 @@ namespace DamoOneVision
 		private bool isDragging = false;
 
 		private MIL_ID milImage = MIL.M_NULL;
-		
+
 		private int ImageWidth = 0;
 		private int ImageHeight = 0;
 		private int ImageNbBands = 0;
@@ -97,7 +85,7 @@ namespace DamoOneVision
 
 			if (bitmap == null || bitmap.PixelWidth != this.ImageWidth || bitmap.PixelHeight != this.ImageHeight)
 			{
-				bitmap = new WriteableBitmap( (int)this.ImageWidth, (int)this.ImageHeight, 96, 96, getPixelFormat(), null );
+				bitmap = new WriteableBitmap( (int) this.ImageWidth, (int) this.ImageHeight, 96, 96, getPixelFormat(), null );
 				ConversionImage.Source = bitmap;
 			}
 

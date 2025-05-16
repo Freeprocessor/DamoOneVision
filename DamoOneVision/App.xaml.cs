@@ -1,16 +1,10 @@
 ﻿using DamoOneVision.Camera;
 using DamoOneVision.Data;
 using DamoOneVision.Services;
-using DamoOneVision.Services.Input;
 using DamoOneVision.Services.Repository;
 using DamoOneVision.ViewModels;
 using DamoOneVision.Views;
-using KeypadDemo.Services;
-using Matrox.MatroxImagingLibrary;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.Windows;
 

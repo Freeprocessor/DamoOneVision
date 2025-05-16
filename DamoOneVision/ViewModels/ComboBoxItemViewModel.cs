@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using Microsoft.Win32;
 using System.Windows;
-using Matrox.MatroxImagingLibrary;
-using CommunityToolkit.Mvvm.Input;
+using System.Windows.Input;
 
 
 namespace DamoOneVision.ViewModels
@@ -37,7 +36,7 @@ namespace DamoOneVision.ViewModels
 		}
 
 		private int _number; // 번호 속성 추가
-		// Number 속성
+							 // Number 속성
 		public int Number
 		{
 			get => _number;

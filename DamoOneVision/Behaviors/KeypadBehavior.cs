@@ -1,8 +1,8 @@
-﻿using System.Windows;
+﻿using DamoOneVision.Controls.Keypad;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using DamoOneVision.Controls.Keypad;
 
 namespace DamoOneVision.Behaviors;
 

@@ -1,24 +1,9 @@
 ﻿using DamoOneVision.Camera;
 using DamoOneVision.Services;
-using DamoOneVision.ViewModels;
 using Matrox.MatroxImagingLibrary;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Shapes;
 
 namespace DamoOneVision.Views
 {
@@ -141,15 +126,15 @@ namespace DamoOneVision.Views
 			{
 				tmp = image1[ i ] - image2[ i ];
 
-				image[ i ] = (ushort)Math.Abs( tmp );
+				image[ i ] = (ushort) Math.Abs( tmp );
 
 			}
 			MIL.MbufPut( MilImage, image );
 
 
 			// 이미지 표시
-			
-			MIL.MbufPut( MilImage, ShortMilImageShortScale( MilImage )); 
+
+			MIL.MbufPut( MilImage, ShortMilImageShortScale( MilImage ) );
 
 
 			MIL.MdispSelect( MilDisplay, MilImage );

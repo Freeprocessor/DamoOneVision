@@ -1,34 +1,12 @@
-﻿using System.Windows;
-using Matrox.MatroxImagingLibrary;
-using System.Windows.Threading;
-
-using SpinnakerNET;
-using SpinnakerNET.GenApi;
-
-//using LiteDB;
-using DamoOneVision.Camera;
-using DamoOneVision.Data;
-using System.IO;
-using Microsoft.Win32;
-using System.Diagnostics;
-
+﻿using DamoOneVision.Services;
 using DamoOneVision.ViewModels;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System;
-using DamoOneVision.Services;
-using static OpenCvSharp.FileStorage;
-using System.Net;
-using System.Windows.Media.Converters;
-using Newtonsoft.Json.Linq;
-using DamoOneVision.ImageProcessing;
-using DamoOneVision.Models;
 using DamoOneVision.Views;
+//using LiteDB;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
-using System.Runtime.CompilerServices;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 
 namespace DamoOneVision
@@ -80,7 +58,7 @@ namespace DamoOneVision
 
 
 
-		public MainWindow( MainViewModel mainViewModel ,ManualViewModel manualViewModel, SettingViewModel settingViewModel, MilSystemService milSystemService, CameraService cameraService )
+		public MainWindow( MainViewModel mainViewModel, ManualViewModel manualViewModel, SettingViewModel settingViewModel, MilSystemService milSystemService, CameraService cameraService )
 		{
 			InitializeComponent();
 			Stylus.SetIsPressAndHoldEnabled( this, false );
@@ -169,7 +147,7 @@ namespace DamoOneVision
 		}
 
 
-		private void InitMILDisplay()
+		private void InitMILDisplay( )
 		{
 
 			InfraredCameraDisplay.DisplayId = _milSystemService.InfraredDisplay;
@@ -342,7 +320,7 @@ namespace DamoOneVision
 			base.OnClosed( e );
 
 			// MILContext 해제
-			
+
 		}
 
 

@@ -1,16 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using DamoOneVision.Camera;
-using DamoOneVision.Data;
-using DamoOneVision.Models;
 using DamoOneVision.Services;
+using DamoOneVision.Views;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Newtonsoft.Json;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -65,6 +60,8 @@ namespace DamoOneVision.ViewModels
 
 		public ICommand LoadImagesCommand { get; }
 		public ICommand ImageSelectedCommand { get; }
+		public ICommand SelectFolderCommand { get; }
+
 
 		public AdvancedViewModel( CameraService cameraService )
 		{
@@ -83,6 +80,7 @@ namespace DamoOneVision.ViewModels
 
 			LoadImagesCommand = new AsyncRelayCommand( _ => LoadAllImages() );
 			ImageSelectedCommand = new RelayCommand<string>( OnImageSelected );
+			SelectFolderCommand = new AsyncRelayCommand( _ => SelectFolderAndLoadAsync() );
 		}
 
 		private void InitLocalAppFolder( )
@@ -121,6 +119,22 @@ namespace DamoOneVision.ViewModels
 		{
 			if (!string.IsNullOrEmpty( imagePath ) && File.Exists( imagePath ))
 				_cameraService.InfraredCameraLoadImage( imagePath );
+		}
+
+		private async Task SelectFolderAndLoadAsync( )
+		{
+			var picker = new FolderPickerWindow(imageFolder);   // imageFolder = 루트 경로
+			if (picker.ShowDialog() == true)
+				await LoadImagesFromFolderAsync( picker.SelectedFolderPath );
+		}
+
+		private async Task LoadImagesFromFolderAsync( string folder )
+		{
+			ImagePaths.Clear();
+			var files = Directory.GetFiles(folder, "*.bmp");
+			foreach (var f in files) ImagePaths.Add( f );
+
+			Logger.WriteLine( $"{files.Length}개의 이미지를 로드했습니다." );
 		}
 	}
 }

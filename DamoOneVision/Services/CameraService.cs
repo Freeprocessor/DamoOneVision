@@ -1,19 +1,11 @@
 ﻿using DamoOneVision.Camera;
-using DamoOneVision.ViewModels;
 using DamoOneVision.ImageProcessing;
-using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-
 using DamoOneVision.Models;
 using DamoOneVision.Services.Repository;
-using System.Windows.Input;
+using DamoOneVision.ViewModels;
+using Matrox.MatroxImagingLibrary;
+using System.Diagnostics;
+using System.Windows;
 
 
 namespace DamoOneVision.Services
@@ -88,7 +80,7 @@ namespace DamoOneVision.Services
 		public event Action<bool> BusyStateChanged;
 
 
-		public CameraService(CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
+		public CameraService( CameraManager infraredCamera, CameraManager sideCamera1, CameraManager sideCamera2, CameraManager sideCamera3,
 			MilSystemService milSystemService, Lazy<MainViewModel> mainViewModel )
 		{
 			MilSystem = MILContext.Instance.MilSystem;
@@ -122,7 +114,7 @@ namespace DamoOneVision.Services
 				Logger.WriteLine( "이미 카메라가 연결되어 있습니다." );
 				return true;
 			}
-			SetBusy(true);
+			SetBusy( true );
 			try
 			{
 				var tasks = new[]
@@ -135,7 +127,7 @@ namespace DamoOneVision.Services
 
 				await Task.WhenAll( tasks );
 
-				SetVisionConnected(true);
+				SetVisionConnected( true );
 
 				_infraredCamera.ManualFocus( _infraredCameraModel.CameraFocusValue );
 
@@ -159,8 +151,8 @@ namespace DamoOneVision.Services
 			finally
 			{
 				//_infraredCamera.AutoFocus();
-				SetBusy(false);
-				
+				SetBusy( false );
+
 			}
 			return true;
 		}
@@ -172,7 +164,7 @@ namespace DamoOneVision.Services
 				Logger.WriteLine( "카메라가 연결되어 있지 않습니다." );
 				return;
 			}
-			SetBusy(true);
+			SetBusy( true );
 
 			var tasks = new[]
 				{
@@ -184,8 +176,8 @@ namespace DamoOneVision.Services
 
 			await Task.WhenAll( tasks );
 
-			SetBusy(false);
-			SetVisionConnected(false);
+			SetBusy( false );
+			SetVisionConnected( false );
 		}
 
 		public async Task<double> InfraredCameraAutoFocus( )
@@ -342,7 +334,7 @@ namespace DamoOneVision.Services
 					/// SideCamera 제거 후 InfraredCamera만 사용
 					/// 
 
-					for(int i=0; i<1;  i++)
+					for (int i = 0; i < 1; i++)
 					{
 						try
 						{
@@ -412,7 +404,7 @@ namespace DamoOneVision.Services
 							//isGood = result[ 0 ] && result[ 1 ] && result[ 2 ];
 							var result = await Task.Run( ( ) => Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel ) );
 							isGood = result.IsGood;
-							
+
 							Logger.WriteLine( "이미지 처리 완료" );
 
 							///GOOD REJECT LAMP 바인딩

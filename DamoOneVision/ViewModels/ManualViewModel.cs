@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
-using DamoOneVision.Services;
+﻿using CommunityToolkit.Mvvm.Input;
 using DamoOneVision.Data;
 using DamoOneVision.Models;
+using DamoOneVision.Services;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace DamoOneVision.ViewModels
 {
@@ -22,7 +17,7 @@ namespace DamoOneVision.ViewModels
 		private DeviceControlService _deviceControlService;
 		private CameraService _cameraService;
 
-		
+
 		private SettingManager _settingManager;
 		public InfraredCameraModel InfraredCameraModel { get; set; }
 		public MotionModel MotionModel { get; set; }
@@ -442,7 +437,7 @@ namespace DamoOneVision.ViewModels
 			_deviceControlService.EjectorManualOFF();
 		}
 
-		private void MainCVOn()
+		private void MainCVOn( )
 		{
 			_deviceControlService.MainCVOn();
 		}
@@ -596,12 +591,12 @@ namespace DamoOneVision.ViewModels
 
 		private void XAxizServoON( )
 		{
-			_motionService.XAxisServoOn( );
+			_motionService.XAxisServoOn();
 		}
 
 		private void ZAxizServoON( )
 		{
-			_motionService.ZAxisServoOn( );
+			_motionService.ZAxisServoOn();
 		}
 
 		private void XAxizServoOFF( )

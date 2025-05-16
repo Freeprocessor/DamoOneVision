@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-using System.Xml.Serialization;
-using DamoOneVision.Ajinextek.Common;
-using DamoOneVision.Ajinextek.DigitalIO;
+﻿using DamoOneVision.Ajinextek.Common;
 using DamoOneVision.Ajinextek.Motion;
 using DamoOneVision.Models;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace DamoOneVision.Services
 {
-    public class MotionService
-    {
+	public class MotionService
+	{
 
 		public const int X = 0;
 		public const int Z = 2;
@@ -59,7 +51,7 @@ namespace DamoOneVision.Services
 			//motionModel.XAxisReturnSpeed = 100000;
 			//motionModel.XAxisAcceleration = 0.1;
 			//motionModel.XAxisDeceleration = 0.1;
-			
+
 			InitLibrary();
 			_positionTimer = new DispatcherTimer( DispatcherPriority.Normal, Application.Current.Dispatcher );
 			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
@@ -79,11 +71,11 @@ namespace DamoOneVision.Services
 			_positionTimer.Stop();
 		}
 
-		public void SetModel(MotionModel motionModel )
+		public void SetModel( MotionModel motionModel )
 		{
 			_motionModel = motionModel;
 
-			CameraDelay = (int) (_motionModel.XAxisMoveAcceleration * 1000.0 + 200 );
+			CameraDelay = (int) (_motionModel.XAxisMoveAcceleration * 1000.0 + 200);
 			XAxisServoOn();
 			ZAxisServoOn();
 
@@ -175,7 +167,7 @@ namespace DamoOneVision.Services
 				return;
 			if (!_isInitialized)
 			{
-				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!");
+				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!" );
 				return;
 			}
 
@@ -229,7 +221,7 @@ namespace DamoOneVision.Services
 			}
 			// 지정축의 원점 검색 속도 파라이터를 설정합니다.
 			duRetCode = CAXM.AxmHomeSetVel( X, _motionModel.XAxisOriginSpeed1, _motionModel.XAxisOriginSpeed2, _motionModel.XAxisOriginCreepSpeed, _motionModel.XAxisOriginZPhaseSpeed, _motionModel.XAxisOriginAcceleration, _motionModel.XAxisOriginAcceleration );
-			Logger.WriteLine($"{_motionModel.XAxisOriginSpeed1},{_motionModel.XAxisOriginSpeed2}");
+			Logger.WriteLine( $"{_motionModel.XAxisOriginSpeed1},{_motionModel.XAxisOriginSpeed2}" );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
 				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
@@ -282,7 +274,7 @@ namespace DamoOneVision.Services
 
 		public async Task XAxisMoveEndPos( )
 		{
-			await XAxisMoveToPosition( _motionModel.XAxisEndPosition, ConveyorSpeed*1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
+			await XAxisMoveToPosition( _motionModel.XAxisEndPosition, ConveyorSpeed * 1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
 			Logger.WriteLine( $"Conveyor Speed : {ConveyorSpeed} mm/s" );
 			//await XAxisWaitingStop();
 		}
@@ -303,7 +295,7 @@ namespace DamoOneVision.Services
 		public async Task XAxisWaitingStop( )
 		{
 			uint upStatus = 0;
-			await Task.Run( ( ) => 
+			await Task.Run( ( ) =>
 			{
 				while (true)
 				{
@@ -313,7 +305,7 @@ namespace DamoOneVision.Services
 						break;
 					}
 				}
-			});
+			} );
 		}
 
 		public async Task ZAxisWaitingStop( )
@@ -371,7 +363,7 @@ namespace DamoOneVision.Services
 
 			speedMmPerSec = Math.Round( speedMmPerSec, 2 );
 			speedMmPerSec = Math.Abs( speedMmPerSec );
-			
+
 
 			ConveyorSpeed = speedMmPerSec;
 			//Logger.WriteLine( $"Conveyor Speed: {ConveyorSpeed} mm/s" );
@@ -440,7 +432,7 @@ namespace DamoOneVision.Services
 
 		private void JogStart( int axisNum, int dir )
 		{
-			if(!((dir == 1) || (dir == -1)))
+			if (!((dir == 1) || (dir == -1)))
 			{
 				Logger.WriteLine( "JogStart: dir 값이 잘못되었습니다." );
 				return;

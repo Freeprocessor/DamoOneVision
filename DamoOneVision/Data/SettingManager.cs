@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using DamoOneVision.Models;
+﻿using DamoOneVision.Models;
 using DamoOneVision.Services;
-using DamoOneVision.ViewModels;
+using System.IO;
+using System.Text.Json;
 
 namespace DamoOneVision.Data
 {
@@ -178,7 +175,7 @@ namespace DamoOneVision.Data
 			}
 		}
 
-		public string LastOpenedModel()
+		public string LastOpenedModel( )
 		{
 			return Settings.LastOpenedModel;
 		}

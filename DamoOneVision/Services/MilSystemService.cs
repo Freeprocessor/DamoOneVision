@@ -1,10 +1,5 @@
 ﻿using DamoOneVision.Camera;
 using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DamoOneVision.Services
 {
@@ -162,7 +157,7 @@ namespace DamoOneVision.Services
 			//}
 			*/
 			// 2. disp 버퍼 해제
-			
+
 			if (InfraredDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( InfraredDisplay );

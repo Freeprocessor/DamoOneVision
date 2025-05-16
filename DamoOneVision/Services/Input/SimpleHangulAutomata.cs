@@ -1,5 +1,4 @@
 ﻿using DamoOneVision.Services.Input;
-using System.Text;
 namespace KeypadDemo.Services;
 
 public class SimpleHangulAutomata : IHangulAutomata

@@ -2,13 +2,6 @@
 using DamoOneVision.Models;
 using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace DamoOneVision.ImageProcessing
 {
@@ -140,7 +133,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufFree( SideRightBottom );
 			MIL.MbufFree( SideLeftBottom );
 
-			if((Math.Abs(posy1 - posy2) - Math.Abs( posy3 - posy4 )) > 15)
+			if ((Math.Abs( posy1 - posy2 ) - Math.Abs( posy3 - posy4 )) > 15)
 			{
 				return false;
 			}
@@ -329,7 +322,7 @@ namespace DamoOneVision.ImageProcessing
 
 			//Logger.WriteLine( $"Blob Number: {selectedBlobCount}" );
 			//int SelectBlob = 0;
-			
+
 			double AreaSum = 0.0;
 			double Area = 0.0;
 			double MaxArea = 0.0;
@@ -341,7 +334,7 @@ namespace DamoOneVision.ImageProcessing
 				/// M_BLOB_INDEX 속성 가져오기
 				/// 블롭 인덱스는 보통 0부터 시작
 				MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_AREA + MIL.M_TYPE_MIL_DOUBLE, ref Area );
-				
+
 				//MIL.MblobGetResult( BlobResult, MIL.M_BLOB_INDEX( i ), MIL.M_BLOB_TOUCHING_IMAGE_BORDERS + MIL.M_TYPE_MIL_DOUBLE, ref BlobTouchingImageBorders );
 				if (Area > MaxArea)
 				{
@@ -369,7 +362,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 
-			if ( (FillRatio > infraredCameraModel.CircleMinAreaRatio) && (FillRatio < infraredCameraModel.CircleMaxAreaRatio) && (MaxLangth + infraredCameraModel.CircleAreaMinLength) >= (Radius * 2))
+			if ((FillRatio > infraredCameraModel.CircleMinAreaRatio) && (FillRatio < infraredCameraModel.CircleMaxAreaRatio) && (MaxLangth + infraredCameraModel.CircleAreaMinLength) >= (Radius * 2))
 			{
 				moonCutGood = true;
 			}
@@ -394,7 +387,7 @@ namespace DamoOneVision.ImageProcessing
 			/// 아래 구문으로 대체
 			if (divnum != 0)
 			{
-				avg = (int)(sum / divnum);
+				avg = (int) (sum / divnum);
 			}
 
 			double avgCelsius = divnum != 0 ? (sum / divnum) / 100.0 - 273.15 : 0.0;
@@ -457,7 +450,7 @@ namespace DamoOneVision.ImageProcessing
 				double sectorAvg = temps.Any() ? temps.Average() : 0;
 				Logger.WriteLine( $"[Sector {i + 1}] 평균 온도: {sectorAvg:F2} ℃" );
 				sectorTotalSum += sectorAvg;
-				sectorTemp[i] = sectorAvg;
+				sectorTemp[ i ] = sectorAvg;
 				// 7. 그래픽 오버레이에 두 개의 선 추가 (피자 조각 형태)
 				//MIL.MgraColor( GraphicsContext, MIL.M_COLOR_YELLOW );
 				double angleStartRad = start * Math.PI / 180.0;
@@ -514,23 +507,23 @@ namespace DamoOneVision.ImageProcessing
 			///
 			for (int i = 0; i < sectorTemp.Length; i++)
 			{
-				if (sectorTemp[i] > infraredCameraModel.AvgTemperatureMin)
+				if (sectorTemp[ i ] > infraredCameraModel.AvgTemperatureMin)
 				{
-					underHeatSector[i] = true;
+					underHeatSector[ i ] = true;
 				}
 				else
 				{
-					underHeatSector[ i] = false;
+					underHeatSector[ i ] = false;
 					Logger.WriteLine( $"Sector {i + 1} UnderHeat Error" );
 				}
 
-				if (sectorTemp[i] < infraredCameraModel.AvgTemperatureMax)
+				if (sectorTemp[ i ] < infraredCameraModel.AvgTemperatureMax)
 				{
-					overHeatSector[i] = true;
+					overHeatSector[ i ] = true;
 				}
 				else
 				{
-					overHeatSector[i] = false;
+					overHeatSector[ i ] = false;
 					Logger.WriteLine( $"Sector {i + 1} OverHeat Error" );
 				}
 			}
@@ -539,7 +532,7 @@ namespace DamoOneVision.ImageProcessing
 			int overHeatCount = overHeatSector.Count( x => x == false );
 
 			/// 카운트값 추후 변수로 변경 예정
-			if ( underHeatCount > 0 )
+			if (underHeatCount > 0)
 			{
 				underHeatGood = false;
 			}
@@ -548,7 +541,7 @@ namespace DamoOneVision.ImageProcessing
 				underHeatGood = true;
 			}
 
-			if( overHeatCount > 8)
+			if (overHeatCount > 8)
 			{
 				overHeatGood = false;
 			}
@@ -568,7 +561,7 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_GREATER_OR_EQUAL, Radius * 2 - 20 );
 			MIL.MblobSelect( BlobContext, BlobResult, BlobResult, MIL.M_SIZE_X, MIL.M_LESS_OR_EQUAL, Radius * 2 + 20 );
 			*/
-			
+
 
 			if (isSetting)
 			{
@@ -631,7 +624,7 @@ namespace DamoOneVision.ImageProcessing
 			//	BinarizedImage = MIL.M_NULL;
 			//}
 			// [🧠 NEW] 도넛 섹터별 평균 온도 계산 (30도씩 12조각)
-			
+
 
 			MIL.MblobFree( BlobResult );
 			MIL.MblobFree( BlobContext );

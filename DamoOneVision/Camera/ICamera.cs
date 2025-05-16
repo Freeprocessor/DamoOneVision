@@ -1,9 +1,4 @@
 ﻿using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DamoOneVision.Camera
 {
@@ -27,7 +22,7 @@ namespace DamoOneVision.Camera
 
 		MIL_ID ReciveLoadBinarizedImage( );
 
-		ushort[ ] LoadImageData();
+		ushort[ ] LoadImageData( );
 
 		ushort[ ] CaptureImageData( );
 

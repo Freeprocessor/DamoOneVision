@@ -1,15 +1,9 @@
 ﻿using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
 using SpinnakerNET;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Media3D;
 
 namespace DamoOneVision.Camera
 {
@@ -80,7 +74,7 @@ namespace DamoOneVision.Camera
 					return false;
 				}
 
-				if(MilImage == MIL.M_NULL)
+				if (MilImage == MIL.M_NULL)
 				{
 					MIL_INT width = (int) camera.Width.Value;
 					MIL_INT height = (int) camera.Height.Value;

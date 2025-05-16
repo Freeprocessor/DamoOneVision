@@ -1,18 +1,13 @@
-﻿using DamoOneVision.Data;
-using DamoOneVision.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
+using DamoOneVision.ImageProcessing;
 using Matrox.MatroxImagingLibrary;
-using Spinnaker;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-
-using Newtonsoft.Json;
-using System.IO;
-using DamoOneVision.ImageProcessing;
-using CommunityToolkit.Mvvm.Input;
 
 
 namespace DamoOneVision.ViewModels
@@ -64,7 +59,7 @@ namespace DamoOneVision.ViewModels
 			ComboBoxItems = new ObservableCollection<ComboBoxItemViewModel>();
 			AddComboBoxCommand = new RelayCommand<object>( AddComboBox );
 			DeleteComboBoxCommand = new RelayCommand<object>( DeleteComboBox );
-			ConversionProcessCommand = new AsyncRelayCommand<object?>( 
+			ConversionProcessCommand = new AsyncRelayCommand<object?>(
 				async param => await ConversionProcessAsync( param ),
 				param => CanExecuteConversionProcess( param ) );
 
@@ -121,14 +116,14 @@ namespace DamoOneVision.ViewModels
 			{
 				try
 				{
-					ProcessingPixelData = (byte[])RawPixelData.Clone();
+					ProcessingPixelData = (byte[ ]) RawPixelData.Clone();
 					foreach (var item in ComboBoxItems)
 					{
 						if (item.Number > targetNumber)
 							break;
 
 						switch (item.SelectedProcessingOption)
-						{ 
+						{
 							//case "HSV":
 							//	Conversion.RunHSLThreshold( item.HMinValue ?? 0, item.HMaxValue ?? 0, 
 							//		item.SMinValue ?? 0, item.SMaxValue ?? 0, item.VMinValue ?? 0, 

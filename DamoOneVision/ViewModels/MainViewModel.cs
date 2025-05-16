@@ -1,30 +1,16 @@
-﻿using Advantech.Adam;
-using DamoOneVision.Camera;
+﻿using CommunityToolkit.Mvvm.Input;
 using DamoOneVision.Data;
 using DamoOneVision.Models;
 using DamoOneVision.Services;
-using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
-using System.Windows.Forms;  // WinForms 네임스페이스 추가 (참조 필요)
-using DamoOneVision.ImageProcessing;
-using Newtonsoft.Json;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace DamoOneVision.ViewModels
 {
-	public class MainViewModel: INotifyPropertyChanged
+	public class MainViewModel : INotifyPropertyChanged
 	{
 		/// <summary>
 		/// PropertyChanged 이벤트 핸들러, WPF 바인딩을 위해 필요
@@ -237,7 +223,7 @@ namespace DamoOneVision.ViewModels
 
 
 
-		
+
 
 
 		// -----------------------------------------------------------------------
@@ -261,7 +247,7 @@ namespace DamoOneVision.ViewModels
 
 		//}
 
-		public MainViewModel( DeviceControlService deviceControlService, CameraService cameraService, SettingManager settingManager)
+		public MainViewModel( DeviceControlService deviceControlService, CameraService cameraService, SettingManager settingManager )
 		{
 			_deviceControlService = deviceControlService;
 			_cameraService = cameraService;
@@ -284,7 +270,8 @@ namespace DamoOneVision.ViewModels
 
 
 			MachineStartCommand = new AsyncRelayCommand(
-				async _ => await Task.Run(async()=>{
+				async _ => await Task.Run( async ( ) =>
+				{
 					/// 카메라 연결 실패, 성공여부 확인해서 함수 중단 or 계속진행
 					bool isConnect = await _cameraService.ConnectAction();
 					if (!isConnect)
@@ -306,7 +293,8 @@ namespace DamoOneVision.ViewModels
 			);
 
 			MachineStopCommand = new AsyncRelayCommand(
-				async _ => await Task.Run( async ( ) => {
+				async _ => await Task.Run( async ( ) =>
+				{
 					await _deviceControlService.MachineStopAction();
 					_deviceControlService.ConveyorReadStop();
 				} )

@@ -1,12 +1,5 @@
-﻿using DamoOneVision.Ajinextek.Motion;
-using DamoOneVision.Models;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration.Conventions;
+﻿using DamoOneVision.Models;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DamoOneVision.Services
 {
@@ -49,7 +42,7 @@ namespace DamoOneVision.Services
 
 		bool _isError = false;
 
-		public DeviceControlService( ModbusService modbus, AdvantechCardService advantechCard, MotionService motionService)
+		public DeviceControlService( ModbusService modbus, AdvantechCardService advantechCard, MotionService motionService )
 		{
 			_modbus = modbus;
 			_advantechCard = advantechCard;
@@ -81,16 +74,16 @@ namespace DamoOneVision.Services
 			_advantechCard.DisconnectAsync();
 		}
 
-		public void TowerLampAsync(string status)
+		public void TowerLampAsync( string status )
 		{
-			if(status == "STOP")
+			if (status == "STOP")
 			{
 				_isError = false;
 				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
 				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = true;
 				_advantechCard.WriteCoil[ TOWERLAMP_GREEN ] = false;
 			}
-			else if(status == "START")
+			else if (status == "START")
 			{
 				_isError = false;
 				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = false;
@@ -104,9 +97,9 @@ namespace DamoOneVision.Services
 			}
 		}
 
-		private async void TowerLampErrorAsync()
+		private async void TowerLampErrorAsync( )
 		{
-			while(_isError)
+			while (_isError)
 			{
 				_advantechCard.WriteCoil[ TOWERLAMP_RED ] = !_advantechCard.WriteCoil[ TOWERLAMP_RED ];
 				_advantechCard.WriteCoil[ TOWERLAMP_YELLOW ] = false;
@@ -204,7 +197,7 @@ namespace DamoOneVision.Services
 				//modbus.WriteSingleCoil( 0, 0x2A, true );
 				Logger.WriteLine( "TriggerReadingAsync Start" );
 				// 제품 간섭 대기
-				while(_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
+				while (_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
 				{
 					await Task.Delay( 100 );
 				}
@@ -326,7 +319,7 @@ namespace DamoOneVision.Services
 
 		public async Task MachineStartAction( )
 		{
-			
+
 
 			/// Vision Lamp ON
 			/// 
@@ -334,7 +327,7 @@ namespace DamoOneVision.Services
 			//await _modbus.SelfHolding( 0x22, 0x22 );
 			//await _modbus.SelfHolding( 0x24, 0x24 );
 
-			
+
 			await _motionService.XAxisMoveWaitPos();
 			await _motionService.ZAxisMoveWorkPos();
 			MainCVOn();
@@ -360,7 +353,7 @@ namespace DamoOneVision.Services
 
 	}
 
-	public class Ejector:IDisposable
+	public class Ejector : IDisposable
 	{
 		public bool IsGood;
 		AdvantechCardService _advantechCard;
@@ -394,8 +387,8 @@ namespace DamoOneVision.Services
 				_advantechCard.WriteCoil[ EJECTOR ] = false;
 			} );
 		}
-		public void Dispose( ) 
-		{ 
+		public void Dispose( )
+		{
 		}
 
 	}

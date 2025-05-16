@@ -109,7 +109,7 @@
                                                 HorizontalAlignment="Right"
                                                 Height="25"
                                                 Width="68"
-                                                Command="{Binding LoadImagesCommand}"
+                                                Command="{Binding SelectFolderCommand}"
                                                 Style="{DynamicResource MaterialDesignRaisedButton}"/>
                             </Grid>
                         </TabItem>

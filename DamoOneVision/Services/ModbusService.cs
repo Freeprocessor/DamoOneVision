@@ -1,15 +1,7 @@
 ﻿using NModbus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using static OpenCvSharp.FileStorage;
-using System.Windows.Threading;
-using Advantech.Adam;
 using System.Windows;
-using DamoOneVision.Views;
+using System.Windows.Threading;
 
 namespace DamoOneVision.Services
 {
@@ -51,7 +43,7 @@ namespace DamoOneVision.Services
 
 		public async void ConnectAsync( )
 		{
-			if(_connected) return;
+			if (_connected) return;
 
 			try
 			{
@@ -60,7 +52,7 @@ namespace DamoOneVision.Services
 				var factory = new ModbusFactory();          // ModbusFactory 선언
 				_master = factory.CreateMaster( _tcpClient ); // IModbusMaster 초기화
 				_connected = true;
-				Logger.WriteLine("Modbus Connect Success");
+				Logger.WriteLine( "Modbus Connect Success" );
 			}
 			catch (Exception ex)
 			{
@@ -139,7 +131,7 @@ namespace DamoOneVision.Services
 				registers[ 2 * i + 1 ] = (ushort) (HoldingRegister32[ i ] >> 16);
 			}
 
-			for (int i=0; i<length*2; i++)
+			for (int i = 0; i < length * 2; i++)
 			{
 				HoldingRegister[ i ] = registers[ i ];
 			}
@@ -305,7 +297,7 @@ namespace DamoOneVision.Services
 			}
 		}
 
-		public int WriteHoldingRegisters( byte station, ushort startAddress, ushort[] data )
+		public int WriteHoldingRegisters( byte station, ushort startAddress, ushort[ ] data )
 		{
 			if (!IsConnected) throw new Exception( "Modbus is not connected." );
 			try
@@ -400,7 +392,7 @@ namespace DamoOneVision.Services
 					}
 				} );
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Logger.WriteLine( ex.Message );
 			}

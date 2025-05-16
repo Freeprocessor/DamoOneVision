@@ -1,12 +1,5 @@
-﻿using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using DamoOneVision.Services;
+﻿using DamoOneVision.Services;
+using Matrox.MatroxImagingLibrary;
 
 namespace DamoOneVision.Camera
 {

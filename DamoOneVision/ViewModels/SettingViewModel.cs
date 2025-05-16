@@ -6,13 +6,8 @@ using DamoOneVision.Models;
 using DamoOneVision.Services;
 using DamoOneVision.Views;
 using Matrox.MatroxImagingLibrary;
-using MS.WindowsAPICodePack.Internal;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 
@@ -336,7 +331,7 @@ namespace DamoOneVision.ViewModels
 		private void LoadModel( string modelName )
 		{
 			var data = _settingManager.LoadModelData(modelName);
-			if (data == null || data.InfraredCameraModels == null || data.MotionModels == null ) return;
+			if (data == null || data.InfraredCameraModels == null || data.MotionModels == null) return;
 
 			InfraredCameraModels.Clear();
 			MotionModels.Clear();
@@ -571,7 +566,7 @@ namespace DamoOneVision.ViewModels
 					ActiveValue = 0;
 					break;
 
-				
+
 			}
 			ConversionImage();
 		}

@@ -1,16 +1,7 @@
-﻿using Matrox.MatroxImagingLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using DamoOneVision.Services;
+using Matrox.MatroxImagingLibrary;
 using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
 using System.Runtime.InteropServices;
-using System.Drawing.Drawing2D;
-using System.Diagnostics;
-using DamoOneVision.Services;
 
 namespace DamoOneVision.Camera
 {
@@ -108,12 +99,12 @@ namespace DamoOneVision.Camera
 
 				// MIL 버퍼 할당
 				//TODO 필요한 구문이 아닌 것 같으니 최적화 대상
-				if(this.NbBands == 1)
+				if (this.NbBands == 1)
 				{
 					//gray
 
 				}
-				else if(this.NbBands == 3)
+				else if (this.NbBands == 3)
 				{
 					//color
 					attribute += MIL.M_RGB24;
