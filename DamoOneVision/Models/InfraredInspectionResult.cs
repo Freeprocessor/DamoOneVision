@@ -34,11 +34,20 @@ public class InfraredInspectionResult : INotifyPropertyChanged
 		set { _underHeatIssue = value; OnPropertyChanged( nameof( UnderHeatIssue ) ); }
 	}
 
-	public bool IsGood => !(MoonCutIssue || CircleIssue || OverHeatIssue || UnderHeatIssue);
+	private bool _temperatureIssue;
+
+	public bool TemperatureIssue
+	{
+		get => _temperatureIssue;
+		set { _temperatureIssue = value; OnPropertyChanged( nameof( TemperatureIssue ) ); }
+	}
+
+	public bool IsGood => !(MoonCutIssue || CircleIssue || OverHeatIssue || UnderHeatIssue || TemperatureIssue);
 
 	// 추가 정보
 	public double FillRatio { get; set; }
 	public double AverageTemperature { get; set; }
+	public double TempeDiv { get; set; }
 	public double Radius { get; set; }
 	public double MaxBlobLength { get; set; }
 }

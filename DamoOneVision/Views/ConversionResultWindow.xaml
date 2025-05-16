@@ -26,6 +26,11 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,5">
+                    <TextBlock Text="{Binding LastInspectionResult.TempeDiv, StringFormat='온도편차: {0:F1}℃'}" FontSize="14"/>
+                    <TextBlock Text="최고온도 - 최저온도" FontSize="12" Foreground="Gray"/>
+                </StackPanel>
+
+                <StackPanel Margin="0,5">
                     <TextBlock Text="{Binding LastInspectionResult.Radius, StringFormat='검출 반지름: {0:F1} px'}" FontSize="14"/>
                     <TextBlock Text="측정된 외곽 원 반지름" FontSize="12" Foreground="Gray"/>
                 </StackPanel>

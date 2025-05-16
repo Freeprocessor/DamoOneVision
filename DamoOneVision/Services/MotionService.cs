@@ -75,7 +75,7 @@ namespace DamoOneVision.Services
 		{
 			_motionModel = motionModel;
 
-			CameraDelay = (int) (_motionModel.XAxisMoveAcceleration * 1000.0 + 200);
+			CameraDelay = (int) (_motionModel.XAxisMoveAcceleration * 1000.0 );
 			XAxisServoOn();
 			ZAxisServoOn();
 

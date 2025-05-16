@@ -7,6 +7,8 @@ namespace DamoOneVision.Services
 	{
 		public event Func<Task<bool>> TriggerDetected;
 
+		public event Func<Task<bool>> CameraConversion;
+
 		const int X = 0;
 		//const uint Y = 1;
 		const int Z = 2;

@@ -134,6 +134,11 @@ namespace DamoOneVision.ViewModels
 			var files = Directory.GetFiles(folder, "*.bmp");
 			foreach (var f in files) ImagePaths.Add( f );
 
+
+			string folderName = Path.GetFileName(folder.TrimEnd('\\', '/'));
+			string msg        = $"{folderName} 폴더에서 {files.Length}개의 이미지를 불러왔습니다.";
+			Application.Current.Dispatcher.Invoke( ( ) =>
+				MessageBox.Show( msg, "안내", MessageBoxButton.OK, MessageBoxImage.Information ) );
 			Logger.WriteLine( $"{files.Length}개의 이미지를 로드했습니다." );
 		}
 	}

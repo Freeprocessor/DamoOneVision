@@ -267,6 +267,11 @@ namespace DamoOneVision.ViewModels
 				return result;
 			};
 
+			//_deviceControlService.CameraConversion += async ( ) =>
+			//{
+			//	bool
+			//};
+
 
 
 			MachineStartCommand = new AsyncRelayCommand(

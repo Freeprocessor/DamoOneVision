@@ -171,6 +171,7 @@ namespace DamoOneVision.ImageProcessing
 			bool circleGood = false;
 			bool overHeatGood = false;
 			bool underHeatGood = false;
+			bool tempdivGood = false;
 
 			//MIL_ID CircleMeasMarker = MIL.M_NULL;
 			MIL_ID BlobResult = MIL.M_NULL;
@@ -397,85 +398,107 @@ namespace DamoOneVision.ImageProcessing
 
 			MIL.MdispControl( InfraredDisplay, MIL.M_OVERLAY_CLEAR, MIL.M_DEFAULT );
 
-			double[] sectorTemp = new double[12];
+			double[] sectorTemp = new double[36];
 
 			double sectorTotalSum = 0.0;
-			for (int i = 0; i < 12; i++)
+			List<Task> tasks = new();
+
+			object sumLock = new();                  // ★ 공유 데이터 보호 (sectorTotalSum, sectorTemp)
+
+			// ★ for → Task.Run 내부로 캡처
+			for (int i = 0; i < 36; i++)
 			{
-				if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
+				int idx = i;                         // ★ 클로저 변수 고정
+
+				tasks.Add( Task.Run( ( ) =>
 				{
-					Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
-					circleGood = false;
-					break;
-				}
-				// 시작 각도: 시계 방향으로 -각도로 표현
-				double span = 30.0;
-				double start = -i * span;
+					// ─────────────── MIL 스레드 컨텍스트 (Thread-safe) ───────────────
+					// 스레드 컨텍스트 확보
+					MIL_ID tctx = MIL.M_NULL;
+					MIL.MthrAlloc( MilSystem,          // SystemId
+								  MIL.M_THREAD,       // ObjectType
+								  MIL.M_DEFAULT,      // ControlFlag
+								  MIL.M_NULL,         // ThreadFctPtr  (null ⇒ 새 스레드를 만들지 않고
+								  MIL.M_NULL,         // UserPtr        현재 스레드에 컨텍스트만 부여)
+								  ref tctx );          // ThreadOrEventId (out)
 
-				MIL_ID sectorMask = MIL.M_NULL;
-				MIL_ID graCtx = MIL.M_NULL;
-				MIL_ID sectorImage = MIL.M_NULL;
+					// ------------- ↓↓↓↓↓ 기존 코드 “원형” ↓↓↓↓↓ -------------
+					if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
+					{
+						Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
+						circleGood = false;
+						return;                       // 이 Task 종료
+					}
+					double span  = 10.0;
+					double start = -idx * span;
 
-				// 1. 마스크 이미지 생성 및 초기화
-				MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
-					MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorMask );
-				MIL.MbufClear( sectorMask, MIL.M_COLOR_BLACK );
+					MIL_ID sectorMask  = MIL.M_NULL;
+					MIL_ID graCtx      = MIL.M_NULL;
+					MIL_ID sectorImage = MIL.M_NULL;
 
-				MIL.MgraAlloc( MilSystem, ref graCtx );
-				MIL.MgraColor( graCtx, MIL.M_COLOR_WHITE );
+					MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
+								  MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorMask );
+					MIL.MbufClear( sectorMask, MIL.M_COLOR_BLACK );
 
-				// 2. 섹터 영역 그리기 (외곽 호)
-				MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY, Radius, Radius,
-					start, span );
+					MIL.MgraAlloc( MilSystem, ref graCtx );
+					MIL.MgraColor( graCtx, MIL.M_COLOR_WHITE );
 
-				// 3. 내부 원 제거 (도넛 형태 유지)
-				MIL.MgraColor( graCtx, MIL.M_COLOR_BLACK );
-				MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY, smallRadius, smallRadius,
-					start, span );
+					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
+									Radius, Radius, start, span );
 
-				// 4. 섹터 마스크와 실제 이미지 AND
-				MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
-					MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorImage );
-				MIL.MimArith( InfraredCameraImage, sectorMask, sectorImage, MIL.M_AND );
+					MIL.MgraColor( graCtx, MIL.M_COLOR_BLACK );
+					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
+									smallRadius, smallRadius, start, span );
 
-				// 5. 데이터 가져오기
-				int w = 0, h = 0;
-				MIL.MbufInquire( sectorImage, MIL.M_SIZE_X, ref w );
-				MIL.MbufInquire( sectorImage, MIL.M_SIZE_Y, ref h );
-				ushort[] sectorData = new ushort[w * h];
-				MIL.MbufGet( sectorImage, sectorData );
+					MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
+								  MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorImage );
+					MIL.MimArith( InfraredCameraImage, sectorMask, sectorImage, MIL.M_AND );
 
-				// 6. 평균 온도 계산
-				var temps = sectorData.Where(v => v > 0).Select(v => (v / 100.0) - 273.15);
-				double sectorAvg = temps.Any() ? temps.Average() : 0;
-				Logger.WriteLine( $"[Sector {i + 1}] 평균 온도: {sectorAvg:F2} ℃" );
-				sectorTotalSum += sectorAvg;
-				sectorTemp[ i ] = sectorAvg;
-				// 7. 그래픽 오버레이에 두 개의 선 추가 (피자 조각 형태)
-				//MIL.MgraColor( GraphicsContext, MIL.M_COLOR_YELLOW );
-				double angleStartRad = start * Math.PI / 180.0;
-				double angleEndRad = (start + span) * Math.PI / 180.0;
+					int w = 0, h = 0;
+					MIL.MbufInquire( sectorImage, MIL.M_SIZE_X, ref w );
+					MIL.MbufInquire( sectorImage, MIL.M_SIZE_Y, ref h );
+					ushort[] sectorData = new ushort[w * h];
+					MIL.MbufGet( sectorImage, sectorData );
 
-				// [🧠 수정된 코드: 내부 반지름부터 외부 반지름까지 선 그리기]
-				double x1_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleStartRad);
-				double y1_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleStartRad);
-				double x1_end = DetectCirclrCenterX + Radius * Math.Cos(angleStartRad);
-				double y1_end = DetectCirclrCenterY + Radius * Math.Sin(angleStartRad);
+					var temps = sectorData.Where(v => v > 0)
+							  .Select(v => (v / 100.0) - 273.15);
+					double sectorAvg = temps.Any() ? temps.Average() : 0;
+					//Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
 
-				double x2_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleEndRad);
-				double y2_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleEndRad);
-				double x2_end = DetectCirclrCenterX + Radius * Math.Cos(angleEndRad);
-				double y2_end = DetectCirclrCenterY + Radius * Math.Sin(angleEndRad);
+					lock (sumLock)                    // ★ 동시 수정 보호
+					{
+						sectorTotalSum += sectorAvg;
+						sectorTemp[ idx ] = sectorAvg;
+					}
 
-				MIL.MgraLine( GraphicsContext, MilOverlayImage, x1_start, y1_start, x1_end, y1_end );
-				MIL.MgraLine( GraphicsContext, MilOverlayImage, x2_start, y2_start, x2_end, y2_end );
+					double angleStartRad = start * Math.PI / 180.0;
+					double angleEndRad   = (start + span) * Math.PI / 180.0;
 
-				// 리소스 해제
-				MIL.MbufFree( sectorMask );
-				MIL.MbufFree( sectorImage );
-				MIL.MgraFree( graCtx );
+					double x1_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleStartRad);
+					double y1_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleStartRad);
+					double x1_end   = DetectCirclrCenterX + Radius      * Math.Cos(angleStartRad);
+					double y1_end   = DetectCirclrCenterY + Radius      * Math.Sin(angleStartRad);
+
+					double x2_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleEndRad);
+					double y2_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleEndRad);
+					double x2_end   = DetectCirclrCenterX + Radius      * Math.Cos(angleEndRad);
+					double y2_end   = DetectCirclrCenterY + Radius      * Math.Sin(angleEndRad);
+
+					MIL.MgraLine( GraphicsContext, MilOverlayImage, x1_start, y1_start, x1_end, y1_end );
+					MIL.MgraLine( GraphicsContext, MilOverlayImage, x2_start, y2_start, x2_end, y2_end );
+
+					MIL.MbufFree( sectorMask );
+					MIL.MbufFree( sectorImage );
+					MIL.MgraFree( graCtx );
+					// ------------- ↑↑↑↑↑ 기존 코드 “원형” ↑↑↑↑↑ -------------
+
+					MIL.MthrFree( tctx );             // 스레드 컨텍스트 해제
+				} ) );
 			}
-			double sectorTotalAvg = sectorTotalSum / 12;
+
+			// ★ 모든 Task 완료 대기 (동기식이면 Task.WaitAll, 비동기면 await)
+			Task.WaitAll( tasks.ToArray() );
+			double sectorTotalAvg = sectorTotalSum / 36;
 			Logger.WriteLine( $"12개 섹터 평균 온도: {sectorTotalAvg:F2} ℃" );
 
 
@@ -502,8 +525,8 @@ namespace DamoOneVision.ImageProcessing
 
 
 			/// 평균 온도 기준으로 섹터별 온도 비교
-			bool[] underHeatSector = new bool[12];
-			bool[] overHeatSector = new bool[12];
+			bool[] underHeatSector = new bool[36];
+			bool[] overHeatSector = new bool[36];
 			///
 			for (int i = 0; i < sectorTemp.Length; i++)
 			{
@@ -514,7 +537,7 @@ namespace DamoOneVision.ImageProcessing
 				else
 				{
 					underHeatSector[ i ] = false;
-					Logger.WriteLine( $"Sector {i + 1} UnderHeat Error" );
+					//Logger.WriteLine( $"Sector {i + 1} UnderHeat Error" );
 				}
 
 				if (sectorTemp[ i ] < infraredCameraModel.AvgTemperatureMax)
@@ -524,15 +547,18 @@ namespace DamoOneVision.ImageProcessing
 				else
 				{
 					overHeatSector[ i ] = false;
-					Logger.WriteLine( $"Sector {i + 1} OverHeat Error" );
+					//Logger.WriteLine( $"Sector {i + 1} OverHeat Error" );
 				}
 			}
 
 			int underHeatCount = underHeatSector.Count( x => x == false );
 			int overHeatCount = overHeatSector.Count( x => x == false );
 
+			Logger.WriteLine( $"UnderHeat Count: {underHeatCount}" );
+			Logger.WriteLine( $"OverHeat Count: {overHeatCount}" );
+
 			/// 카운트값 추후 변수로 변경 예정
-			if (underHeatCount > 0)
+			if (underHeatCount >= infraredCameraModel.UnderHeatCountLim)
 			{
 				underHeatGood = false;
 			}
@@ -541,13 +567,33 @@ namespace DamoOneVision.ImageProcessing
 				underHeatGood = true;
 			}
 
-			if (overHeatCount > 8)
+			if (overHeatCount >= infraredCameraModel.OverHeatCountLim)
 			{
 				overHeatGood = false;
 			}
 			else
 			{
 				overHeatGood = true;
+			}
+
+			// ① NaN 제거
+			var clean = sectorTemp.Where(v => !double.IsNaN(v)).ToArray();
+
+			if (clean.Length == 0)        // ② 빈 배열 체크
+			{
+				Console.WriteLine( "값이 없습니다." );
+			}
+			double max = clean.Max();
+			double min = clean.Min();
+
+			double tempDiv = max - min;
+			if ( tempDiv > infraredCameraModel.TempDivLim )
+			{
+				tempdivGood = false;
+			}
+			else
+			{
+				tempdivGood = true;
 			}
 
 			//Logger.WriteLine( $"avg: {avg}" );
@@ -644,9 +690,11 @@ namespace DamoOneVision.ImageProcessing
 				CircleIssue = !circleGood,
 				OverHeatIssue = !overHeatGood,
 				UnderHeatIssue = !underHeatGood,
+				TemperatureIssue = !tempdivGood,
 
 				FillRatio = FillRatio,
 				AverageTemperature = avgCelsius,
+				TempeDiv = tempDiv,
 				Radius = Radius,
 				MaxBlobLength = MaxLangth
 			};

@@ -579,7 +579,139 @@
                                          Margin="5,0"
                                          HorizontalAlignment="Center"/>
                                 </Grid>
-                                
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="UnderHeatCountLim">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="최저 미달 섹터 개수:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="UnderHeatCountLim"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.UnderHeatCountLim}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="OverHeatCountLim">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="최고 초과 섹터 개수:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="OverHeatCountLim"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.OverHeatCountLim}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="TempDivLim">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="온도 편차 제한:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="TempDivLim"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.TempDivLim}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
                                 <Grid Margin="5,5,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="130"/>
@@ -635,7 +767,7 @@
                                         TickFrequency="{Binding ActiveValueTick, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         IsSnapToTickEnabled="True"
                                         Value="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="20" Orientation="Vertical" Height="300"/>
+                                        Width="20" Orientation="Vertical" Height="490"/>
                                 <TextBox Text="{Binding ActiveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Width="80"
                                         Margin="10"
@@ -643,7 +775,7 @@
                             </StackPanel>
                             <Grid Grid.Column="2" >
                                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                    <Button Height="48" Content="×100" Margin="0,0,0,10"  Command="{Binding ActiveValueMul100}" >
+                                    <Button Height="70" Content="×100" Margin="0,0,0,10"  Command="{Binding ActiveValueMul100}" >
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
                                                 <Setter Property="Background" Value="LightGray"/>
@@ -655,7 +787,7 @@
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <Button Height="48" Content="×10" Margin="0,0,0,10" Command="{Binding ActiveValueMul10}" >
+                                    <Button Height="70" Content="×10" Margin="0,0,0,10" Command="{Binding ActiveValueMul10}" >
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
                                                 <Setter Property="Background" Value="LightGray"/>
@@ -667,7 +799,7 @@
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <Button Height="48" Content="×1" Margin="0,0,0,50" Command="{Binding ActiveValueMul1}" >
+                                    <Button Height="70" Content="×1" Margin="0,0,0,50" Command="{Binding ActiveValueMul1}" >
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
                                                 <Setter Property="Background" Value="LightGray"/>
@@ -679,8 +811,8 @@
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="+" Command="{Binding ActiveValuePlus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
-                                    <Button Background="#FF1744" Foreground="White" Margin="0,0,0,10" Height="48" Content="-" Command="{Binding ActiveValueMinus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    <Button Background="#76FF03" Foreground="Black" Margin="0,0,0,10" Height="70" Content="+" Command="{Binding ActiveValuePlus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                                    <Button Background="#76FF03" Foreground="Black" Margin="0,0,0,10" Height="70" Content="-" Command="{Binding ActiveValueMinus}" Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
                                     <TextBlock Text="{Binding ActiveValueTick}" FontStyle="Italic" Foreground="Gray"/>
                                 </StackPanel>

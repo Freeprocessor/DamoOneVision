@@ -6,59 +6,90 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"                      
         Title="폴더 선택"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Background="{DynamicResource MaterialDesignPaper}"
         d:DesignHeight="720"
         d:DesignWidth="540">
 
-    <Border Padding="24" Background="{DynamicResource MaterialDesignPaper}" >
-        <ScrollViewer VerticalScrollBarVisibility="Auto"  PanningMode="VerticalOnly">
-            <ItemsControl ItemsSource="{Binding FolderItems}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="3" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <!-- 한 타일 -->
-                        <Grid Width="180" Margin="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <!-- 이미지 -->
-                                <RowDefinition Height="Auto"/>
-                                <!-- 날짜 라벨 -->
-                            </Grid.RowDefinitions>
+    <!-- ▼▼▼ 여기부터 새로 추가 ▼▼▼ -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <!-- 커스텀 타이틀바 -->
+            <RowDefinition Height="*"/>
+            <!-- 기존 내용 -->
+        </Grid.RowDefinitions>
 
-                            <!-- ① 썸네일 -->
-                            <Border Grid.Row="0"
-                    CornerRadius="6"
-                    BorderThickness="1"
-                    BorderBrush="{DynamicResource PrimaryHueMidBrush}">
-                                <Image Source="{Binding Thumbnail}"
-                       Stretch="UniformToFill"
-                       Height="160" Width="180"/>
-                            </Border>
+        <!-- (1) 타이틀바 + 닫기버튼 -->
+        <Border Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
 
-                            <!-- ② 폴더명(날짜) -->
-                            <TextBlock Grid.Row="1"
-                       Text="{Binding Name}"          
-                       FontSize="16"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center"
-                       Margin="0,6,0,0"/>
-            
-            <!-- 터치 선택 -->
-                        <Button Command="{Binding DataContext.SelectFolderCommand,
-                                      RelativeSource={RelativeSource AncestorType=Window}}"
-                    CommandParameter="{Binding Path}"
-                    Background="Transparent"
-                    BorderThickness="0"/>
-        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </Border>
+                <TextBlock Text="폴더 선택"
+                           VerticalAlignment="Center"
+                           Margin="12,0"
+                           Foreground="Black"
+                           FontSize="16"
+                           FontWeight="SemiBold"/>
+
+                <Button Grid.Column="1"
+                        Content="✕"
+                        FontSize="14"
+                        Foreground="Black"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="CloseButton_Click"/>
+            </Grid>
+        </Border>
+        <!-- ▲▲▲ 여기까지 새로 추가 ▲▲▲ -->
+
+        <Border Grid.Row="1" Padding="24" Background="{DynamicResource MaterialDesignPaper}" >
+            <ScrollViewer VerticalScrollBarVisibility="Auto"  PanningMode="VerticalOnly">
+                <ItemsControl ItemsSource="{Binding FolderItems}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <!-- 한 타일 -->
+                            <Grid Width="180" Margin="8"
+                                MouseLeftButtonUp="Tile_MouseLeftButtonUp"
+                                Background="Transparent"
+                                Cursor="Hand">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- ① 썸네일 -->
+                                <Border Grid.Row="0"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource PrimaryHueMidBrush}">
+                                    <Image Source="{Binding Thumbnail}"
+                                        Stretch="UniformToFill"
+                                        Height="160" Width="180"/>
+                                </Border>
+
+                                <!-- ② 날짜(폴더명) -->
+                                <TextBlock Grid.Row="1"
+                                    Text="{Binding Name}"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,6,0,0"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
 </Window>

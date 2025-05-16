@@ -177,6 +177,48 @@ namespace DamoOneVision.Models
 			}
 		}
 
+		private double _underHeatCountLim;
+		public double UnderHeatCountLim
+		{
+			get => _underHeatCountLim;
+			set
+			{
+				if (_underHeatCountLim != value)
+				{
+					_underHeatCountLim = value;
+					OnPropertyChanged( nameof( UnderHeatCountLim ) );
+				}
+			}
+		}
+
+		private double _overHeatCountLim;
+		public double OverHeatCountLim
+		{
+			get => _overHeatCountLim;
+			set
+			{
+				if (_overHeatCountLim != value)
+				{
+					_overHeatCountLim = value;
+					OnPropertyChanged( nameof( OverHeatCountLim ) );
+				}
+			}
+		}
+
+		private double _tempDivLim;
+		public double TempDivLim
+		{
+			get => _tempDivLim;
+			set
+			{
+				if (_tempDivLim != value)
+				{
+					_tempDivLim = value;
+					OnPropertyChanged( nameof( TempDivLim ) );
+				}
+			}
+		}
+
 		private double _cameraFocusValue;
 		public double CameraFocusValue
 		{

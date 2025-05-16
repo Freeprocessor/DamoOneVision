@@ -553,6 +553,31 @@ namespace DamoOneVision.ViewModels
 					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
 					_isBinarized = false;
 					break;
+
+				case "UnderHeatCountLim":
+					ActiveValue = SelectedInfraredCameraModel.UnderHeatCountLim;
+					ActiveValueMin = 0; // 예시: 최소 온도
+					ActiveValueMax = 12; // 예시: 최대 온도
+					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
+					_isBinarized = false;
+					break;
+
+				case "OverHeatCountLim":
+					ActiveValue = SelectedInfraredCameraModel.OverHeatCountLim;
+					ActiveValueMin = 0; // 예시: 최소 온도
+					ActiveValueMax = 12; // 예시: 최대 온도
+					ActiveValueTick = 1; // 예시: 0.1 단위로 조정
+					_isBinarized = false;
+					break;
+
+				case "TempDivLim":
+					ActiveValue = SelectedInfraredCameraModel.TempDivLim;
+					ActiveValueMin = 0; // 예시: 최소 온도
+					ActiveValueMax = 10; // 예시: 최대 온도
+					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
+					_isBinarized = false;
+					break;
+
 				case "ProductHeight":
 					ActiveValue = SelectedInfraredCameraModel.ProductHeight;
 					ActiveValueMin = 40; // 예시: 최소 온도
@@ -610,6 +635,15 @@ namespace DamoOneVision.ViewModels
 					break;
 				case "AvgTemperatureMax":
 					SelectedInfraredCameraModel.AvgTemperatureMax = ActiveValue;
+					break;
+				case "UnderHeatCountLim":
+					SelectedInfraredCameraModel.UnderHeatCountLim = ActiveValue;
+					break;
+				case "OverHeatCountLim":
+					SelectedInfraredCameraModel.OverHeatCountLim = ActiveValue;
+					break;
+				case "TempDivLim":
+					SelectedInfraredCameraModel.TempDivLim = ActiveValue;
 					break;
 				case "ProductHeight":
 					SelectedInfraredCameraModel.ProductHeight = ActiveValue;
