@@ -181,9 +181,15 @@ namespace DamoOneVision.ImageProcessing
 			MIL_ID SettingGraphicsContext = MIL.M_NULL;
 			MIL_ID MeasMarker = MIL.M_NULL;
 			MIL_ID MilOverlayImage = MIL.M_NULL;
+
+			MIL_ID ModCircleShape = MIL.M_NULL;
+
+			//MIL_ID MimConvolImage = MIL.M_NULL;
 			MIL_ID MilAnnulusImage = MIL.M_NULL;
 			MIL_ID AnnulusAndBinarized = MIL.M_NULL;
 			MIL_ID AnnulusAndImage = MIL.M_NULL;
+
+			MIL_ID ResultobjectforModCircleShapeContext = MIL.M_NULL;
 
 			double ReferenceArea = 0.0;
 			double Radius = 0.0;
@@ -221,6 +227,9 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MilAnnulusImage );
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndBinarized );
 			MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref AnnulusAndImage );
+			//MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MimConvolImage );
+			//MIL.MbufAllocColor( MilSystem, 1, 640, 480, 8 + MIL.M_UNSIGNED, MIL.M_IMAGE + MIL.M_PROC + MIL.M_DISP, ref MimConvolImage );
+
 
 			/// Black으로 초기화 
 			MIL.MbufClear( MilAnnulusImage, MIL.M_COLOR_BLACK );
@@ -229,6 +238,10 @@ namespace DamoOneVision.ImageProcessing
 
 			/// 이진화 이미지 생성 
 			MIL.MimBinarize( InfraredCameraImage, BinarizedImage, MIL.M_GREATER, thresholdForMil, MIL.M_NULL );
+
+			/// Edge 검출용 이미지 생성
+			//MIL.MimConvolve( InfraredCameraImage, MimConvolImage, MIL.M_LAPLACIAN_8 + MIL.M_OVERSCAN_ENABLE );
+
 
 			// 로그 기록 (권장)
 			Logger.WriteLine( $"기준 온도: {infraredCameraModel.ReferenceBaseTemperature}, 현재 온도: {currentReferenceAvg}, 동적 임계값: {dynamicThreshold}" );
@@ -259,11 +272,35 @@ namespace DamoOneVision.ImageProcessing
 
 
 			/// 원찾기 
+			/// 
+
+
+
 			MIL.MmeasAllocMarker( MilSystem, MIL.M_CIRCLE, MIL.M_DEFAULT, ref MeasMarker );
+
+			MIL.MmeasSetScore( MeasMarker, MIL.M_RADIUS_SCORE, 0.0, MIL.M_MAX_POSSIBLE_VALUE, MIL.M_MAX_POSSIBLE_VALUE, MIL.M_MAX_POSSIBLE_VALUE, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT );
+
+			//MIL.MmeasSetScore( MeasMarker, MIL.M_RADIUS_SCORE, 0.0, 0.0, 0.0, MIL.M_MAX_POSSIBLE_VALUE, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT );
+
+
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_CIRCLE_ACCURACY, MIL.M_HIGH, MIL.M_NULL );
+			//MIL.MmeasSetMarker( MeasMarker, MIL.M_SUB_PIXEL, MIL.M_ENABLE, MIL.M_NULL );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_FILTER_TYPE, MIL.M_SHEN, MIL.M_NULL );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_FILTER_SMOOTHNESS, 15.0, MIL.M_NULL );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_EDGEVALUE_MIN, 6.0, MIL.M_NULL );
+
+
+			
 
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_SEARCH_REGION_INPUT_UNITS, MIL.M_PIXEL, MIL.M_NULL );
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_CENTER, infraredCameraModel.CircleCenterX, infraredCameraModel.CircleCenterY );
 			MIL.MmeasSetMarker( MeasMarker, MIL.M_RING_RADII, infraredCameraModel.CircleMinRadius, infraredCameraModel.CircleMaxRadius );
+
+		//	MIL.MmeasSetMarker( MeasMarker, MIL.M_MINIMUM_CIRCULAR_ARC_POINTS, 64, MIL.M_NULL );
+			MIL.MmeasSetMarker( MeasMarker, MIL.M_MAX_ASSOCIATION_DISTANCE, MIL.M_DEFAULT, MIL.M_NULL );
+			//MIL.MmeasSetMarker( MeasMarker, MIL.M_CIRCULAR_FIT_ERROR_MAX, 0.5, MIL.M_NULL );
+
+
 			MIL.MmeasFindMarker( MIL.M_DEFAULT, BinarizedImage, MeasMarker, MIL.M_DEFAULT );
 
 			try
@@ -277,6 +314,33 @@ namespace DamoOneVision.ImageProcessing
 			{
 				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
 			}
+
+			/// 원 찾기 (mod)
+			//MIL.MmodAllocResult( MilSystem, MIL.M_SHAPE_CIRCLE, ref ResultobjectforModCircleShapeContext );
+
+			//MIL.MmodAlloc( MilSystem, MIL.M_SHAPE_CIRCLE, MIL.M_DEFAULT, ref ModCircleShape );
+			//MIL.MmodDefine( ModCircleShape, MIL.M_CIRCLE, MIL.M_DEFAULT, 140.0, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT );
+
+			//MIL.MmodControl( ModCircleShape, MIL.M_CONTEXT, MIL.M_DETAIL_LEVEL, MIL.M_HIGH );
+			//MIL.MmodControl( ModCircleShape, MIL.M_CONTEXT, MIL.M_SMOOTHNESS, 20.0 );
+
+			//MIL.MmodPreprocess( ModCircleShape, MIL.M_DEFAULT );
+
+			//MIL.MmodFind( ModCircleShape, MimConvolImage, ResultobjectforModCircleShapeContext );
+
+			//try
+			//{
+			//	MIL.MmodGetResult( ResultobjectforModCircleShapeContext, 0, MIL.M_POSITION_X + MIL.M_TYPE_MIL_DOUBLE, ref DetectCirclrCenterX );
+			//	MIL.MmodGetResult( ResultobjectforModCircleShapeContext, 0, MIL.M_POSITION_Y + MIL.M_TYPE_MIL_DOUBLE, ref DetectCirclrCenterY );
+			//	MIL.MmodGetResult( ResultobjectforModCircleShapeContext, 0, MIL.M_RADIUS + MIL.M_TYPE_MIL_DOUBLE, ref Radius );
+			//}
+			//catch (Exception ex)
+			//{
+			//	Logger.WriteLine( $"ModCircleShape에서 예외 발생: {ex.Message}" );
+			//}
+
+
+
 
 			double smallRadius = Radius - infraredCameraModel.CircleInnerRadius;
 
@@ -425,12 +489,13 @@ namespace DamoOneVision.ImageProcessing
 					// ------------- ↓↓↓↓↓ 기존 코드 “원형” ↓↓↓↓↓ -------------
 					if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
 					{
-						Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
+						//Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
 						circleGood = false;
 						return;                       // 이 Task 종료
 					}
 					double span  = 10.0;
-					double start = -idx * span;
+					double start = (idx - 1) * span;
+					double end = idx * span;
 
 					MIL_ID sectorMask  = MIL.M_NULL;
 					MIL_ID graCtx      = MIL.M_NULL;
@@ -444,11 +509,11 @@ namespace DamoOneVision.ImageProcessing
 					MIL.MgraColor( graCtx, MIL.M_COLOR_WHITE );
 
 					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
-									Radius, Radius, start, span );
+									Radius, Radius, start, end );
 
 					MIL.MgraColor( graCtx, MIL.M_COLOR_BLACK );
 					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
-									smallRadius, smallRadius, start, span );
+									smallRadius, smallRadius, start, end );
 
 					MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
 								  MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorImage );
@@ -460,16 +525,27 @@ namespace DamoOneVision.ImageProcessing
 					ushort[] sectorData = new ushort[w * h];
 					MIL.MbufGet( sectorImage, sectorData );
 
+					//MIL.MdispSelect( InfraredDisplay, sectorMask );
+					//MIL.MdispSelect( InfraredDisplay, sectorImage );
+
+					//var temps = sectorData.Where(v => v > 0)
+					//		  .Select(v => (v / 100.0) - 273.15);
+
+					/// 테스트
 					var temps = sectorData.Where(v => v > 0)
-							  .Select(v => (v / 100.0) - 273.15);
+					  .Select(v => v / 100.0 - 273.15);
+
 					double sectorAvg = temps.Any() ? temps.Average() : 0;
-					//Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
+					Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
 
 					lock (sumLock)                    // ★ 동시 수정 보호
 					{
 						sectorTotalSum += sectorAvg;
 						sectorTemp[ idx ] = sectorAvg;
 					}
+
+					int validPix = temps.Count();
+					//Logger.WriteLine($"[S{idx+1}] valid={validPix}, avg={sectorAvg:F1}");
 
 					double angleStartRad = start * Math.PI / 180.0;
 					double angleEndRad   = (start + span) * Math.PI / 180.0;
@@ -678,10 +754,14 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MgraFree( SettingGraphicsContext );
 			MIL.MgraFree( AnnulusContext );
 			MIL.MmeasFree( MeasMarker );
+			MIL.MmodFree( ModCircleShape );
+			MIL.MmodFree( ResultobjectforModCircleShapeContext );
 
+			//MIL.MbufFree( MimConvolImage );
 			MIL.MbufFree( AnnulusAndBinarized );
 			MIL.MbufFree( AnnulusAndImage );
 			MIL.MbufFree( MilAnnulusImage );
+
 
 			//BinarizedImage = MIL.M_NULL;
 			var inspectionResult = new InfraredInspectionResult
