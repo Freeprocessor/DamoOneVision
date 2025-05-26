@@ -245,9 +245,10 @@ namespace DamoOneVision.Services
 				//Logger.WriteLine( $"Tracking Start : {sw.ElapsedMilliseconds} ms" );
 				//Logger.WriteLine( "{_motionService.CameraDelay}" );
 				await Task.Delay( _motionService.CameraDelay );
-				_isGood = await TriggerDetected();
-				ejector.IsGood = _isGood;
+
+				/// 실행시간 단축
 				//_isGood = await TriggerDetected();
+				Task<bool> detectTask = TriggerDetected();
 
 				//Logger.WriteLine( $"Capture Complete : {sw.ElapsedMilliseconds} ms" );
 				_motionService.XAxisStop();
@@ -255,7 +256,12 @@ namespace DamoOneVision.Services
 				await _motionService.XAxisWaitingStop();
 				//Logger.WriteLine( $"Tracking Stop Complete {sw.ElapsedMilliseconds} ms" );
 				Logger.WriteLine( $"Current Position {_motionService.XAxisGetCommandPosition()} pulse)" );
-				await _motionService.XAxisMoveWaitPos();
+
+				Task moveTask = _motionService.XAxisMoveWaitPos();
+				await Task.WhenAll( detectTask, moveTask );
+				_isGood = detectTask.Result;
+
+				ejector.IsGood = _isGood;
 				//Logger.WriteLine( $"Wait Move Complete : {sw.ElapsedMilliseconds} ms" );
 			}
 			//modbus.WriteSingleCoil( 0, 0x06, false );

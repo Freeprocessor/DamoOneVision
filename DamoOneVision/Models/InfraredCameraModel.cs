@@ -219,6 +219,20 @@ namespace DamoOneVision.Models
 			}
 		}
 
+		private double _neighborDiffLim ;
+		public double NeighborDiffLim
+		{
+			get => _neighborDiffLim;
+			set
+			{
+				if (_neighborDiffLim != value)
+				{
+					_neighborDiffLim = value;
+					OnPropertyChanged( nameof( NeighborDiffLim ) );
+				}
+			}
+		}
+
 		private double _cameraFocusValue;
 		public double CameraFocusValue
 		{

@@ -100,7 +100,7 @@
             </materialDesign:Card>
 
 
-            <StackPanel Margin="10,50,10,10">
+            <StackPanel Margin="10,5,10,10">
                 <TextBlock Text="불량 유형 램프" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
 
                 <!-- 블롭 검사 -->
@@ -186,6 +186,22 @@
                         </Ellipse.Style>
                     </Ellipse>
                     <TextBlock Text="온도편차 검사" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Width="30" Height="30" Stroke="Black" StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="Green"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InspectionResult.NeighborTempIssue}" Value="True">
+                                        <Setter Property="Fill" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="인접부 온도편차 검사" VerticalAlignment="Center" Margin="10,0"/>
                 </StackPanel>
             </StackPanel>
 

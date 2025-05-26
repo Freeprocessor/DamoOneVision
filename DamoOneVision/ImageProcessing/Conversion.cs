@@ -573,10 +573,57 @@ namespace DamoOneVision.ImageProcessing
 			}
 
 			// ★ 모든 Task 완료 대기 (동기식이면 Task.WaitAll, 비동기면 await)
-			Task.WaitAll( tasks.ToArray() );
+			try
+			{
+				await Task.WhenAll( tasks ).ConfigureAwait( false );
+			}
+			catch (Exception ex)
+			{
+				Logger.WriteLine( $"섹터 처리 중 예외: {ex}" );
+				//throw;                        // 상위에서 추가 처리할 경우
+			}
+
 			double sectorTotalAvg = sectorTotalSum / 36;
 			Logger.WriteLine( $"12개 섹터 평균 온도: {sectorTotalAvg:F2} ℃" );
 
+			/// 인접섹터 온도 비교
+			// ── 1) NaN·Inf 제거
+			double[] neighborDiff   = new double[36];
+			bool[]   neighborIssue  = new bool[36];
+			int      neighborBadCnt = 0;
+
+			for (int i = 0; i < 36; i++)
+			{
+				int next = (i + 1) % 36;
+				double diff = Math.Abs(sectorTemp[i] - sectorTemp[next]);
+
+				neighborDiff[ i ] = diff;
+				neighborIssue[ i ] = diff > infraredCameraModel.NeighborDiffLim;
+
+				if (neighborIssue[ i ]) neighborBadCnt++;
+			}
+
+			bool neighborGood = neighborBadCnt == 0;
+
+			Logger.WriteLine(
+				$"Neighbor ΔT > {infraredCameraModel.NeighborDiffLim:F1} ℃ 섹터 수: {neighborBadCnt}" );
+
+			///불량섹터 표시
+			//for (int i = 0; i < 36; i++)
+			//{
+			//	if (!neighborIssue[ i ]) continue;
+
+			//	double span  = 10.0;
+			//	double start = (i - 1) * span;
+			//	double end   = i * span;
+
+			//	// 빨강색으로 두꺼운 선
+			//	MIL.MgraColor( GraphicsContext, MIL.M_COLOR_RED );
+			//	MIL.MgraArcFill( GraphicsContext, MilOverlayImage,
+			//		DetectCirclrCenterX, DetectCirclrCenterY,
+			//		Radius, Radius, start, end );
+			//	MIL.MgraColor( GraphicsContext, MIL.M_COLOR_WHITE );
+			//}
 
 			/// 임계온도 이상 값 검출이 아닌 전체 면적 기준 평균 온도로 변경
 			//if ( avgCelsius > infraredCameraModel.AvgTemperatureMin )
@@ -771,6 +818,7 @@ namespace DamoOneVision.ImageProcessing
 				OverHeatIssue = !overHeatGood,
 				UnderHeatIssue = !underHeatGood,
 				TemperatureIssue = !tempdivGood,
+				NeighborTempIssue = !neighborGood,
 
 				FillRatio = FillRatio,
 				AverageTemperature = avgCelsius,

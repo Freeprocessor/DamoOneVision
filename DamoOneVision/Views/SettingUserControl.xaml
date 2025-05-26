@@ -691,7 +691,7 @@
                                             </Style>
                                         </Border.Style>
 
-                                        <TextBlock Text="온도 편차 제한:"
+                                        <TextBlock Text="최대온도 편차 제한:"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Left"
                                            Margin="0,0"/>
@@ -706,6 +706,50 @@
                                     </Border>
 
                                     <TextBox Text="{Binding SelectedInfraredCameraModel.TempDivLim}"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Margin="5,0"
+                                         HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <Grid Margin="5,5,5,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 강조 스타일 적용 -->
+                                    <Border Grid.Column="0"
+                                        Padding="2"
+                                        Cursor="Hand"
+                                        VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ActivePropertyName}" Value="NeighborDiffLim">
+                                                        <Setter Property="Background" Value="#B9F6CA"/>
+                                                        <!-- 연초록색 강조 -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="인접섹터온도편차 제한:"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0"/>
+
+                                        <!-- 클릭 트리거는 Border에 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding SelectPropertyCommand}"
+                                       CommandParameter="NeighborDiffLim"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Border>
+
+                                    <TextBox Text="{Binding SelectedInfraredCameraModel.NeighborDiffLim}"
                                          VerticalAlignment="Center"
                                          Grid.Column="1"
                                          Margin="5,0"

@@ -578,6 +578,14 @@ namespace DamoOneVision.ViewModels
 					_isBinarized = false;
 					break;
 
+				case "NeighborDiffLim":
+					ActiveValue = SelectedInfraredCameraModel.NeighborDiffLim;
+					ActiveValueMin = 0; // 예시: 최소 온도
+					ActiveValueMax = 10; // 예시: 최대 온도
+					ActiveValueTick = 0.01; // 예시: 0.1 단위로 조정
+					_isBinarized = false;
+					break;
+
 				case "ProductHeight":
 					ActiveValue = SelectedInfraredCameraModel.ProductHeight;
 					ActiveValueMin = 40; // 예시: 최소 온도
@@ -645,6 +653,9 @@ namespace DamoOneVision.ViewModels
 				case "TempDivLim":
 					SelectedInfraredCameraModel.TempDivLim = ActiveValue;
 					break;
+				case "NeighborDiffLim":
+					SelectedInfraredCameraModel.NeighborDiffLim = ActiveValue;
+					break;
 				case "ProductHeight":
 					SelectedInfraredCameraModel.ProductHeight = ActiveValue;
 					break;
@@ -680,6 +691,9 @@ namespace DamoOneVision.ViewModels
 				_mainViewModel.IsGoodColor = "Red";
 				_mainViewModel.IsGoodStatus = "Reject";
 			}
+
+			_mainViewModel.InspectionResult = result;
+			_mainViewModel.OnProductDetected( result.IsGood );
 		}
 
 
@@ -724,6 +738,9 @@ namespace DamoOneVision.ViewModels
 						_mainViewModel.IsGoodColor = "Red";
 						_mainViewModel.IsGoodStatus = "Reject";
 					}
+
+					_mainViewModel.InspectionResult = result;
+					_mainViewModel.OnProductDetected( result.IsGood );
 					await Task.Delay( 100 );
 				}
 			} );
