@@ -167,11 +167,28 @@ namespace DamoOneVision.ImageProcessing
 
 			if (InfraredCameraImage == MIL.M_NULL)
 			{
+				sw.Stop();
 				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
 				return null;
 			}
-			//return true;
-			//Logger.WriteLine( "InfraredCameraModel 호출" );
+
+
+			long width = 0;
+			long height = 0;
+			MIL.MbufInquire( InfraredCameraImage, MIL.M_SIZE_X, ref width );
+			MIL.MbufInquire( InfraredCameraImage, MIL.M_SIZE_Y, ref height );
+
+
+			if (InfraredCameraImage == MIL.M_NULL)
+			{
+				sw.Stop();
+				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
+				return null;
+			}
+			// 해상도 바뀌면 그때만 Free→Alloc, 매 프레임엔 Clear()
+			ReusableMilBuffers.EnsureSize( MilSystem, (int) width, (int) height );
+			ReusableMilBuffers.Clear();    // ← 입력프레임 처리 전 초기화
+
 			bool moonCutGood = false;
 			bool circleGood = false;
 			bool overHeatGood = false;
@@ -484,99 +501,70 @@ namespace DamoOneVision.ImageProcessing
 
 				tasks.Add( Task.Run( ( ) =>
 				{
-					// ─────────────── MIL 스레드 컨텍스트 (Thread-safe) ───────────────
-					// 스레드 컨텍스트 확보
-					MIL_ID tctx = MIL.M_NULL;
-					MIL.MthrAlloc( MilSystem,          // SystemId
-								  MIL.M_THREAD,       // ObjectType
-								  MIL.M_DEFAULT,      // ControlFlag
-								  MIL.M_NULL,         // ThreadFctPtr  (null ⇒ 새 스레드를 만들지 않고
-								  MIL.M_NULL,         // UserPtr        현재 스레드에 컨텍스트만 부여)
-								  ref tctx );          // ThreadOrEventId (out)
+					// MIL 스레드 컨텍스트 확보 (기존 그대로)
+					//MIL_ID tctx = MIL.M_NULL;
+					//MIL.MthrAlloc( MilSystem, MIL.M_THREAD,MIL.M_NULL, MIL.M_NULL, MIL.M_DEFAULT, ref tctx );
 
-					// ------------- ↓↓↓↓↓ 기존 코드 “원형” ↓↓↓↓↓ -------------
 					if (Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
-					{
-						//Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
-						circleGood = false;
-						return;                       // 이 Task 종료
-					}
+						return;   // early-exit
 
+					/* --- 1) 각 Task 전용 버퍼/그래픽 컨텍스트 가져오기 --- */
+					MIL_ID mask   = ReusableMilBuffers.AcquireMask(idx);
+					MIL_ID sector = ReusableMilBuffers.AcquireSector(idx);
+					MIL_ID gctx   = ReusableMilBuffers.AcquireGctx(idx);     // 섹터별 전용 gctx
+
+					MIL.MbufClear( mask, MIL.M_COLOR_BLACK );    // ← 반드시 초기화
+					MIL.MbufClear( sector, MIL.M_COLOR_BLACK );
+
+					/* --- 2) 마스크 작성 & AND --- */
 					double start = (idx - 1) * span;
-					double end = idx * span;
+					double end   = idx * span;
 
-					MIL_ID sectorMask  = MIL.M_NULL;
-					MIL_ID graCtx      = MIL.M_NULL;
-					MIL_ID sectorImage = MIL.M_NULL;
-
-					MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
-								  MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorMask );
-					MIL.MbufClear( sectorMask, MIL.M_COLOR_BLACK );
-
-					MIL.MgraAlloc( MilSystem, ref graCtx );
-					MIL.MgraColor( graCtx, MIL.M_COLOR_WHITE );
-
-					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
+					MIL.MgraColor( gctx, MIL.M_COLOR_WHITE );
+					MIL.MgraArcFill( gctx, mask,
+									DetectCirclrCenterX, DetectCirclrCenterY,
 									Radius, Radius, start, end );
 
-					MIL.MgraColor( graCtx, MIL.M_COLOR_BLACK );
-					MIL.MgraArcFill( graCtx, sectorMask, DetectCirclrCenterX, DetectCirclrCenterY,
+					MIL.MgraColor( gctx, MIL.M_COLOR_BLACK );
+					MIL.MgraArcFill( gctx, mask,
+									DetectCirclrCenterX, DetectCirclrCenterY,
 									smallRadius, smallRadius, start, end );
 
-					MIL.MbufClone( InfraredCameraImage, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT,
-								  MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref sectorImage );
-					MIL.MimArith( InfraredCameraImage, sectorMask, sectorImage, MIL.M_AND );
+					MIL.MimArith( InfraredCameraImage, mask, sector, MIL.M_AND );
 
-					int w = 0, h = 0;
-					MIL.MbufInquire( sectorImage, MIL.M_SIZE_X, ref w );
-					MIL.MbufInquire( sectorImage, MIL.M_SIZE_Y, ref h );
-					ushort[] sectorData = new ushort[w * h];
-					MIL.MbufGet( sectorImage, sectorData );
+					/* --- 3) 평균 온도 계산 --- */
+					ushort[] sectorData = new ushort[width * height];
+					MIL.MbufGet( sector, sectorData );
 
-					//MIL.MdispSelect( InfraredDisplay, sectorMask );
-					//MIL.MdispSelect( InfraredDisplay, sectorImage );
+					var temps     = sectorData.Where(v => v > 0)
+							  .Select(v => v / 100.0 - 273.15);
+					double sAvg   = temps.Any() ? temps.Average() : 0.0;
 
-					//var temps = sectorData.Where(v => v > 0)
-					//		  .Select(v => (v / 100.0) - 273.15);
-
-					/// 테스트
-					var temps = sectorData.Where(v => v > 0)
-					  .Select(v => v / 100.0 - 273.15);
-
-					double sectorAvg = temps.Any() ? temps.Average() : 0;
-					//Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
-
-					lock (sumLock)                    // ★ 동시 수정 보호
+					lock (sumLock)
 					{
-						sectorTotalSum += sectorAvg;
-						sectorTemp[ idx ] = sectorAvg;
+						sectorTotalSum += sAvg;
+						sectorTemp[ idx ] = sAvg;
 					}
 
-					int validPix = temps.Count();
-					//Logger.WriteLine($"[S{idx+1}] valid={validPix}, avg={sectorAvg:F1}");
+					/* --- 4) 분할선 표시 (원래 코드 유지) --- */
+					double a0 = start * Math.PI / 180.0;
+					double a1 = (start + span) * Math.PI / 180.0;
 
-					double angleStartRad = start * Math.PI / 180.0;
-					double angleEndRad   = (start + span) * Math.PI / 180.0;
+					double x1 = DetectCirclrCenterX + smallRadius * Math.Cos(a0);
+					double y1 = DetectCirclrCenterY + smallRadius * Math.Sin(a0);
+					double x2 = DetectCirclrCenterX + Radius      * Math.Cos(a0);
+					double y2 = DetectCirclrCenterY + Radius      * Math.Sin(a0);
 
-					double x1_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleStartRad);
-					double y1_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleStartRad);
-					double x1_end   = DetectCirclrCenterX + Radius      * Math.Cos(angleStartRad);
-					double y1_end   = DetectCirclrCenterY + Radius      * Math.Sin(angleStartRad);
+					double x3 = DetectCirclrCenterX + smallRadius * Math.Cos(a1);
+					double y3 = DetectCirclrCenterY + smallRadius * Math.Sin(a1);
+					double x4 = DetectCirclrCenterX + Radius      * Math.Cos(a1);
+					double y4 = DetectCirclrCenterY + Radius      * Math.Sin(a1);
 
-					double x2_start = DetectCirclrCenterX + smallRadius * Math.Cos(angleEndRad);
-					double y2_start = DetectCirclrCenterY + smallRadius * Math.Sin(angleEndRad);
-					double x2_end   = DetectCirclrCenterX + Radius      * Math.Cos(angleEndRad);
-					double y2_end   = DetectCirclrCenterY + Radius      * Math.Sin(angleEndRad);
+					MIL.MgraLine( gctx, MilOverlayImage, x1, y1, x2, y2 );
+					MIL.MgraLine( gctx, MilOverlayImage, x3, y3, x4, y4 );
 
-					MIL.MgraLine( GraphicsContext, MilOverlayImage, x1_start, y1_start, x1_end, y1_end );
-					MIL.MgraLine( GraphicsContext, MilOverlayImage, x2_start, y2_start, x2_end, y2_end );
-
-					MIL.MbufFree( sectorMask );
-					MIL.MbufFree( sectorImage );
-					MIL.MgraFree( graCtx );
-					// ------------- ↑↑↑↑↑ 기존 코드 “원형” ↑↑↑↑↑ -------------
-
-					MIL.MthrFree( tctx );             // 스레드 컨텍스트 해제
+					/* --- 5) 컨텍스트 해제 --- */
+					//MIL.MthrFree( tctx );
 				} ) );
 			}
 
@@ -809,8 +797,8 @@ namespace DamoOneVision.ImageProcessing
 			MIL.MgraFree( SettingGraphicsContext );
 			MIL.MgraFree( AnnulusContext );
 			MIL.MmeasFree( MeasMarker );
-			MIL.MmodFree( ModCircleShape );
-			MIL.MmodFree( ResultobjectforModCircleShapeContext );
+			//MIL.MmodFree( ModCircleShape );
+			//MIL.MmodFree( ResultobjectforModCircleShapeContext );
 
 			//MIL.MbufFree( MimConvolImage );
 			MIL.MbufFree( AnnulusAndBinarized );

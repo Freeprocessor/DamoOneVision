@@ -69,7 +69,7 @@ namespace DamoOneVision.Camera
 
 			MIL.MsysControl( MilSystem, MIL.M_DISCOVER_DEVICE, MIL.M_DEFAULT );
 			//MIL.MappControl( MIL.M_DEFAULT, MIL.M_DEBUG_LEVEL, MIL.M_DEBUG_ALL );
-			MIL.MappControl( MIL.M_ERROR, MIL.M_PRINT_DISABLE );
+			//MIL.MappControl( MIL.M_ERROR, MIL.M_PRINT_DISABLE );
 			//MIL.MappControl( MIL.M_ERROR, MIL );
 		}
 

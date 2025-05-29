@@ -135,6 +135,8 @@ namespace DamoOneVision
 			Logger.WriteLine( "[App] OnExit 시작" );
 			try
 			{
+				ReusableMilBuffers.Free();
+
 				ServiceProvider.GetRequiredService<CameraService>()?.Dispose();
 				ServiceProvider.GetRequiredService<MotionService>()?.ReleaseLibrary();
 

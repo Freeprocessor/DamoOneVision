@@ -204,9 +204,18 @@ namespace DamoOneVision.Services
 			var vm = _mainViewModel.Value;
 			_infraredCamera.LoadImage( MilSystem, filePath );
 
+			MIL_ID milimage = GetImage();
+			MIL_ID milscale = GetScaleImage();
+			MIL_ID milbin = GetBinarizedImage();
+
 			MIL.MdispSelect( _infraredCameraDisplay, _infraredCamera.ReciveLoadScaleImage() );
 			//JETImageSave();
-			var result = await Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel );
+			var result = await Conversion.InfraredCameraModel( false, false, milbin, milscale, milimage, _infraredCameraDisplay, _infraredCameraModel );
+
+			if (result == null)
+			{
+				return;
+			}
 
 			if (result.IsGood)
 			{

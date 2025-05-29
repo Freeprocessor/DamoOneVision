@@ -476,22 +476,22 @@ namespace DamoOneVision.Camera
 					MIL.MbufFree( MilLoadBinarizedImage );
 					Logger.WriteLine( "MilLoadBinarizedImage 해제" );
 				}
-
+				
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilImage );
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref LoadMilScaleImage );
 				MIL.MbufImport( filePath, MIL.M_DEFAULT, MIL.M_RESTORE + MIL.M_NO_GRAB + MIL.M_NO_COMPRESS, MilSystem, ref MilLoadBinarizedImage );
-
+				
 				// 이미지 속성 가져오기
 				MIL_INT width = 0;
 				MIL_INT height = 0;
 				MIL_INT nbBands = 0;
 				MIL_INT dataType = 0;
-
+				//Logger.WriteLine( $"[LoadImage]  ID before inquire = 0x{LoadMilImage:X}" );
 				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_X, ref width );
 				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_Y, ref height );
 				MIL.MbufInquire( LoadMilImage, MIL.M_SIZE_BAND, ref nbBands );
 				MIL.MbufInquire( LoadMilImage, MIL.M_TYPE, ref dataType );
-
+				//Logger.WriteLine( $"[LoadImage]  ID after  inquire = 0x{LoadMilImage:X}" );
 				this.Width = width;
 				this.Height = height;
 				this.NbBands = nbBands;
