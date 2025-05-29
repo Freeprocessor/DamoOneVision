@@ -93,7 +93,7 @@ namespace DamoOneVision
 			_manualUserControl.GoMainRequested += ( s, e ) =>
 			{
 				MainContent.Content = _mainUserControl;
-				_manualViewModel.PositionReadStop();
+				//_manualViewModel.PositionReadStop();
 			};
 
 			_settingUserControl.GoMainRequested += ( s, e ) =>
@@ -240,7 +240,7 @@ namespace DamoOneVision
 		{
 			// Manual 화면으로 전환
 			MainContent.Content = _manualUserControl;
-			_manualViewModel.PositionReadStart();
+			//_manualViewModel.PositionReadStart();
 
 		}
 

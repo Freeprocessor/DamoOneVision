@@ -106,7 +106,13 @@ namespace DamoOneVision.ViewModels
 			{
 				string selectedFolder = dialog.FileName;
 				ImagePaths.Clear();
-				var files = Directory.GetFiles(selectedFolder, "*.bmp");
+				//var files = Directory.GetFiles(selectedFolder, "*.bmp");
+
+				var files = Directory.GetFiles( selectedFolder, "*.bmp" )
+                      .OrderByDescending( f => File.GetLastWriteTime( f ) )   // 최신 → 오래된 순
+                      .ToArray();
+
+
 				foreach (var file in files)
 					ImagePaths.Add( file );
 
@@ -131,7 +137,13 @@ namespace DamoOneVision.ViewModels
 		private async Task LoadImagesFromFolderAsync( string folder )
 		{
 			ImagePaths.Clear();
-			var files = Directory.GetFiles(folder, "*.bmp");
+			//var files = Directory.GetFiles(folder, "*.bmp");
+			var files = Directory.GetFiles( folder, "*.bmp" )
+                      .OrderByDescending( f => File.GetLastWriteTime( f ) )
+                      .ToArray();
+
+
+
 			foreach (var f in files) ImagePaths.Add( f );
 
 

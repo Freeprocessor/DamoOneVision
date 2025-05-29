@@ -237,7 +237,7 @@
                             <!-- Row 0 -->
                             <Label Content="현재위치" Grid.Column="0"
                                    Margin="5,0,5,0" VerticalAlignment="Center" Height="24"/>
-                            <TextBox Text="{Binding XAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding XAxisCommandPosition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="0" Grid.Column="1"
                                      Margin="5,5,5,5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
@@ -402,7 +402,7 @@
                             <Label Content="현재위치"
                                    Grid.Row="0" Grid.Column="0"
                                    Margin="5" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZAxisCommandPosition, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding ZAxisCommandPosition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                      Grid.Row="0" Grid.Column="1"
                                      Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>

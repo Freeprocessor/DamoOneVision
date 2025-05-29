@@ -129,29 +129,31 @@ namespace DamoOneVision
 			) );
 		}
 
-		protected override async void OnExit( ExitEventArgs e )
+		protected override void OnExit( ExitEventArgs e )
 		{
 			base.OnExit( e );
-
+			Logger.WriteLine( "[App] OnExit 시작" );
 			try
 			{
-				Debug.WriteLine( "[App] OnExit 시작" );
-
 				ServiceProvider.GetRequiredService<CameraService>()?.Dispose();
 				ServiceProvider.GetRequiredService<MotionService>()?.ReleaseLibrary();
 
 				var milSystemService = ServiceProvider.GetRequiredService<MilSystemService>();
-				await milSystemService.DisposeAsync();
+				milSystemService.DisposeAsync().AsTask().GetAwaiter().GetResult();
 
 				MILContext.Instance.Dispose();
-
-				Logger.Shutdown();
-				Debug.WriteLine( "[App] OnExit 종료" );
+				Logger.WriteLine( "[App] OnExit 완료" );
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine( "[OnExit 예외] " + ex.Message );
-				Debug.WriteLine( ex.StackTrace );
+				Logger.WriteLine( "[OnExit 예외] " + ex.Message );
+				Logger.WriteLine( ex.StackTrace );
+			}
+			finally
+			{
+				//Logger.WriteLine( "[App] OnExit 종료" );
+				//await Task.Delay(1000);
+				Logger.Shutdown();       // ★ 버퍼 flush
 			}
 		}
 	}

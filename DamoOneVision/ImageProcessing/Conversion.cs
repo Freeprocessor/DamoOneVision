@@ -2,6 +2,7 @@
 using DamoOneVision.Models;
 using DamoOneVision.Services;
 using Matrox.MatroxImagingLibrary;
+using System.Diagnostics;
 
 namespace DamoOneVision.ImageProcessing
 {
@@ -160,6 +161,10 @@ namespace DamoOneVision.ImageProcessing
 
 		public static async Task<InfraredInspectionResult> InfraredCameraModel( bool isSetting, bool isBinarized, MIL_ID BinarizedImage, MIL_ID InfraredCameraScaleImage, MIL_ID InfraredCameraImage, MIL_ID InfraredDisplay, InfraredCameraModel infraredCameraModel )
 		{
+
+			Stopwatch sw = new Stopwatch();	
+			sw.Start();
+
 			if (InfraredCameraImage == MIL.M_NULL)
 			{
 				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
@@ -462,15 +467,18 @@ namespace DamoOneVision.ImageProcessing
 
 			MIL.MdispControl( InfraredDisplay, MIL.M_OVERLAY_CLEAR, MIL.M_DEFAULT );
 
-			double[] sectorTemp = new double[36];
+
 
 			double sectorTotalSum = 0.0;
 			List<Task> tasks = new();
 
 			object sumLock = new();                  // ★ 공유 데이터 보호 (sectorTotalSum, sectorTemp)
 
+			const int sectorCount = 60;          // ← 36 ▶ 60 으로 변경
+			double     span       = 360.0 / sectorCount;   // 6°
+			double[] sectorTemp = new double[sectorCount];
 			// ★ for → Task.Run 내부로 캡처
-			for (int i = 0; i < 36; i++)
+			for (int i = 0; i < sectorCount; i++)
 			{
 				int idx = i;                         // ★ 클로저 변수 고정
 
@@ -493,7 +501,7 @@ namespace DamoOneVision.ImageProcessing
 						circleGood = false;
 						return;                       // 이 Task 종료
 					}
-					double span  = 10.0;
+
 					double start = (idx - 1) * span;
 					double end = idx * span;
 
@@ -536,7 +544,7 @@ namespace DamoOneVision.ImageProcessing
 					  .Select(v => v / 100.0 - 273.15);
 
 					double sectorAvg = temps.Any() ? temps.Average() : 0;
-					Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
+					//Logger.WriteLine( $"[Sector {idx + 1}] 평균 온도: {sectorAvg:F2} ℃" );
 
 					lock (sumLock)                    // ★ 동시 수정 보호
 					{
@@ -583,18 +591,18 @@ namespace DamoOneVision.ImageProcessing
 				//throw;                        // 상위에서 추가 처리할 경우
 			}
 
-			double sectorTotalAvg = sectorTotalSum / 36;
+			double sectorTotalAvg = sectorTotalSum / sectorCount;
 			Logger.WriteLine( $"12개 섹터 평균 온도: {sectorTotalAvg:F2} ℃" );
 
 			/// 인접섹터 온도 비교
 			// ── 1) NaN·Inf 제거
-			double[] neighborDiff   = new double[36];
-			bool[]   neighborIssue  = new bool[36];
+			double[] neighborDiff   = new double[sectorCount];
+			bool[]   neighborIssue  = new bool[sectorCount];
 			int      neighborBadCnt = 0;
 
-			for (int i = 0; i < 36; i++)
+			for (int i = 0; i < sectorCount; i++)
 			{
-				int next = (i + 1) % 36;
+				int next = (i + 1) % sectorCount;
 				double diff = Math.Abs(sectorTemp[i] - sectorTemp[next]);
 
 				neighborDiff[ i ] = diff;
@@ -648,8 +656,8 @@ namespace DamoOneVision.ImageProcessing
 
 
 			/// 평균 온도 기준으로 섹터별 온도 비교
-			bool[] underHeatSector = new bool[36];
-			bool[] overHeatSector = new bool[36];
+			bool[] underHeatSector = new bool[sectorCount];
+			bool[] overHeatSector = new bool[sectorCount];
 			///
 			for (int i = 0; i < sectorTemp.Length; i++)
 			{
@@ -826,6 +834,9 @@ namespace DamoOneVision.ImageProcessing
 				Radius = Radius,
 				MaxBlobLength = MaxLangth
 			};
+
+			sw.Stop();
+			Logger.WriteLine( $"검사 시간: {sw.ElapsedMilliseconds} ms" );
 
 			return inspectionResult;
 		}

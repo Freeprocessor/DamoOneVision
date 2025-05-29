@@ -14,8 +14,12 @@ namespace DamoOneVision.ViewModels
 		{
 			if (!Directory.Exists( rootPath )) return;
 
-			foreach (var dir in Directory.EnumerateDirectories( rootPath ))
+			/* ▽▽ 여기 한 줄만 변경 ▽▽ */
+			foreach (var dir in Directory.EnumerateDirectories( rootPath )
+										 .OrderByDescending( d => Directory.GetLastWriteTime( d ) ))
+			{
 				FolderItems.Add( MakeFolderItem( dir ) );
+			}
 		}
 
 		private FolderItem MakeFolderItem( string dir )

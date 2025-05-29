@@ -5,7 +5,7 @@ using DamoOneVision.Services;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
+
 
 namespace DamoOneVision.ViewModels
 {
@@ -22,22 +22,9 @@ namespace DamoOneVision.ViewModels
 		public InfraredCameraModel InfraredCameraModel { get; set; }
 		public MotionModel MotionModel { get; set; }
 
-		private double _xAxisWaitingPosition;
-		private double _xAxisEndPosition;
-		private double _xAxisCommandPosition;
-		private double _xAxisVelocity = 10000;
-		private double _xAxisAcceleration = 0.5; // 기본 가속도
-		private double _xAxisDeceleration = 0.5; // 기본 감속도
+
 		private bool _xAxisIsMoving;
-
-		private double _zAxisWorkPosition;
-		private double _zAxisCommandPosition;
-		private double _zAxisVelocity = 10000;
-		private double _zAxisAcceleration = 0.5; // 기본 가속도
-		private double _zAxisDeceleration = 0.5; // 기본 감속도
 		private bool _zAxisIsMoving;
-
-		private double _conveyorSpeed;
 
 		// Connect 버튼이 활성화되는 조건 (예: 아직 연결 안 됐고, 작업 중이 아님)
 		public bool CanConnect => !IsVisionConnected && !IsBusy;
@@ -45,9 +32,21 @@ namespace DamoOneVision.ViewModels
 		// Disconnect 버튼이 활성화되는 조건 (예: 이미 연결되어 있고, 작업 중이 아님)
 		public bool CanDisconnect => IsVisionConnected && !IsBusy;
 
-
-
-		private readonly DispatcherTimer _positionTimer;
+		public double ConveyorSpeed
+		{
+			get => _motionService.ConveyorSpeed;
+			private set { }
+		} 
+		public double XAxisCommandPosition
+		{
+			get => _motionService.XCmdPos;
+			private set { }
+		} 
+		public double ZAxisCommandPosition
+		{
+			get => _motionService.ZCmdPos;
+			private set { }
+		} 
 
 		/// <summary>
 		/// PropertyChanged 이벤트 핸들러, WPF 바인딩을 위해 필요
@@ -135,12 +134,27 @@ namespace DamoOneVision.ViewModels
 			_cameraService.CameraConnectedChanged += OnCameraConnectedChanged;
 			_cameraService.BusyStateChanged += OnBusyStateChanged;
 
-			_positionTimer = new DispatcherTimer();
-			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
-			_positionTimer.Tick += PositionTimer_Tick;
 
+			/* MotionService 의 PropertyChanged 구독 */
+			_motionService.PropertyChanged += MotionService_PropertyChanged;
 
 			setModel();
+		}
+
+		private void MotionService_PropertyChanged( object? s, PropertyChangedEventArgs e )
+		{
+			/* Service 쪽 이름 그대로 relay */
+			if (e.PropertyName is nameof( MotionService.ConveyorSpeed ) or
+								 nameof( MotionService.XCmdPos ) or
+								 nameof( MotionService.ZCmdPos ))
+			{
+				OnPropertyChanged( e.PropertyName switch
+				{
+					nameof( MotionService.ConveyorSpeed ) => nameof( ConveyorSpeed ),
+					nameof( MotionService.XCmdPos ) => nameof( XAxisCommandPosition ),
+					_ => nameof( ZAxisCommandPosition )
+				} );
+			}
 		}
 
 		private void setModel( )
@@ -185,16 +199,19 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		public void PositionReadStart( )
-		{
-			_positionTimer.Start();
-		}
+		//public void PositionReadStart( )
+		//{
+		//	//
+		//	_motionService.ConveyorReadStart();
+		//}
 
-		public void PositionReadStop( )
-		{
-			_positionTimer.Stop();
-		}
+		//public void PositionReadStop( )
+		//{
+		//	//
+		//	_motionService.ConveyorReadStop();
+		//}
 
+		private double _xAxisWaitingPosition;
 		public double XAxisWaitingPosition
 		{
 			get => _xAxisWaitingPosition;
@@ -207,6 +224,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _xAxisEndPosition;
 		public double XAxisEndPosition
 		{
 			get => _xAxisEndPosition;
@@ -219,18 +237,8 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-		public double XAxisCommandPosition
-		{
-			get => _xAxisCommandPosition;
-			set
-			{
-				_xAxisCommandPosition = value;
-				OnPropertyChanged( nameof( XAxisCommandPosition ) );
-				(XAxisMoveWaitCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-				(XAxisMoveEndCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-			}
-		}
 
+		private double _xAxisVelocity = 10000;
 		public double XAxisVelocity
 		{
 			get => _xAxisVelocity;
@@ -243,6 +251,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _xAxisAcceleration = 0.5; // 기본 가속도
 		public double XAxisAcceleration
 		{
 			get => _xAxisAcceleration;
@@ -253,6 +262,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _xAxisDeceleration = 0.5; // 기본 감속도
 		public double XAxisDeceleration
 		{
 			get => _xAxisDeceleration;
@@ -263,7 +273,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
-
+		private double _zAxisWorkPosition;
 		public double ZAxisWorkPosition
 		{
 			get => _zAxisWorkPosition;
@@ -276,17 +286,7 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		public double ZAxisCommandPosition
-		{
-			get => _zAxisCommandPosition;
-			set
-			{
-				_zAxisCommandPosition = value;
-				OnPropertyChanged( nameof( ZAxisCommandPosition ) );
-				(ZAxisMoveWorkCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
-			}
-		}
-
+		private double _zAxisVelocity = 10000;
 		public double ZAxisVelocity
 		{
 			get => _zAxisVelocity;
@@ -298,6 +298,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _zAxisAcceleration = 0.5; // 기본 가속도
 		public double ZAxisAcceleration
 		{
 			get => _zAxisAcceleration;
@@ -308,6 +309,7 @@ namespace DamoOneVision.ViewModels
 			}
 		}
 
+		private double _zAxisDeceleration = 0.5; // 기본 감속도
 		public double ZAxisDeceleration
 		{
 			get => _zAxisDeceleration;
@@ -315,16 +317,6 @@ namespace DamoOneVision.ViewModels
 			{
 				_zAxisDeceleration = value;
 				OnPropertyChanged( nameof( ZAxisDeceleration ) );
-			}
-		}
-
-		public double ConveyorSpeed
-		{
-			get => _conveyorSpeed;
-			set
-			{
-				_conveyorSpeed = value;
-				OnPropertyChanged( nameof( ConveyorSpeed ) );
 			}
 		}
 
@@ -672,12 +664,6 @@ namespace DamoOneVision.ViewModels
 		}
 
 
-		private void PositionTimer_Tick( object? sender, EventArgs e )
-		{
-			XAxisCommandPosition = _motionService.XAxisGetCommandPosition();
-			ZAxisCommandPosition = _motionService.ZAxisGetCommandPosition();
-			ConveyorSpeed = _motionService.GetConveyorSpeed();
-		}
 
 		protected void OnPropertyChanged( string propertyName )
 		{

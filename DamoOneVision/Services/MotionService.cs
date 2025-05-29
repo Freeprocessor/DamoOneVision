@@ -1,13 +1,28 @@
 ﻿using DamoOneVision.Ajinextek.Common;
 using DamoOneVision.Ajinextek.Motion;
 using DamoOneVision.Models;
+using System;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace DamoOneVision.Services
 {
-	public class MotionService
+	public class MotionService : IDisposable
 	{
+		public event PropertyChangedEventHandler? PropertyChanged;
+
+
+		// ★ UI-스레드 보장용 헬퍼
+		private void Raise( string name )
+		{
+			// 현재 애플리케이션에 Dispatcher가 있고,
+			// 호출 스레드가 UI 스레드가 아니라면
+			var d = Application.Current?.Dispatcher;
+			if (d != null && !d.CheckAccess())
+				d.Invoke( ( ) => PropertyChanged?.Invoke( this, new PropertyChangedEventArgs( name ) ) );
+			else
+				PropertyChanged?.Invoke( this, new PropertyChangedEventArgs( name ) );
+		}
 
 		public const int X = 0;
 		public const int Z = 2;
@@ -25,17 +40,55 @@ namespace DamoOneVision.Services
 		const int ALARMRESET = 1;
 		const int SERVOBREAK = 2;
 
+		/* ―――――――― 엔코더/컨베이어 상수 ―――――――― */
+		private const int    ENCODER_AXIS   = 1;        // 실제 엔코더 채널
+		private const double PPR            = 1000.0;   // Pulse Per Revolution
+		private const double DIST_PER_REVMM = 300.0;    // 1회전 이송 거리(mm)
+
+		/* 32-bit 엔코더 카운터 범위(아진보드 기본) */
+		private const long   MAX_COUNT      = int.MaxValue;   //  +2 147 483 647
+		private const long   MIN_COUNT      = int.MinValue;   //  −2 147 483 648
+		private const long   COUNT_RANGE    = (long)MAX_COUNT - MIN_COUNT + 1L;   // 4 294 967 296
+
 		bool isXAxisHome = false;
 		bool isZAxisHome = false;
 
 		public int CameraDelay { get; set; }
 
-		private double _lastPosition = 0;
-		private DateTime _lastTime = DateTime.Now;
+		/* ―――――――― 내부 상태 ―――――――― */
+		private double            _lastPulse     = 0.0;          // 직전 펄스
+		private DateTime          _lastTime      = DateTime.Now; // 직전 시간
+		private CancellationTokenSource? _cts;
+		private Task?             _speedTask;
 
-		public double ConveyorSpeed { get; set; }
 
-		private readonly DispatcherTimer _positionTimer;
+		/* ① 속도·축 위치 프로퍼티를 모두 여기서 보유 */
+		private double _conveyorSpeed;
+		public double ConveyorSpeed
+		{
+			get => _conveyorSpeed;
+			private set      // ← 외부에서 못 바꾸도록 private set
+			{
+				if (Math.Abs( _conveyorSpeed - value ) > 0.01)
+				{
+					_conveyorSpeed = value;
+					Raise( nameof( ConveyorSpeed ) );
+				}
+			}
+		}
+
+		private double _xCmdPos, _zCmdPos;
+		public double XCmdPos
+		{
+			get => _xCmdPos;
+			private set { _xCmdPos = value; Raise( nameof( XCmdPos ) ); }
+		}
+		public double ZCmdPos
+		{
+			get => _zCmdPos;
+			private set { _zCmdPos = value; Raise( nameof( ZCmdPos ) ); }
+		}
+
 		private MotionModel _motionModel;
 
 		private bool _isInitialized = false; // 라이브러리 초기화 여부
@@ -53,22 +106,43 @@ namespace DamoOneVision.Services
 			//motionModel.XAxisDeceleration = 0.1;
 
 			InitLibrary();
-			_positionTimer = new DispatcherTimer( DispatcherPriority.Normal, Application.Current.Dispatcher );
-			_positionTimer.Interval = TimeSpan.FromMilliseconds( 200 ); // 0.2초마다 업데이트
-			_positionTimer.Tick += PositionTimer_Tick;
-
+			ConveyorReadStart();
 		}
 
 		public void ConveyorReadStart( )
 		{
+			if (_cts != null) return;            // 이미 실행 중
+
+			// 기준 위치·시간 확보
+			CAXM.AxmStatusGetActPos( ENCODER_AXIS, ref _lastPulse );
 			_lastTime = DateTime.Now;
-			_positionTimer.Start();
+
+			_cts = new CancellationTokenSource();
+			_speedTask = Task.Run( async ( ) =>
+			{
+				while (!_cts.IsCancellationRequested)
+				{
+					GetConveyorSpeed();          // 10 Hz 주기로 속도 계산
+
+					CAXM.AxmStatusGetCmdPos( X, ref _xCmdPos );
+					CAXM.AxmStatusGetCmdPos( Z, ref _zCmdPos );
+					Raise( nameof( XCmdPos ) );
+					Raise( nameof( ZCmdPos ) );
+
+					await Task.Delay( 100, _cts.Token );
+				}
+			}, _cts.Token );
 			Logger.WriteLine( "ConveyorReadStart" );
 		}
 
 		public void ConveyorReadStop( )
 		{
-			_positionTimer.Stop();
+			if (_cts == null) return;
+			_cts.Cancel();
+			try { _speedTask!.Wait(); }
+			catch { /* TaskCanceledException 무시 */ }
+			_cts = null;
+			_speedTask = null;
 		}
 
 		public void SetModel( MotionModel motionModel )
@@ -333,42 +407,43 @@ namespace DamoOneVision.Services
 		/// <returns>속도 mm/s</returns>
 		public double GetConveyorSpeed( )
 		{
-			int axisNo = 1;
-			double pulsePerRevolution = 1000;
-			double distancePerRevolution = 300;
+			/* 1) 현재 펄스 위치 읽기 */
+			double curPulseDouble = 0.0;
+			uint ret = CAXM.AxmStatusGetActPos(ENCODER_AXIS, ref curPulseDouble);
+			if (ret != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
+			{
+				//Logger.WriteLine( $"[WARN] AxmStatusGetActPos 실패 : 0x{ret:X}" );
+				return ConveyorSpeed;            // 오류 시 이전 값 유지
+			}
 
-			double pulsePerMm = pulsePerRevolution / distancePerRevolution;
-
-			// 현재 위치 (엔코더 단위)
-			double currentPulse = 0;
-			CAXM.AxmStatusGetActPos( axisNo, ref currentPulse );
-
-			// 현재 시간
+			/* 2) 경과 시간(ms 단위 노이즈 차단) */
 			DateTime now = DateTime.Now;
-			double elapsedSeconds = (now - _lastTime).TotalSeconds;
+			double dtSec = (now - _lastTime).TotalSeconds;
+			if (dtSec < 0.002)                   // 2 ms 이하 샘플은 무시
+				return ConveyorSpeed;
 
-			// 이동 거리 계산
-			double deltaPulse = currentPulse - _lastPosition;
+			/* 3) 펄스 차이(오버플로우 보정) */
+			long curPulse = (long)curPulseDouble;
+			long lastPulse = (long)_lastPulse;
+			long deltaPulse = curPulse - lastPulse;
+
+			// |delta| 가 전체 범위의 절반보다 크면 오버/언더플로우로 판단
+			if (deltaPulse > COUNT_RANGE / 2L)          // + → - 로 래핑된 경우
+				deltaPulse -= COUNT_RANGE;
+			else if (deltaPulse < -COUNT_RANGE / 2L)    // - → + 로 래핑된 경우
+				deltaPulse += COUNT_RANGE;
+
+			/* 4) 속도 계산 */
+			double pulsePerMm = PPR / DIST_PER_REVMM;
 			double distanceMm = deltaPulse / pulsePerMm;
+			double speedMmSec = Math.Abs(distanceMm / dtSec);
 
-			// 속도 계산
-			double speedMmPerSec = distanceMm / elapsedSeconds;
-
-			// 상태 갱신
+			/* 5) 상태 갱신 */
+			_lastPulse = curPulseDouble;
 			_lastTime = now;
-			_lastPosition = 0; // 다음 계산을 위해 기준값 0으로 고정
+			ConveyorSpeed = Math.Round( speedMmSec, 2 );
 
-			// 💡 위치를 0으로 초기화 (커맨드/액츄얼 모두)
-			CAXM.AxmStatusSetPosMatch( axisNo, 0.0 );
-
-			speedMmPerSec = Math.Round( speedMmPerSec, 2 );
-			speedMmPerSec = Math.Abs( speedMmPerSec );
-
-
-			ConveyorSpeed = speedMmPerSec;
-			//Logger.WriteLine( $"Conveyor Speed: {ConveyorSpeed} mm/s" );
-			//Logger.WriteLine( $"Speed: {ConveyorSpeed} mm/s" );
-			return speedMmPerSec;
+			return ConveyorSpeed;
 		}
 
 		public double XAxisGetCommandPosition( )
@@ -495,9 +570,11 @@ namespace DamoOneVision.Services
 			CAXM.AxmMoveSStop( Z );
 		}
 
-		private void PositionTimer_Tick( object? sender, EventArgs e )
+		public void Dispose( )
 		{
-			GetConveyorSpeed();
+			ConveyorReadStop();
+			Logger.WriteLine("Motion Service Dispose");
+			GC.SuppressFinalize( this );
 		}
 	}
 }
