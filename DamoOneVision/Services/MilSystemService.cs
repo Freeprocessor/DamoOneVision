@@ -162,56 +162,56 @@ namespace DamoOneVision.Services
 			{
 				MIL.MdispFree( InfraredDisplay );
 				InfraredDisplay = MIL.M_NULL;
-				Logger.WriteLine( "InfraredDisplay 해제 완료." );
+				Logger.WriteLine( "INFO", "MilSystemService", "InfraredDisplay 해제 완료.", 0 );
 			}
 
 			if (InfraredConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( InfraredConversionDisplay );
 				InfraredConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "InfraredConversionDisplay 해제 완료." );
+				Logger.WriteLine( "INFO", "MilSystemService", "InfraredConversionDisplay 해제 완료.", 0 );
 			}
 
 			if (SideCam1Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam1Display );
 				SideCam1Display = MIL.M_NULL;
-				Logger.WriteLine( "SideCam1Display 해제 완료." );
+				Logger.WriteLine( "INFO", "MilSystemService", "SideCam1Display 해제 완료.", 0 );
 			}
 
 			if (SideCam1ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam1ConversionDisplay );
 				SideCam1ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "SideCam1ConversionDisplay 해제 완료." );
+				Logger.WriteLine("INFO", "MilSystemService", "SideCam1ConversionDisplay 해제 완료.", 0 );
 			}
 
 			if (SideCam2Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam2Display );
 				SideCam2Display = MIL.M_NULL;
-				Logger.WriteLine( "SideCam2Display 해제 완료." );
+				Logger.WriteLine("INFO", "MilSystemService", "SideCam2Display 해제 완료.", 0 );
 			}
 
 			if (SideCam2ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam2ConversionDisplay );
 				SideCam2ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "SideCam2ConversionDisplay 해제 완료." );
+				Logger.WriteLine("INFO", "MilSystemService", "SideCam2ConversionDisplay 해제 완료.", 0 );
 			}
 
 			if (SideCam3Display != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam3Display );
 				SideCam3Display = MIL.M_NULL;
-				Logger.WriteLine( "SideCam3Display 해제 완료." );
+				Logger.WriteLine("INFO", "MilSystemService", "SideCam3Display 해제 완료.", 0 );
 			}
 
 			if (SideCam3ConversionDisplay != MIL.M_NULL)
 			{
 				MIL.MdispFree( SideCam3ConversionDisplay );
 				SideCam3ConversionDisplay = MIL.M_NULL;
-				Logger.WriteLine( "SideCam3ConversionDisplay 해제 완료." );
+				Logger.WriteLine("INFO", "MilSystemService", "SideCam3ConversionDisplay 해제 완료.", 0 );
 			}
 
 			/// 어떻게 이미지를 해제할 것인지?

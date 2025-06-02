@@ -132,7 +132,7 @@ namespace DamoOneVision
 		protected override void OnExit( ExitEventArgs e )
 		{
 			base.OnExit( e );
-			Logger.WriteLine( "[App] OnExit 시작" );
+			Logger.WriteLine( "INFO", "App", "OnExit 시작" );
 			try
 			{
 				ReusableMilBuffers.Free();
@@ -144,12 +144,12 @@ namespace DamoOneVision
 				milSystemService.DisposeAsync().AsTask().GetAwaiter().GetResult();
 
 				MILContext.Instance.Dispose();
-				Logger.WriteLine( "[App] OnExit 완료" );
+				Logger.WriteLine( "INFO", "App", "OnExit 완료" );
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( "[OnExit 예외] " + ex.Message );
-				Logger.WriteLine( ex.StackTrace );
+				Logger.WriteLine( "ERROR", "App", "OnExit 예외 " + ex.Message );
+				Logger.WriteLine( "ERROR", "App", ex.StackTrace );
 			}
 			finally
 			{

@@ -46,7 +46,7 @@ namespace DamoOneVision.Views
 			if (MilImage1 != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage1 );
-				Logger.WriteLine( "MilImage1 해제" );
+				Logger.WriteLine( "INFO", "ImageCompose", "MilImage1 해제" );
 			}
 
 			string? path = OpenImageFile();
@@ -67,7 +67,7 @@ namespace DamoOneVision.Views
 			if (MilImage2 != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage2 );
-				Logger.WriteLine( "MilImage1 해제" );
+				Logger.WriteLine( "INFO", "ImageCompose", "MilImage1 해제" );
 			}
 
 			string? path = OpenImageFile();
@@ -97,7 +97,7 @@ namespace DamoOneVision.Views
 			if (MilImage != MIL.M_NULL)
 			{
 				MIL.MbufFree( MilImage );
-				Logger.WriteLine( "MilImage 해제" );
+				Logger.WriteLine( "INFO", "ImageCompose", "MilImage 해제" );
 			}
 
 			MIL.MbufClone( MilImage1, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref MilImage );

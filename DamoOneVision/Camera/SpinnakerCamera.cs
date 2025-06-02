@@ -34,7 +34,7 @@ namespace DamoOneVision.Camera
 			InitImageSave();
 			MilSystem = MILContext.Instance.MilSystem;
 			this.CameraName = CameraName;
-			Logger.WriteLine( $"{CameraName} Spinnaker 카메라 연결" );
+			Logger.WriteLine( "INFO", "Spinnaker", $"{CameraName} Spinnaker 카메라 연결" );
 		}
 		private void InitImageSave( )
 		{
@@ -84,7 +84,7 @@ namespace DamoOneVision.Camera
 					MIL.MbufAllocColor( MilSystem, nbBands, width, height, dataType, MIL.M_IMAGE + MIL.M_PROC + MIL.M_DISP, ref MilImage );
 				}
 
-				Logger.WriteLine( $"{CameraName} Spinnaker 카메라 연결 성공" );
+				Logger.WriteLine( "INFO", "Spinnaker", $"{CameraName} Spinnaker 카메라 연결 성공" );
 
 				return true;
 			}

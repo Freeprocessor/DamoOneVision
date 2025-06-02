@@ -28,7 +28,7 @@ namespace DamoOneVision.Camera
 		}
 		~MILContext( )
 		{
-			Logger.WriteLine( "[MILContext] Finalizer 호출됨! GC가 Dispose보다 먼저 호출했을 수 있음" );
+			Logger.WriteLine( "ERROR", "MILContext", "Finalizer 호출됨! GC가 Dispose보다 먼저 호출했을 수 있음" );
 		}
 
 		//public static MIL_INT Width;

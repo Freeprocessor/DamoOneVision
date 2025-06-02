@@ -21,19 +21,29 @@ namespace DamoOneVision.Services
 		{
 			Task.Factory.StartNew( ProcessLogQueue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default );
 		}
+		private static int _classWidth = 0;   // 가장 긴 classification 길이
+		private static int _funcWidth  = 0;   // 가장 긴 function 길이
+		private static readonly object _lock = new();
 
-		/// <summary>
-		/// 외부에서 호출하는 실제 "로그 남기기" 메서드
-		/// </summary>
-		/// <param name="message"></param>
-		public static void WriteLine( string message )
+		public static void WriteLine( string classification,
+									 string function,
+									 string message,
+									 int type = 1 )
 		{
-			// 1) 디버그 출력
-			Debug.WriteLine( message );
+			string functiontap = "";
+			if (function.Length <= 9)
+			{
+				functiontap = "\t";
+			}
+			string logMessage =
+		$"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\t" +   // 날짜 뒤 탭
+        $"[{classification}]\t" +                  // 토큰 사이 탭
+		$"[{function}]\t" +
+		functiontap+
+		message;
 
-			// 2) Queue에 메시지를 추가 (BlockingCollection이 가득 차면 대기)
-			_logQueue.Add( message );
-
+			Debug.WriteLine( logMessage );
+			if (type != 0) _logQueue.Add( logMessage );
 		}
 
 		/// <summary>
@@ -94,7 +104,7 @@ namespace DamoOneVision.Services
 
 				// 파일에 실제 쓰기 (AppendAllTextAsync -> Task.Wait 또는 await 가능)
 				// 여기서는 동기식 예시(File.AppendAllText)로도 충분.
-				File.AppendAllText( logFilePath, $"{DateTime.Now} : {message}{Environment.NewLine}" );
+				File.AppendAllText( logFilePath, $"{message}{Environment.NewLine}" );
 			}
 			catch (Exception ex)
 			{

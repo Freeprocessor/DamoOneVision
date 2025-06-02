@@ -132,7 +132,7 @@ namespace DamoOneVision.Services
 					await Task.Delay( 100, _cts.Token );
 				}
 			}, _cts.Token );
-			Logger.WriteLine( "ConveyorReadStart" );
+			Logger.WriteLine( "INFO", "MotionService", "ConveyorReadStart" );
 		}
 
 		public void ConveyorReadStop( )
@@ -163,7 +163,7 @@ namespace DamoOneVision.Services
 
 			if (openResult != 0)
 			{
-				Logger.WriteLine( $"AxlOpen 실패, 에러 코드: {openResult}" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxlOpen 실패, 에러 코드: {openResult}" );
 				return false;
 			}
 			else
@@ -172,11 +172,11 @@ namespace DamoOneVision.Services
 				int isOpened = CAXL.AxlIsOpened();
 				if (isOpened == 1)
 				{
-					Logger.WriteLine( "AXL 라이브러리가 정상적으로 로드되었습니다!" );
+					Logger.WriteLine( "INFO", "MotionService", "AXL 라이브러리가 정상적으로 로드되었습니다!" );
 				}
 				else
 				{
-					Logger.WriteLine( "AXL 라이브러리 로드에 실패했습니다." );
+					Logger.WriteLine( "ERROR", "MotionService", "AXL 라이브러리 로드에 실패했습니다." );
 					return false;
 				}
 
@@ -203,20 +203,20 @@ namespace DamoOneVision.Services
 			if (CAXL.AxlOpen( 7 ) != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
 				_isInitialized = false;
-				Logger.WriteLine( "AxlOpen 실패" );
+				Logger.WriteLine( "ERROR", "MotionService", "AxlOpen 실패" );
 				return;
 			}
 			//++ 지정한 Mot파일의 설정값들로 모션보드의 설정값들을 일괄변경 적용합니다.
 			if (CAXM.AxmMotLoadParaAll( motFilePath ) != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
 				_isInitialized = false;
-				Logger.WriteLine( "AxmMotLoadParaAll 실패" );
+				Logger.WriteLine( "ERROR", "MotionService", "AxmMotLoadParaAll 실패" );
 				return;
 			}
 			else
 			{
 				//++ 모션보드의 설정값들을 모두 적용하였습니다.
-				Logger.WriteLine( "모션보드 설정값을 모두 적용하였습니다." );
+				Logger.WriteLine( "INFO", "MotionService", "모션보드 설정값을 모두 적용하였습니다." );
 				_isInitialized = true;
 			}
 
@@ -241,7 +241,7 @@ namespace DamoOneVision.Services
 				return;
 			if (!_isInitialized)
 			{
-				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!" );
+				Logger.WriteLine( "ERROR", "MotionService", "모션 라이브러리가 초기화되지 않았습니다!" );
 				return;
 			}
 
@@ -254,7 +254,7 @@ namespace DamoOneVision.Services
 
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmMoveStartPos return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmMoveStartPos return error[Code:{duRetCode}]" );
 			}
 		}
 
@@ -264,7 +264,7 @@ namespace DamoOneVision.Services
 				return;
 			if (!_isInitialized)
 			{
-				Logger.WriteLine( "모션 라이브러리가 초기화되지 않았습니다!" );
+				Logger.WriteLine( "ERROR", "MotionService", "모션 라이브러리가 초기화되지 않았습니다!" );
 				return;
 			}
 
@@ -277,7 +277,7 @@ namespace DamoOneVision.Services
 
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmMoveStartPos return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmMoveStartPos return error[Code:{duRetCode}]" );
 			}
 		}
 
@@ -285,29 +285,29 @@ namespace DamoOneVision.Services
 		{
 			if (isXAxisHome)
 				return;
-			Logger.WriteLine( "X-Axis Home" );
+			Logger.WriteLine( "INFO", "MotionService", "X-Axis Home" );
 			uint duRetCode = 0;
 			// 지정축의 원점 검색 파라미터를 설정합니다.
 			duRetCode = CAXM.AxmHomeSetMethod( X, _motionModel.XAxisOriginDirection, _motionModel.XAxisOriginSensor, _motionModel.XAxisOriginUseZPhase, _motionModel.XAxisOriginDelay, _motionModel.XAxisOriginOffset );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeSetStart return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeSetStart return error[Code:{duRetCode}]" );
 			}
 			// 지정축의 원점 검색 속도 파라이터를 설정합니다.
 			duRetCode = CAXM.AxmHomeSetVel( X, _motionModel.XAxisOriginSpeed1, _motionModel.XAxisOriginSpeed2, _motionModel.XAxisOriginCreepSpeed, _motionModel.XAxisOriginZPhaseSpeed, _motionModel.XAxisOriginAcceleration, _motionModel.XAxisOriginAcceleration );
-			Logger.WriteLine( $"{_motionModel.XAxisOriginSpeed1},{_motionModel.XAxisOriginSpeed2}" );
+			Logger.WriteLine( "INFO", "MotionService", $"{_motionModel.XAxisOriginSpeed1},{_motionModel.XAxisOriginSpeed2}", 0 );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 			// 원점 검색을 실행합니다.
 			duRetCode = CAXM.AxmHomeSetStart( X );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 
-			Logger.WriteLine( "X-Axis Home End" );
+			Logger.WriteLine( "INFO", "MotionService", "X-Axis Home End" );
 			isXAxisHome = true;
 		}
 
@@ -315,27 +315,27 @@ namespace DamoOneVision.Services
 		{
 			if (isZAxisHome)
 				return;
-			Logger.WriteLine( "Z-Axis Home" );
+			Logger.WriteLine( "INFO", "MotionService", "Z-Axis Home" );
 			uint duRetCode = 0;
 			// 지정축의 원점 검색 파라미터를 설정합니다.
 			duRetCode = CAXM.AxmHomeSetMethod( Z, _motionModel.ZAxisOriginDirection, _motionModel.ZAxisOriginSensor, _motionModel.ZAxisOriginUseZPhase, _motionModel.ZAxisOriginDelay, _motionModel.ZAxisOriginOffset );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeSetStart return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeSetStart return error[Code:{duRetCode}]" );
 			}
 			// 지정축의 원점 검색을 시작합니다.
 			duRetCode = CAXM.AxmHomeSetVel( Z, _motionModel.ZAxisOriginSpeed1, _motionModel.ZAxisOriginSpeed2, _motionModel.ZAxisOriginCreepSpeed, _motionModel.ZAxisOriginZPhaseSpeed, _motionModel.ZAxisOriginAcceleration, _motionModel.ZAxisOriginAcceleration );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 			duRetCode = CAXM.AxmHomeSetStart( Z );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
 			{
-				Logger.WriteLine( $"AxmHomeGetResult return error[Code:{duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmHomeGetResult return error[Code:{duRetCode}]" );
 			}
 
-			Logger.WriteLine( "Z-Axis Home End" );
+			Logger.WriteLine( "INFO", "MotionService", "Z-Axis Home End" );
 			isZAxisHome = true;
 		}
 
@@ -349,7 +349,7 @@ namespace DamoOneVision.Services
 		public async Task XAxisMoveEndPos( )
 		{
 			await XAxisMoveToPosition( _motionModel.XAxisEndPosition, ConveyorSpeed * 1000, _motionModel.XAxisMoveAcceleration, _motionModel.XAxisMoveDeceleration );
-			Logger.WriteLine( $"Conveyor Speed : {ConveyorSpeed} mm/s" );
+			Logger.WriteLine( "INFO", "MotionService", $"Conveyor Speed : {ConveyorSpeed} mm/s" );
 			//await XAxisWaitingStop();
 		}
 
@@ -509,7 +509,7 @@ namespace DamoOneVision.Services
 		{
 			if (!((dir == 1) || (dir == -1)))
 			{
-				Logger.WriteLine( "JogStart: dir 값이 잘못되었습니다." );
+				Logger.WriteLine( "ERROR", "MotionService", "JogStart: dir 값이 잘못되었습니다." );
 				return;
 			}
 
@@ -522,7 +522,7 @@ namespace DamoOneVision.Services
 			//++ 지정한 축을 (+)방향으로 지정한 속도/가속도/감속도로 모션구동합니다.
 			duRetCode = CAXM.AxmMoveVel( axisNum, dVelocity * dir, dAccel, dDecel );
 			if (duRetCode != (uint) AXT_FUNC_RESULT.AXT_RT_SUCCESS)
-				Logger.WriteLine( $"AxmMoveVel return error[Code:{0:duRetCode}]" );
+				Logger.WriteLine( "ERROR", "MotionService", $"AxmMoveVel return error[Code:{0:duRetCode}]" );
 
 			//Logger.WriteLine( "Jog Start" );
 
@@ -573,7 +573,7 @@ namespace DamoOneVision.Services
 		public void Dispose( )
 		{
 			ConveyorReadStop();
-			Logger.WriteLine("Motion Service Dispose");
+			Logger.WriteLine( "INFO", "MotionService", "Motion Service Dispose" );
 			GC.SuppressFinalize( this );
 		}
 	}

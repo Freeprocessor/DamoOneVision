@@ -170,7 +170,7 @@ namespace DamoOneVision.ImageProcessing
 			if (InfraredCameraImage == MIL.M_NULL)
 			{
 				sw.Stop();
-				Logger.WriteLine( "InfraredCameraImage가 유효하지 않습니다." );
+				Logger.WriteLine( "WARN", "Conversion", "InfraredCameraImage가 유효하지 않습니다." );
 				return null;
 			}
 
@@ -200,9 +200,6 @@ namespace DamoOneVision.ImageProcessing
 			// 기준 온도 차이만큼 임계값을 동적으로 보정
 			double dynamicThreshold = infraredCameraModel.BinarizedThreshold + delta;
 			double thresholdForMil = (dynamicThreshold + 273.15) * 100;
-
-			// 로그 기록 (권장)
-			Logger.WriteLine( $"기준 온도: {infraredCameraModel.ReferenceBaseTemperature}, 현재 온도: {currentReferenceAvg}, 동적 임계값: {dynamicThreshold}" );
 
 			/// 오버레이 이미지 생성
 			MIL.MdispInquire( InfraredDisplay, MIL.M_OVERLAY_ID, ref MilOverlayImage );
@@ -238,7 +235,7 @@ namespace DamoOneVision.ImageProcessing
 			   : sectorTemp.Average();       // 평균 구하기
 			bool neighborGood = neighborBadCnt == 0;
 
-			Logger.WriteLine($"Neighbor ΔT > {infraredCameraModel.NeighborDiffLim:F1} ℃ 섹터 수: {neighborBadCnt}" );
+			
 
 
 
@@ -249,14 +246,14 @@ namespace DamoOneVision.ImageProcessing
 
 			if (selectedBlobCount == 0 || Radius == 0 || Radius < infraredCameraModel.CircleMinRadius)
 			{
-				Logger.WriteLine( "Radius가 0이거나 최소 원주보다 작습니다." );
+				Logger.WriteLine( "WARN", "Conversion", "Radius가 0이거나 최소 원주보다 작습니다." );
 				circleGood = false;
 			}
 			else
 			{
 				ReferenceArea = (Math.PI * Radius * Radius) - (Math.PI * smallRadius * smallRadius);
 				FillRatio = AreaSum / ReferenceArea;
-				Logger.WriteLine( $"FillRatio: {FillRatio}" );
+				
 				circleGood = true;
 			}
 
@@ -303,8 +300,8 @@ namespace DamoOneVision.ImageProcessing
 			int underHeatCount = underHeatSector.Count( x => x == false );
 			int overHeatCount = overHeatSector.Count( x => x == false );
 
-			Logger.WriteLine( $"UnderHeat Count: {underHeatCount}" );
-			Logger.WriteLine( $"OverHeat Count: {overHeatCount}" );
+			// 로그 기록 (권장)
+
 
 			bool underHeatGood = false;
 			bool overHeatGood = false;
@@ -334,7 +331,7 @@ namespace DamoOneVision.ImageProcessing
 
 			if (clean.Length == 0)        // ② 빈 배열 체크
 			{
-				Console.WriteLine( "값이 없습니다." );
+				Logger.WriteLine( "WARN", "Conversion", "온도값이 없습니다." );
 			}
 			double max = clean.Max();
 			double min = clean.Min();
@@ -394,7 +391,13 @@ namespace DamoOneVision.ImageProcessing
 			};
 
 			sw.Stop();
-			Logger.WriteLine( $"검사 시간: {sw.ElapsedMilliseconds} ms" );
+
+			Logger.WriteLine( "INFO", "Conversion", $"FillRatio: {FillRatio}" );
+			Logger.WriteLine( "INFO", "Conversion", $"기준 온도: {infraredCameraModel.ReferenceBaseTemperature}, 현재 온도: {currentReferenceAvg}, 동적 임계값: {dynamicThreshold}" );
+			Logger.WriteLine( "INFO", "Conversion", $"Neighbor ΔT > {infraredCameraModel.NeighborDiffLim:F1} ℃ 섹터 수: {neighborBadCnt}" );
+			Logger.WriteLine( "INFO", "Conversion", $"UnderHeat Count: {underHeatCount}" );
+			Logger.WriteLine( "INFO", "Conversion", $"OverHeat Count: {overHeatCount}" );
+			Logger.WriteLine( "INFO", "Conversion", $"검사 시간: {sw.ElapsedMilliseconds} ms" );
 
 			return inspectionResult;
 		}
@@ -485,16 +488,16 @@ namespace DamoOneVision.ImageProcessing
 				MIL.MmeasGetResult( MeasMarker, MIL.M_RADIUS + MIL.M_TYPE_MIL_DOUBLE, ref Radius, MIL.M_NULL );
 				MIL.MmeasGetResultSingle( MeasMarker, MIL.M_POSITION + MIL.M_TYPE_MIL_DOUBLE, ref DetectCirclrCenterX, ref DetectCirclrCenterY, 0 );
 
-				Logger.WriteLine( $"Radius: {Radius}, Circle X : {DetectCirclrCenterX}, Circle Y : {DetectCirclrCenterY}" );
+				Logger.WriteLine( "INFO", "Conversion", $"Radius: {Radius}, Circle X : {DetectCirclrCenterX}, Circle Y : {DetectCirclrCenterY}" );
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
+				Logger.WriteLine( "ERROR", "Conversion", $"MmeasGetResultSingle에서 예외 발생: {ex.Message}" );
 			}
 
 
 			sw.Stop( );
-			Logger.WriteLine( $"MeasFind  : {sw.ElapsedMilliseconds} ms" );
+			Logger.WriteLine( "INFO", "Conversion", $"MeasFind  : {sw.ElapsedMilliseconds} ms" );
 
 			MIL.MmeasDraw( GraphicsContext, MeasMarker, MilOverlayImage, MIL.M_DRAW_EDGES, MIL.M_DEFAULT, MIL.M_DEFAULT );
 
@@ -593,7 +596,7 @@ namespace DamoOneVision.ImageProcessing
 			sw.Stop( );
 			//Logger.WriteLine( $"블롭의 전체 면적 : {AreaSum}\n" );
 			//Logger.WriteLine( $"블롭의 최대 길이 : {MaxLangth} \n" );
-			Logger.WriteLine( $"Blob      : {sw.ElapsedMilliseconds} ms" );
+			Logger.WriteLine( "INFO", "Conversion", $"Blob      : {sw.ElapsedMilliseconds} ms" );
 
 			MIL.MblobDraw( GraphicsContext, BlobResult, MilOverlayImage, MIL.M_DRAW_BOX, MIL.M_DEFAULT, MIL.M_DEFAULT );
 
@@ -695,12 +698,12 @@ namespace DamoOneVision.ImageProcessing
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( $"섹터 처리 중 예외: {ex}" );
+				Logger.WriteLine("ERROR", "Conversion", $"섹터 처리 중 예외: {ex}" );
 				//throw;                        // 상위에서 추가 처리할 경우
 			}
 
 			double sectorTotalAvg = sectorTotalSum / SectorCount;
-			Logger.WriteLine( $"{SectorCount}개 섹터 평균 온도: {sectorTotalAvg:F2} ℃" );
+			Logger.WriteLine( "INFO", "Conversion", $"{SectorCount}개 섹터 평균 온도: {sectorTotalAvg:F2} ℃" );
 			/// 인접섹터 온도 비교
 			// ── 1) NaN·Inf 제거
 			double[] neighborDiff   = new double[SectorCount];
@@ -718,54 +721,11 @@ namespace DamoOneVision.ImageProcessing
 				if (neighborIssue[ i ]) neighborBadCnt++;
 			}
 			sw.Stop( );
-			Logger.WriteLine( $"SectorCalculate: {sw.ElapsedMilliseconds} ms" );
+			Logger.WriteLine( "INFO", "Conversion", $"SectorCalculate: {sw.ElapsedMilliseconds} ms" );
 
 			return (neighborBadCnt, sectorTemp);  // 섹터별 온도 차이로 불량 섹터 수 반환
 		}
 
-		//private static int DrawSetors( MIL_ID MilOverlayImage, int SectorCount, double Radius, double SmallRadius, double DetectCirclrCenterX, double DetectCirclrCenterY )
-		//{
-		//	///불량섹터 표시
-		//	double     span       = 360.0 / SectorCount;   // 6°
-		//	for (int i = 0; i < SectorCount; i++)
-		//	{
-		//		MIL_ID gctx   = ReusableMilBuffers.AcquireGctx(i);     // 섹터별 전용 gctx
-		//		double start = (i - 1) * span;
-		//		/* --- 4) 분할선 표시 (원래 코드 유지) --- */
-		//		double a0 = start * Math.PI / 180.0;
-		//		double a1 = (start + span) * Math.PI / 180.0;
-
-		//		double x1 = DetectCirclrCenterX + SmallRadius * Math.Cos(a0);
-		//		double y1 = DetectCirclrCenterY + SmallRadius * Math.Sin(a0);
-		//		double x2 = DetectCirclrCenterX + Radius      * Math.Cos(a0);
-		//		double y2 = DetectCirclrCenterY + Radius      * Math.Sin(a0);
-
-		//		double x3 = DetectCirclrCenterX + SmallRadius * Math.Cos(a1);
-		//		double y3 = DetectCirclrCenterY + SmallRadius * Math.Sin(a1);
-		//		double x4 = DetectCirclrCenterX + Radius      * Math.Cos(a1);
-		//		double y4 = DetectCirclrCenterY + Radius      * Math.Sin(a1);
-
-		//		MIL.MgraLine( gctx, MilOverlayImage, x1, y1, x2, y2 );
-		//		MIL.MgraLine( gctx, MilOverlayImage, x3, y3, x4, y4 );
-		//	}
-
-		//	//for (int i = 0; i < 36; i++)
-		//	//{
-		//	//	if (!neighborIssue[ i ]) continue;
-
-		//	//	double span  = 10.0;
-		//	//	double start = (i - 1) * span;
-		//	//	double end   = i * span;
-
-		//	//	// 빨강색으로 두꺼운 선
-		//	//	MIL.MgraColor( GraphicsContext, MIL.M_COLOR_RED );
-		//	//	MIL.MgraArcFill( GraphicsContext, MilOverlayImage,
-		//	//		DetectCirclrCenterX, DetectCirclrCenterY,
-		//	//		Radius, Radius, start, end );
-		//	//	MIL.MgraColor( GraphicsContext, MIL.M_COLOR_WHITE );
-		//	//}
-		//	return 0;
-		//}
 		/// <summary>
 		/// 60·48·36 등 원하는 개수의 섹터 분할선을
 		/// 8-인수 MgraLines 한 번으로 그린다.
@@ -778,6 +738,15 @@ namespace DamoOneVision.ImageProcessing
 				double smallRadius,
 				double cx, double cy )
 		{
+			Stopwatch sw = new Stopwatch( );
+			sw.Start( );
+
+			if (radius == 0 || cx == 0 || cy == 0)
+			{
+				sw.Stop( );
+				return 0;
+			}
+
 			/* ── 1) 반지름·센터가 변하지 않으면 다시 그릴 필요 없음 */
 			double prevR = double.NaN, prevRin = double.NaN, prevCx = double.NaN, prevCy = double.NaN;
 			if (radius == prevR && smallRadius == prevRin && cx == prevCx && cy == prevCy)
@@ -829,6 +798,9 @@ namespace DamoOneVision.ImageProcessing
 
 			MIL.MgraFree( gctx ); // 그래픽 컨텍스트 해제
 
+			sw.Stop( );
+			Logger.WriteLine( "INFO", "Conversion", $"DrawSetors: {sw.ElapsedMilliseconds} ms" );
+
 			return 0;
 		}
 		private static double CalculateReferenceRoiAverage( MIL_ID image )
@@ -854,7 +826,7 @@ namespace DamoOneVision.ImageProcessing
 			{
 				if (milImage == MIL.M_NULL)
 				{
-					Logger.WriteLine( "milImage가 유효하지 않습니다." );
+					Logger.WriteLine( "WARN", "Conversion", "milImage가 유효하지 않습니다." );
 					throw new ArgumentNullException( nameof( milImage ) );
 				}
 
@@ -882,7 +854,7 @@ namespace DamoOneVision.ImageProcessing
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( $"ExtractPixelData에서 예외 발생: {ex.Message}" );
+				Logger.WriteLine( "ERROR", "Conversion", $"ExtractPixelData에서 예외 발생: {ex.Message}" );
 				throw;
 			}
 		}

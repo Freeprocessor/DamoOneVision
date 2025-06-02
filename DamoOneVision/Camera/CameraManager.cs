@@ -44,7 +44,7 @@ namespace DamoOneVision.Camera
 			}
 			else
 			{
-				Logger.WriteLine( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
+				Logger.WriteLine( "ERROR", "CameraManager", $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
 				throw new Exception( $"{_cameraName}은/는 지원되지 않는 카메라 모델입니다." );
 			}
 		}
@@ -76,15 +76,15 @@ namespace DamoOneVision.Camera
 				}
 				else
 				{
-					Logger.WriteLine( "카메라 연결 실패" );
-					throw new Exception( "카메라 연결 실패" );
+					Logger.WriteLine( "ERROR", "CameraManager", "카메라 연결 실패" );
+					//throw new Exception( "카메라 연결 실패" );
 				}
 			} );
 		}
 
 		public async Task DisconnectAsync( )
 		{
-			Logger.WriteLine( $"{_cameraName} 연결 해제" );
+			Logger.WriteLine( "INFO", "CameraManager", $"{_cameraName} 연결 해제" );
 			await Task.Run( ( ) =>
 			{
 				try
@@ -100,7 +100,7 @@ namespace DamoOneVision.Camera
 				}
 				catch (Exception ex)
 				{
-					Logger.WriteLine( $"DisconnectAsync에서 예외 발생: {ex.Message}" );
+					Logger.WriteLine( "ERROR", "CameraManager", $"DisconnectAsync에서 예외 발생: {ex.Message}" );
 
 					throw;
 				}
@@ -118,22 +118,22 @@ namespace DamoOneVision.Camera
 					if (IsConnected)
 					{
 						MilImage = camera.CaptureImage();
-						Logger.WriteLine( $"{_cameraName} : 카메라 이미지 캡처 완료" );
+						Logger.WriteLine( "INFO", "CameraManager", $"{_cameraName} : 카메라 이미지 캡처 완료" );
 					}
 					else if (camera.ReciveImage() != MIL.M_NULL)
 					{
-						Logger.WriteLine( $"{_cameraName} : 로드된 이미지를 사용합니다." );
+						Logger.WriteLine( "INFO", "CameraManager", $"{_cameraName} : 로드된 이미지를 사용합니다." );
 						MilImage = camera.ReciveImage();
 					}
 					else
 					{
-						Logger.WriteLine( $"{_cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
+						Logger.WriteLine( "WARN", "CameraManager", $"{_cameraName} : 카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 						//MessageBox.Show( "카메라가 연결되어 있지 않고, 로드된 이미지도 없습니다." );
 					}
 				}
 				catch (Exception ex)
 				{
-					Logger.WriteLine( $"CaptureSingleImageAsync에서 예외 발생: {ex.Message}" );
+					Logger.WriteLine( "ERROR", "CameraManager", $"CaptureSingleImageAsync에서 예외 발생: {ex.Message}" );
 					MilImage = MIL.M_NULL;
 				}
 			} );

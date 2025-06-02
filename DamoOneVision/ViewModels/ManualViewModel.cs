@@ -649,7 +649,7 @@ namespace DamoOneVision.ViewModels
 				string modelName = _settingManager.LastOpenedModel(); // 현재 사용 중인 모델 이름
 				_settingManager.SaveModelData( modelName, modelData );
 
-				Logger.WriteLine( $"AutoFocus 완료, 포커스 값({focusValue:F6})을 모델 '{modelName}'에 저장했습니다." );
+				Logger.WriteLine( "INFO", "ManualVM", $"AutoFocus 완료, 포커스 값({focusValue:F6})을 모델 '{modelName}'에 저장했습니다." );
 			}
 			else
 			{

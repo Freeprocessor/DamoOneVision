@@ -117,7 +117,7 @@ namespace DamoOneVision.ViewModels
 					ImagePaths.Add( file );
 
 				MessageBox.Show( $"{files.Length}개의 이미지가 로드되었습니다." );
-				Logger.WriteLine( $"{files.Length}개의 이미지가 로드되었습니다." );
+				Logger.WriteLine( "INFO", "AdvancedVM", $"{files.Length}개의 이미지가 로드되었습니다." );
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace DamoOneVision.ViewModels
 			string msg        = $"{folderName} 폴더에서 {files.Length}개의 이미지를 불러왔습니다.";
 			Application.Current.Dispatcher.Invoke( ( ) =>
 				MessageBox.Show( msg, "안내", MessageBoxButton.OK, MessageBoxImage.Information ) );
-			Logger.WriteLine( $"{files.Length}개의 이미지를 로드했습니다." );
+			Logger.WriteLine( "INFO", "AdvancedVM", $"{files.Length}개의 이미지를 로드했습니다." );
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace DamoOneVision.Data
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( $"[설정 불러오기 오류] {ex.Message}" );
+				Logger.WriteLine( "ERROR", "AppSetting", $"[설정 불러오기 오류] {ex.Message}" );
 			}
 			return new AppSettings();
 		}
@@ -206,7 +206,7 @@ namespace DamoOneVision.Data
 
 			if (!File.Exists( filePath ))
 			{
-				Logger.WriteLine( "모델 파일이 존재하지 않습니다." );
+				Logger.WriteLine( "WARN", "AppSetting", "모델 파일이 존재하지 않습니다." );
 				return new ModelData();  // or return null;
 			}
 
@@ -215,7 +215,7 @@ namespace DamoOneVision.Data
 
 			if (modelData == null)
 			{
-				Logger.WriteLine( "모델 파일 파싱 실패" );
+				Logger.WriteLine( "ERROR", "AppSetting", "모델 파일 파싱 실패" );
 				return new ModelData();
 			}
 
@@ -223,13 +223,13 @@ namespace DamoOneVision.Data
 			if (modelData.MotionModels?.Any() == true)
 			{
 				_deviceControlService.SetModel( modelData.MotionModels.First() );
-				Logger.WriteLine( $"Motion Model : '{modelName}' 로드 완료" );
+				Logger.WriteLine( "INFO", "AppSetting", $"Motion Model : '{modelName}' 로드 완료" );
 			}
 
 			if (modelData.InfraredCameraModels?.Any() == true)
 			{
 				_cameraService.SetModel( modelData.InfraredCameraModels.First() );
-				Logger.WriteLine( $"Camera Model : '{modelName}' 로드 완료" );
+				Logger.WriteLine( "INFO", "AppSetting", $"Camera Model : '{modelName}' 로드 완료" );
 			}
 
 			Settings.LastOpenedModel = modelName;
@@ -266,11 +266,11 @@ namespace DamoOneVision.Data
 			if (File.Exists( filePath ))
 			{
 				File.Delete( filePath );
-				Logger.WriteLine( $"모델 '{modelName}' 삭제됨" );
+				Logger.WriteLine( "INFO", "AppSetting", $"모델 '{modelName}' 삭제됨" );
 			}
 			else
 			{
-				Logger.WriteLine( $"모델 파일이 존재하지 않음: {filePath}" );
+				Logger.WriteLine( "WARN", "AppSetting", $"모델 파일이 존재하지 않음: {filePath}" );
 			}
 
 			// LastOpenedModel 초기화 필요하면 여기서도 가능

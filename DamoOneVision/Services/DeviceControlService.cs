@@ -197,7 +197,7 @@ namespace DamoOneVision.Services
 			await Task.Run( async ( ) =>
 			{
 				//modbus.WriteSingleCoil( 0, 0x2A, true );
-				Logger.WriteLine( "TriggerReadingAsync Start" );
+				Logger.WriteLine( "INFO", "DeviceService", "TriggerReadingAsync Start" );
 				// 제품 간섭 대기
 				while (_advantechCard.ReadCoil[ VISIONTRIGGER1 ] == true)
 				{
@@ -216,7 +216,7 @@ namespace DamoOneVision.Services
 					{
 						/// Tast
 						await TriggerActionAsync();
-						Logger.WriteLine( "Trigger Detected." );
+						Logger.WriteLine( "INFO", "DeviceService", "Trigger Detected." );
 						//await TriggerAtionTestAsync();
 					}
 
@@ -255,7 +255,7 @@ namespace DamoOneVision.Services
 				//Logger.WriteLine( $"Tracking Stop {sw.ElapsedMilliseconds} ms" );
 				await _motionService.XAxisWaitingStop();
 				//Logger.WriteLine( $"Tracking Stop Complete {sw.ElapsedMilliseconds} ms" );
-				Logger.WriteLine( $"Current Position {_motionService.XAxisGetCommandPosition()} pulse)" );
+				Logger.WriteLine( "INFO", "DeviceService", $"Current Position {_motionService.XAxisGetCommandPosition()} pulse)", 0 );
 
 				Task moveTask = _motionService.XAxisMoveWaitPos();
 				await Task.WhenAll( detectTask, moveTask );
@@ -268,7 +268,7 @@ namespace DamoOneVision.Services
 			//while (modbus.ReadInputs( 0, 0x06, 1 )[ 0 ]) ;
 			while (_advantechCard.ReadCoil[ VISIONTRIGGER1 ]) ;
 			sw.Stop();
-			Logger.WriteLine( $"TriggerReadingAsync End (total: {sw.ElapsedMilliseconds} ms)" );
+			Logger.WriteLine( "INFO", "DeviceService", $"TriggerReadingAsync End (total: {sw.ElapsedMilliseconds} ms)" );
 		}
 
 		private async Task TriggerAtionTestAsync( )
@@ -322,7 +322,7 @@ namespace DamoOneVision.Services
 					System.Threading.Thread.Sleep( 1000 );
 				}
 			} );
-			Logger.WriteLine( "TriggerReadingAsync Stop" );
+			Logger.WriteLine( "INFO", "DeviceService", "TriggerReadingAsync Stop" );
 		}
 
 		public async Task MachineStartAction( )
@@ -343,7 +343,7 @@ namespace DamoOneVision.Services
 			//Logger.WriteLine( "Trigger Reading Start." );
 			TriggerReadingStartAsync();
 			TowerLampAsync( "START" );
-			Logger.WriteLine( "Machine Start." );
+			Logger.WriteLine( "INFO", "DeviceService", "Machine Start." );
 		}
 
 		public async Task MachineStopAction( )
@@ -355,7 +355,7 @@ namespace DamoOneVision.Services
 			SideCVOff();
 			//Logger.WriteLine( "C/V OFF" );
 			TowerLampAsync( "STOP" );
-			Logger.WriteLine( "Machine Stop." );
+			Logger.WriteLine("INFO", "CameraService", "Machine Stop." );
 		}
 
 
@@ -383,7 +383,7 @@ namespace DamoOneVision.Services
 				int ejectorDelay = 0;
 				int ejecttorDistance = 530;
 				ejectorDelay = (int) (ejecttorDistance / _motionService.ConveyorSpeed * 1000.00);
-				Logger.WriteLine( $"[Ejector] Eject Delay 설정값: {_motionService.ConveyorSpeed} ms" );
+				Logger.WriteLine( "INFO", "Ejector", $" Eject Delay 설정값: {_motionService.ConveyorSpeed} ms" );
 				int safeDelay = Math.Max(0, ejectorDelay); // 음수 방지
 				await Task.Delay( safeDelay );
 				if (IsGood)

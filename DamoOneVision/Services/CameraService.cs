@@ -111,7 +111,7 @@ namespace DamoOneVision.Services
 		{
 			if (IsVisionConnected)
 			{
-				Logger.WriteLine( "이미 카메라가 연결되어 있습니다." );
+				Logger.WriteLine( "WARN", "CameraService", "이미 카메라가 연결되어 있습니다." );
 				return true;
 			}
 			SetBusy( true );
@@ -134,8 +134,8 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
-				Logger.WriteLine( $"카메라 연결 오류\n{ex.Message}" );
+				//MessageBox.Show( $"카메라 연결 오류\n{ex.Message}" );
+				Logger.WriteLine( "ERROR", "CameraService", $"카메라 연결 오류\n{ex.Message}" );
 				var tasks = new[]
 				{
 					_infraredCamera.DisconnectAsync(),
@@ -161,7 +161,7 @@ namespace DamoOneVision.Services
 		{
 			if (!_isCameraConnected)
 			{
-				Logger.WriteLine( "카메라가 연결되어 있지 않습니다." );
+				Logger.WriteLine( "WARN", "CameraService", "카메라가 연결되어 있지 않습니다." );
 				return;
 			}
 			SetBusy( true );
@@ -355,12 +355,12 @@ namespace DamoOneVision.Services
 							//_sideCamera3.CaptureSingleImageAsync()
 						};
 							await Task.WhenAll( tasks );
-							Logger.WriteLine( "카메라 이미지 캡처 완료" );
+							Logger.WriteLine( "INFO", "CameraService", "카메라 이미지 캡처 완료" );
 							//Logger.WriteLine( $"Test: {TectTime.ElapsedMilliseconds}ms" );
 						}
 						catch (Exception ex)
 						{
-							Logger.WriteLine( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
+							Logger.WriteLine( "ERROR", "CameraService", $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
 							//MessageBox.Show( $"이미지 캡쳐 중 오류 발생: {ex.Message}" );
 						}
 
@@ -414,7 +414,7 @@ namespace DamoOneVision.Services
 							var result = await Task.Run( ( ) => Conversion.InfraredCameraModel( false, false, GetBinarizedImage(), GetScaleImage(), GetImage(), _infraredCameraDisplay, _infraredCameraModel ) );
 							isGood = result.IsGood;
 
-							Logger.WriteLine( "이미지 처리 완료" );
+							Logger.WriteLine( "INFO", "CameraService", "이미지 처리 완료" );
 
 							///GOOD REJECT LAMP 바인딩
 							///
@@ -443,7 +443,7 @@ namespace DamoOneVision.Services
 					}
 					catch (Exception ex)
 					{
-						Logger.WriteLine( $"이미지 처리 중 오류 발생: {ex.Message}" );
+						Logger.WriteLine( "ERROR", "CameraService", $"이미지 처리 중 오류 발생: {ex.Message}" );
 						//MessageBox.Show( $"이미지 처리 중 오류 발생: {ex.Message}" );
 
 					}
@@ -455,7 +455,7 @@ namespace DamoOneVision.Services
 
 			} );
 			TectTime.Stop();
-			Logger.WriteLine( $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
+			Logger.WriteLine( "INFO", "CameraService", $"이미지 처리 시간: {TectTime.ElapsedMilliseconds}ms" );
 			return isGood;
 
 		}

@@ -123,7 +123,7 @@ namespace DamoOneVision
 					string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{name}_{timeStamp}.bmp");
 
 					SaveControlScreenshot( InfraredCameraDisplay, path );
-					Logger.WriteLine( $"디스플레이 캡처 저장: {path}" );
+					Logger.WriteLine( "INFO", "MainWindow", $"디스플레이 캡처 저장: {path}" );
 				};
 			}
 			//cameraManager.ImageCaptured += OnImageCaptured;
@@ -281,7 +281,7 @@ namespace DamoOneVision
 		private void Click( object sender, RoutedEventArgs e )
 		{
 			MessageBox.Show( "버튼이 클릭되었습니다." );
-			Logger.WriteLine( "버튼이 클릭되었습니다." );
+			Logger.WriteLine( "INFO", "MainWindow", "버튼이 클릭되었습니다." );
 		}
 
 		private void SaveControlScreenshot( FrameworkElement control, string path )

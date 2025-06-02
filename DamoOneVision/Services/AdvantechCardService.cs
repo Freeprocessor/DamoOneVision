@@ -54,12 +54,12 @@ namespace DamoOneVision.Services
 
 			if (_isConnected)
 			{
-				Logger.WriteLine( "Adventech Connected" );
+				Logger.WriteLine( "INFO", "Adventech", "Adventech Connected" );
 				ReadBitAsync();
 			}
 			else
 			{
-				Logger.WriteLine( "Advantech Connect Fail" );
+				Logger.WriteLine( "WARN", "Adventech", "Advantech Connect Fail" );
 			}
 
 
@@ -72,7 +72,7 @@ namespace DamoOneVision.Services
 		{
 			await Task.Run( ( ) =>
 			{
-				Logger.WriteLine( "Advantech Disconnect" );
+				Logger.WriteLine( "INFO", "Adventech", "Advantech Disconnect" );
 				_adamSocket.Disconnect();
 				_adamSocket = null;
 				_isConnected = false;
@@ -104,7 +104,7 @@ namespace DamoOneVision.Services
 		{
 			await Task.Run( async ( ) =>
 			{
-				Logger.WriteLine( "Advantech ReadBitAsync Start" );
+				Logger.WriteLine( "INFO", "Adventech", "Advantech ReadBitAsync Start" );
 				while (true)
 				{
 					if (_isConnected)
@@ -124,7 +124,7 @@ namespace DamoOneVision.Services
 					}
 					else
 					{
-						Logger.WriteLine( "Advantech Not Connected. ReadBitAsync Stop" );
+						Logger.WriteLine( "INFO", "Adventech", "Advantech Not Connected. ReadBitAsync Stop" );
 						break;
 					}
 					await Task.Delay( 1 );

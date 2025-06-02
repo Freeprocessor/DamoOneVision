@@ -358,7 +358,7 @@ namespace DamoOneVision.ViewModels
 			// 2) 두 경우 모두 이름이 비어 있으면 취소
 			if (string.IsNullOrWhiteSpace( targetName ))
 			{
-				Logger.WriteLine( "저장할 모델 이름이 지정되지 않았습니다." );
+				Logger.WriteLine( "WARN", "SettingVM", "저장할 모델 이름이 지정되지 않았습니다." );
 				return;
 			}
 
@@ -390,7 +390,7 @@ namespace DamoOneVision.ViewModels
 				MIL_ID image = _cameraService.GetImage();
 				if (image == MIL.M_NULL)
 				{
-					Logger.WriteLine( "기준 온도 계산용 이미지가 없습니다." );
+					Logger.WriteLine( "WARN", "SettingVM", "기준 온도 계산용 이미지가 없습니다." );
 					MessageBox.Show( "기준 온도 계산용 이미지가 없습니다.\n기존 설정값으로 대체합니다." );
 				}
 				else
@@ -398,7 +398,7 @@ namespace DamoOneVision.ViewModels
 					foreach (var model in InfraredCameraModels)
 					{
 						model.ReferenceBaseTemperature = CalculateReferenceRoiAverage( image );
-						Logger.WriteLine( $"모델 기준 온도 저장됨: {model.ReferenceBaseTemperature}" );
+						Logger.WriteLine( "INFO", "SettingVM", $"모델 기준 온도 저장됨: {model.ReferenceBaseTemperature}" );
 					}
 				}
 			}
@@ -458,7 +458,7 @@ namespace DamoOneVision.ViewModels
 				InfraredCameraModels.Clear();
 				SelectedInfraredCameraModel = null;
 				SelectedModelName = "";
-				Logger.WriteLine( "모델이 삭제되었습니다." );
+				Logger.WriteLine( "INFO", "SettingVM", "모델이 삭제되었습니다." );
 			}
 		}
 
@@ -671,7 +671,7 @@ namespace DamoOneVision.ViewModels
 			var result = await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
 			if (result == null)
 			{
-				Logger.WriteLine( "ConversionImage 결과가 null입니다." );
+				Logger.WriteLine( "ERROR", "SettingVM", "ConversionImage 결과가 null입니다." );
 				return;
 			}
 
@@ -702,17 +702,17 @@ namespace DamoOneVision.ViewModels
 			_isImageDisplay = true;
 			if (SelectedInfraredCameraModel == null)
 			{
-				Logger.WriteLine( "모델정보가 없습니다." );
+				Logger.WriteLine( "WARN", "SettingVM", "모델정보가 없습니다." );
 				return;
 			}
 			else if (_cameraService.GetImage() == MIL.M_NULL)
 			{
-				Logger.WriteLine( "이미지 데이터가 없습니다." );
+				Logger.WriteLine( "WARN", "SettingVM", "이미지 데이터가 없습니다." );
 				return;
 			}
 			else if (_cameraService.ImageData() == null)
 			{
-				Logger.WriteLine( "이미지 데이터가 없습니다.(ImageData)" );
+				Logger.WriteLine( "WARN", "SettingVM", "이미지 데이터가 없습니다.(ImageData)" );
 			}
 
 
@@ -723,7 +723,7 @@ namespace DamoOneVision.ViewModels
 					var result = await Conversion.InfraredCameraModel( true, _isBinarized, _cameraService.GetBinarizedImage(), _cameraService.GetScaleImage(), _cameraService.GetImage(), _cameraService._infraredCameraDisplay, SelectedInfraredCameraModel );
 					if (result == null)
 					{
-						Logger.WriteLine( "ConversionImage 결과가 null입니다." );
+						Logger.WriteLine( "ERROR", "SettingVM", "ConversionImage 결과가 null입니다." );
 						return;
 					}
 					if (result.IsGood)

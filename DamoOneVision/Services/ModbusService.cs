@@ -52,11 +52,11 @@ namespace DamoOneVision.Services
 				var factory = new ModbusFactory();          // ModbusFactory 선언
 				_master = factory.CreateMaster( _tcpClient ); // IModbusMaster 초기화
 				_connected = true;
-				Logger.WriteLine( "Modbus Connect Success" );
+				Logger.WriteLine( "INFO", "ModbusService", "Modbus Connect Success" );
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				_connected = false;
 			}
 
@@ -151,7 +151,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				return -1;
 			}
 		}
@@ -166,7 +166,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				return null;
 			}
 		}
@@ -181,7 +181,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				return null;
 			}
 		}
@@ -196,7 +196,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				return -1;
 			}
 		}
@@ -211,7 +211,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 				return null;
 			}
 		}
@@ -252,7 +252,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 				return null;
 			}
 		}
@@ -292,7 +292,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 				return -1;
 			}
 		}
@@ -307,7 +307,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 				return -1;
 			}
 		}
@@ -351,7 +351,7 @@ namespace DamoOneVision.Services
 						}
 						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
 						{
-							Logger.WriteLine( "SelfHolding operation timed out." );
+							Logger.WriteLine( "ERROR", "ModbusService", "SelfHolding operation timed out." );
 							throw new TimeoutException( "SelfHolding operation timed out." );
 						}
 						//Thread.Sleep( 10 );
@@ -360,7 +360,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 			}
 
 		}
@@ -385,7 +385,7 @@ namespace DamoOneVision.Services
 						}
 						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
 						{
-							Logger.WriteLine( "SelfHolding operation timed out." );
+							Logger.WriteLine( "ERROR", "ModbusService", "SelfHolding operation timed out." );
 							throw new TimeoutException( "SelfHolding operation timed out." );
 						}
 						//Thread.Sleep( 10 );
@@ -394,7 +394,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 			}
 
 		}
@@ -419,7 +419,7 @@ namespace DamoOneVision.Services
 						}
 						if ((DateTime.Now - startTime).TotalMilliseconds > 5000) // 5초 타임아웃
 						{
-							Logger.WriteLine( "SelfHolding operation timed out." );
+							Logger.WriteLine( "INFO", "ModbusService", "SelfHolding operation timed out." );
 							throw new TimeoutException( "SelfHolding operation timed out." );
 						}
 						//Thread.Sleep( 10 );
@@ -428,7 +428,7 @@ namespace DamoOneVision.Services
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine("ERROR", "ModbusService", ex.Message );
 			}
 
 		}
@@ -473,7 +473,7 @@ namespace DamoOneVision.Services
 				await Task.Run( ( ) =>
 				{
 					_lifeBitStatus = true;
-					Logger.WriteLine( "LifeBit ON" );
+					Logger.WriteLine( "INFO", "ModbusService", "LifeBit ON" );
 					ushort i = 0;
 					while (_connected)
 					{
@@ -508,12 +508,12 @@ namespace DamoOneVision.Services
 						System.Threading.Thread.Sleep( 1000 );
 					}
 					_lifeBitStatus = false;
-					Logger.WriteLine( "LifeBit OFF" );
+					Logger.WriteLine( "INFO", "ModbusService", "LifeBit OFF" );
 				} );
 			}
 			catch (Exception ex)
 			{
-				Logger.WriteLine( ex.Message );
+				Logger.WriteLine( "ERROR", "ModbusService", ex.Message );
 			}
 		}
 
